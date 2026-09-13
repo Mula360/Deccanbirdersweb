@@ -1,0 +1,220 @@
+{
+    "key": "group_site_settings",
+    "title": "Site Settings",
+    "fields": [
+        {
+            "key": "field_site_settings_footer_tagline",
+            "label": "Footer Tagline",
+            "name": "footer_tagline",
+            "aria-label": "",
+            "type": "textarea",
+            "instructions": "Shown in the footer under the logo.",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "",
+                "class": "",
+                "id": ""
+            },
+            "default_value": "",
+            "maxlength": "",
+            "rows": 3,
+            "placeholder": "",
+            "new_lines": ""
+        },
+        {
+            "key": "field_site_settings_contact_address",
+            "label": "Contact Address",
+            "name": "contact_address",
+            "aria-label": "",
+            "type": "textarea",
+            "instructions": "",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "",
+                "class": "",
+                "id": ""
+            },
+            "default_value": "",
+            "maxlength": "",
+            "rows": 3,
+            "placeholder": "",
+            "new_lines": "br"
+        },
+        {
+            "key": "field_site_settings_contact_phone",
+            "label": "Contact Phone",
+            "name": "contact_phone",
+            "aria-label": "",
+            "type": "text",
+            "instructions": "",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "",
+                "class": "",
+                "id": ""
+            },
+            "default_value": "",
+            "maxlength": "",
+            "placeholder": "",
+            "prepend": "",
+            "append": ""
+        },
+        {
+            "key": "field_site_settings_contact_whatsapp",
+            "label": "Contact WhatsApp",
+            "name": "contact_whatsapp",
+            "aria-label": "",
+            "type": "text",
+            "instructions": "10-digit number, no country code (used to build a wa.me link).",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "",
+                "class": "",
+                "id": ""
+            },
+            "default_value": "",
+            "maxlength": "",
+            "placeholder": "",
+            "prepend": "",
+            "append": ""
+        },
+        {
+            "key": "field_site_settings_social_ebird",
+            "label": "Social eBird",
+            "name": "social_ebird",
+            "aria-label": "",
+            "type": "url",
+            "instructions": "",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "",
+                "class": "",
+                "id": ""
+            },
+            "default_value": "",
+            "placeholder": "https://ebird.org/region/IN-TG"
+        },
+        {
+            "key": "field_site_settings_social_facebook",
+            "label": "Social Facebook",
+            "name": "social_facebook",
+            "aria-label": "",
+            "type": "url",
+            "instructions": "",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "",
+                "class": "",
+                "id": ""
+            },
+            "default_value": "",
+            "placeholder": "https://facebook.com/deccanbirders"
+        },
+        {
+            "key": "field_site_settings_db_api_base_url",
+            "label": "DB API Base URL",
+            "name": "db_api_base_url",
+            "aria-label": "",
+            "type": "text",
+            "instructions": "Paste your Vercel deployment URL. No trailing slash.",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "",
+                "class": "",
+                "id": ""
+            },
+            "default_value": "",
+            "maxlength": "",
+            "placeholder": "https://deccan-birders-api.vercel.app",
+            "prepend": "",
+            "append": ""
+        },
+        {
+            "key": "field_site_settings_db_member_count",
+            "label": "DB Member Count",
+            "name": "db_member_count",
+            "aria-label": "",
+            "type": "number",
+            "instructions": "",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "",
+                "class": "",
+                "id": ""
+            },
+            "default_value": 570,
+            "placeholder": "",
+            "min": "",
+            "max": "",
+            "step": "",
+            "prepend": "",
+            "append": ""
+        },
+        {
+            "key": "field_site_settings_db_years_active",
+            "label": "DB Years Active",
+            "name": "db_years_active",
+            "aria-label": "",
+            "type": "number",
+            "instructions": "",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "",
+                "class": "",
+                "id": ""
+            },
+            "default_value": 45,
+            "placeholder": "",
+            "min": "",
+            "max": "",
+            "step": "",
+            "prepend": "",
+            "append": ""
+        },
+        {
+            "key": "field_site_settings_db_membership_form_url",
+            "label": "DB Membership Form URL",
+            "name": "db_membership_form_url",
+            "aria-label": "",
+            "type": "url",
+            "instructions": "Google Form URL for membership applications",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "",
+                "class": "",
+                "id": ""
+            },
+            "default_value": "",
+            "placeholder": ""
+        }
+    ],
+    "location": [
+        [
+            {
+                "param": "options_page",
+                "operator": "==",
+                "value": "site-settings"
+            }
+        ]
+    ],
+    "menu_order": 0,
+    "position": "normal",
+    "style": "default",
+    "label_placement": "top",
+    "instruction_placement": "label",
+    "hide_on_screen": "",
+    "active": true,
+    "description": "",
+    "show_in_rest": 0,
+    "modified": 1789257600
+}

@@ -1,0 +1,313 @@
+{
+    "key": "group_events_fields",
+    "title": "Event Details",
+    "fields": [
+        {
+            "key": "field_events_event_date",
+            "label": "Event Date",
+            "name": "event_date",
+            "aria-label": "",
+            "type": "date_picker",
+            "instructions": "",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "",
+                "class": "",
+                "id": ""
+            },
+            "display_format": "d/m/Y",
+            "return_format": "Y-m-d",
+            "first_day": 1
+        },
+        {
+            "key": "field_events_event_type",
+            "label": "Event Type",
+            "name": "event_type",
+            "aria-label": "",
+            "type": "select",
+            "instructions": "",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "",
+                "class": "",
+                "id": ""
+            },
+            "choices": {
+                "Field Trip": "Field Trip",
+                "Bird Walk": "Bird Walk",
+                "Webinar": "Webinar",
+                "Nature Camp": "Nature Camp",
+                "Bird Race": "Bird Race",
+                "Census": "Census"
+            },
+            "default_value": "Field Trip",
+            "return_format": "value",
+            "multiple": 0,
+            "allow_null": 0,
+            "ui": 0,
+            "ajax": 0,
+            "placeholder": ""
+        },
+        {
+            "key": "field_events_location",
+            "label": "Location",
+            "name": "location",
+            "aria-label": "",
+            "type": "text",
+            "instructions": "",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "",
+                "class": "",
+                "id": ""
+            },
+            "default_value": "",
+            "maxlength": "",
+            "placeholder": "",
+            "prepend": "",
+            "append": ""
+        },
+        {
+            "key": "field_events_meeting_point",
+            "label": "Meeting Point",
+            "name": "meeting_point",
+            "aria-label": "",
+            "type": "text",
+            "instructions": "Specific meeting spot within the location",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "",
+                "class": "",
+                "id": ""
+            },
+            "default_value": "",
+            "maxlength": "",
+            "placeholder": "",
+            "prepend": "",
+            "append": ""
+        },
+        {
+            "key": "field_events_start_time",
+            "label": "Start Time",
+            "name": "start_time",
+            "aria-label": "",
+            "type": "time_picker",
+            "instructions": "",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "",
+                "class": "",
+                "id": ""
+            },
+            "display_format": "g:i a",
+            "return_format": "H:i"
+        },
+        {
+            "key": "field_events_leader",
+            "label": "Leader",
+            "name": "leader",
+            "aria-label": "",
+            "type": "text",
+            "instructions": "",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "",
+                "class": "",
+                "id": ""
+            },
+            "default_value": "",
+            "maxlength": "",
+            "placeholder": "",
+            "prepend": "",
+            "append": ""
+        },
+        {
+            "key": "field_events_notes",
+            "label": "Notes",
+            "name": "notes",
+            "aria-label": "",
+            "type": "textarea",
+            "instructions": "",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "",
+                "class": "",
+                "id": ""
+            },
+            "default_value": "",
+            "maxlength": "",
+            "rows": 3,
+            "placeholder": "",
+            "new_lines": ""
+        },
+        {
+            "key": "field_events_loaner_bins",
+            "label": "Loaner Bins",
+            "name": "loaner_bins",
+            "aria-label": "",
+            "type": "true_false",
+            "instructions": "",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "",
+                "class": "",
+                "id": ""
+            },
+            "message": "Loaner binoculars available",
+            "default_value": 0,
+            "ui": 1,
+            "ui_on_text": "",
+            "ui_off_text": ""
+        },
+        {
+            "key": "field_events_entry_fee",
+            "label": "Entry Fee",
+            "name": "entry_fee",
+            "aria-label": "",
+            "type": "number",
+            "instructions": "Leave blank if free",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "",
+                "class": "",
+                "id": ""
+            },
+            "default_value": "",
+            "placeholder": "",
+            "min": "",
+            "max": "",
+            "step": "",
+            "prepend": "₹",
+            "append": ""
+        },
+        {
+            "key": "field_events_is_past",
+            "label": "Is Past",
+            "name": "is_past",
+            "aria-label": "",
+            "type": "true_false",
+            "instructions": "",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "",
+                "class": "",
+                "id": ""
+            },
+            "message": "Mark as past event",
+            "default_value": 0,
+            "ui": 1,
+            "ui_on_text": "",
+            "ui_off_text": ""
+        },
+        {
+            "key": "field_events_report_link",
+            "label": "Report Link",
+            "name": "report_link",
+            "aria-label": "",
+            "type": "url",
+            "instructions": "Link to PITTA report if published",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "",
+                "class": "",
+                "id": ""
+            },
+            "default_value": "",
+            "placeholder": ""
+        },
+        {
+            "key": "field_events_species_count",
+            "label": "Species Count",
+            "name": "species_count",
+            "aria-label": "",
+            "type": "number",
+            "instructions": "Fill after the trip",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "",
+                "class": "",
+                "id": ""
+            },
+            "default_value": "",
+            "placeholder": "",
+            "min": "",
+            "max": "",
+            "step": "",
+            "prepend": "",
+            "append": ""
+        },
+        {
+            "key": "field_events_turnout",
+            "label": "Turnout",
+            "name": "turnout",
+            "aria-label": "",
+            "type": "number",
+            "instructions": "Number of participants",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "",
+                "class": "",
+                "id": ""
+            },
+            "default_value": "",
+            "placeholder": "",
+            "min": "",
+            "max": "",
+            "step": "",
+            "prepend": "",
+            "append": ""
+        },
+        {
+            "key": "field_events_highlights",
+            "label": "Highlights",
+            "name": "highlights",
+            "aria-label": "",
+            "type": "textarea",
+            "instructions": "2-3 sentences for the website",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "",
+                "class": "",
+                "id": ""
+            },
+            "default_value": "",
+            "maxlength": "",
+            "rows": 3,
+            "placeholder": "",
+            "new_lines": ""
+        }
+    ],
+    "location": [
+        [
+            {
+                "param": "post_type",
+                "operator": "==",
+                "value": "db_event"
+            }
+        ]
+    ],
+    "menu_order": 0,
+    "position": "normal",
+    "style": "default",
+    "label_placement": "top",
+    "instruction_placement": "label",
+    "hide_on_screen": "",
+    "active": true,
+    "description": "",
+    "show_in_rest": 0,
+    "modified": 1789257600
+}

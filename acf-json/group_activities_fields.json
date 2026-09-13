@@ -1,0 +1,164 @@
+{
+    "key": "group_activities_fields",
+    "title": "Activities Page",
+    "fields": [
+        {
+            "key": "field_activities_activities",
+            "label": "Activities",
+            "name": "activities",
+            "aria-label": "",
+            "type": "repeater",
+            "instructions": "",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "",
+                "class": "",
+                "id": ""
+            },
+            "collapsed": "field_activities_activities_activity_title",
+            "min": 0,
+            "max": 0,
+            "layout": "block",
+            "button_label": "Add activity",
+            "sub_fields": [
+                {
+                    "key": "field_activities_activities_activity_title",
+                    "label": "Activity Title",
+                    "name": "activity_title",
+                    "aria-label": "",
+                    "type": "text",
+                    "instructions": "",
+                    "required": 0,
+                    "conditional_logic": 0,
+                    "wrapper": {
+                        "width": "",
+                        "class": "",
+                        "id": ""
+                    },
+                    "default_value": "",
+                    "maxlength": "",
+                    "placeholder": "",
+                    "prepend": "",
+                    "append": ""
+                },
+                {
+                    "key": "field_activities_activities_activity_cadence",
+                    "label": "Activity Cadence",
+                    "name": "activity_cadence",
+                    "aria-label": "",
+                    "type": "text",
+                    "instructions": "e.g. Second Sunday, monthly",
+                    "required": 0,
+                    "conditional_logic": 0,
+                    "wrapper": {
+                        "width": "",
+                        "class": "",
+                        "id": ""
+                    },
+                    "default_value": "",
+                    "maxlength": "",
+                    "placeholder": "",
+                    "prepend": "",
+                    "append": ""
+                },
+                {
+                    "key": "field_activities_activities_activity_description",
+                    "label": "Activity Description",
+                    "name": "activity_description",
+                    "aria-label": "",
+                    "type": "wysiwyg",
+                    "instructions": "",
+                    "required": 0,
+                    "conditional_logic": 0,
+                    "wrapper": {
+                        "width": "",
+                        "class": "",
+                        "id": ""
+                    },
+                    "default_value": "",
+                    "tabs": "all",
+                    "toolbar": "basic",
+                    "media_upload": 0,
+                    "delay": 0
+                },
+                {
+                    "key": "field_activities_activities_activity_image",
+                    "label": "Activity Image",
+                    "name": "activity_image",
+                    "aria-label": "",
+                    "type": "image",
+                    "instructions": "",
+                    "required": 0,
+                    "conditional_logic": 0,
+                    "wrapper": {
+                        "width": "",
+                        "class": "",
+                        "id": ""
+                    },
+                    "return_format": "array",
+                    "preview_size": "medium",
+                    "library": "all",
+                    "min_width": "",
+                    "min_height": "",
+                    "min_size": "",
+                    "max_width": "",
+                    "max_height": "",
+                    "max_size": "",
+                    "mime_types": ""
+                }
+            ],
+            "default_value": [
+                {
+                    "activity_title": "Monthly Bird Walks",
+                    "activity_cadence": "Second Sunday, monthly",
+                    "activity_description": "<p>Easy, beginner-friendly walks at accessible city birding spots like KBR National Park. A great way to start birding, with experienced members on hand to help with identification.</p>"
+                },
+                {
+                    "activity_title": "Field Trips",
+                    "activity_cadence": "Monthly, weekends",
+                    "activity_description": "<p>Full-day excursions to lakes, forests, and reservoirs around Hyderabad and the wider Deccan Plateau, in search of a wider range of species than city parks allow.</p>"
+                },
+                {
+                    "activity_title": "Waterfowl Census",
+                    "activity_cadence": "Annually, January",
+                    "activity_description": "<p>An annual citizen-science count of waterbirds across the region's major lakes and wetlands, contributing data to national and international waterbird monitoring efforts.</p>"
+                },
+                {
+                    "activity_title": "Bird Race",
+                    "activity_cadence": "Annually, November",
+                    "activity_description": "<p>A friendly one-day competitive birdwatching event where teams compete to spot the highest number of species, promoting both birding skill and camaraderie.</p>"
+                },
+                {
+                    "activity_title": "Nature Camps",
+                    "activity_cadence": "Twice yearly",
+                    "activity_description": "<p>Overnight and multi-day camps for members and students at biodiversity-rich locations, combining birdwatching with broader nature education.</p>"
+                },
+                {
+                    "activity_title": "Webinars & Talks",
+                    "activity_cadence": "Monthly, online",
+                    "activity_description": "<p>Online talks by naturalists, researchers, and photographers on topics ranging from bird identification to conservation science, open to members and the public.</p>"
+                }
+            ]
+        }
+    ],
+    "location": [
+        [
+            {
+                "param": "page",
+                "operator": "==",
+                "value": "5"
+            }
+        ]
+    ],
+    "menu_order": 0,
+    "position": "normal",
+    "style": "default",
+    "label_placement": "top",
+    "instruction_placement": "label",
+    "hide_on_screen": "",
+    "active": true,
+    "description": "Location rule (Page == a specific page) is a placeholder for the page with slug \"activities\" — ACF has no native slug-matching rule, so once that page exists, open this field group and reselect it in Location so the stored ID matches.",
+    "show_in_rest": 0,
+    "modified": 1789257600
+}

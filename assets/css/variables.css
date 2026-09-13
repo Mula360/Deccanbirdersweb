@@ -1,0 +1,22 @@
+:root {
+  --ink:           #16241D;
+  --surface:       #F5F8F6;
+  --blue:          #2B72B8;
+  --blue-dark:     #1a5a9a;
+  --blue-light:    #EAF2FA;
+  --green:         #17924C;
+  --green-dark:    #0F7A3E;
+  --green-light:   #E6F4EC;
+  --yellow:        #F2B705;
+  --text-body:     #41514A;
+  --text-muted:    #5C6B63;
+  --border:        #DDE5DF;
+  --border-light:  #E7EDE9;
+  --radius-card:   16px;
+  --radius-btn:    999px;
+  --radius-sm:     8px;
+  --font-head:     'Sora', sans-serif;
+  --font-body:     'Source Sans 3', sans-serif;
+  --max-w:         1180px;
+  --pad-section:   80px 20px;
+}

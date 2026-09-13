@@ -1,0 +1,245 @@
+{
+    "key": "group_about_fields",
+    "title": "About Page",
+    "fields": [
+        {
+            "key": "field_about_intro",
+            "label": "About Intro",
+            "name": "about_intro",
+            "aria-label": "",
+            "type": "wysiwyg",
+            "instructions": "",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "",
+                "class": "",
+                "id": ""
+            },
+            "default_value": "",
+            "tabs": "all",
+            "toolbar": "basic",
+            "media_upload": 0,
+            "delay": 0
+        },
+        {
+            "key": "field_about_milestones",
+            "label": "Milestones",
+            "name": "milestones",
+            "aria-label": "",
+            "type": "repeater",
+            "instructions": "Society history timeline.",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "",
+                "class": "",
+                "id": ""
+            },
+            "collapsed": "field_about_milestones_milestone_text",
+            "min": 0,
+            "max": 0,
+            "layout": "table",
+            "button_label": "Add milestone",
+            "sub_fields": [
+                {
+                    "key": "field_about_milestones_milestone_year",
+                    "label": "Milestone Year",
+                    "name": "milestone_year",
+                    "aria-label": "",
+                    "type": "number",
+                    "instructions": "",
+                    "required": 0,
+                    "conditional_logic": 0,
+                    "wrapper": {
+                        "width": "",
+                        "class": "",
+                        "id": ""
+                    },
+                    "default_value": "",
+                    "placeholder": "",
+                    "min": "",
+                    "max": "",
+                    "step": "",
+                    "prepend": "",
+                    "append": ""
+                },
+                {
+                    "key": "field_about_milestones_milestone_text",
+                    "label": "Milestone Text",
+                    "name": "milestone_text",
+                    "aria-label": "",
+                    "type": "text",
+                    "instructions": "",
+                    "required": 0,
+                    "conditional_logic": 0,
+                    "wrapper": {
+                        "width": "",
+                        "class": "",
+                        "id": ""
+                    },
+                    "default_value": "",
+                    "maxlength": "",
+                    "placeholder": "",
+                    "prepend": "",
+                    "append": ""
+                }
+            ],
+            "default_value": [
+                { "milestone_year": 1980, "milestone_text": "Founded as the Birdwatchers' Society of Andhra Pradesh (BSAP)" },
+                { "milestone_year": 1984, "milestone_text": "First issue of PITTA, the society's newsletter, published" },
+                { "milestone_year": 1991, "milestone_text": "First organized waterfowl census conducted across Hyderabad's lakes" },
+                { "milestone_year": 2014, "milestone_text": "Renamed Deccan Birders after the bifurcation of Andhra Pradesh" },
+                { "milestone_year": 2020, "milestone_text": "Online talks and webinars launched to reach members during the pandemic" },
+                { "milestone_year": 2026, "milestone_text": "Current Executive Committee term begins" }
+            ]
+        },
+        {
+            "key": "field_about_committee_members",
+            "label": "Committee Members",
+            "name": "committee_members",
+            "aria-label": "",
+            "type": "repeater",
+            "instructions": "",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "",
+                "class": "",
+                "id": ""
+            },
+            "collapsed": "field_about_committee_members_member_name",
+            "min": 0,
+            "max": 0,
+            "layout": "block",
+            "button_label": "Add member",
+            "sub_fields": [
+                {
+                    "key": "field_about_committee_members_member_name",
+                    "label": "Member Name",
+                    "name": "member_name",
+                    "aria-label": "",
+                    "type": "text",
+                    "instructions": "",
+                    "required": 1,
+                    "conditional_logic": 0,
+                    "wrapper": {
+                        "width": "",
+                        "class": "",
+                        "id": ""
+                    },
+                    "default_value": "",
+                    "maxlength": "",
+                    "placeholder": "",
+                    "prepend": "",
+                    "append": ""
+                },
+                {
+                    "key": "field_about_committee_members_member_role",
+                    "label": "Member Role",
+                    "name": "member_role",
+                    "aria-label": "",
+                    "type": "text",
+                    "instructions": "",
+                    "required": 1,
+                    "conditional_logic": 0,
+                    "wrapper": {
+                        "width": "",
+                        "class": "",
+                        "id": ""
+                    },
+                    "default_value": "",
+                    "maxlength": "",
+                    "placeholder": "",
+                    "prepend": "",
+                    "append": ""
+                },
+                {
+                    "key": "field_about_committee_members_member_email",
+                    "label": "Member Email",
+                    "name": "member_email",
+                    "aria-label": "",
+                    "type": "email",
+                    "instructions": "",
+                    "required": 0,
+                    "conditional_logic": 0,
+                    "wrapper": {
+                        "width": "",
+                        "class": "",
+                        "id": ""
+                    },
+                    "default_value": "",
+                    "placeholder": "",
+                    "prepend": "",
+                    "append": ""
+                },
+                {
+                    "key": "field_about_committee_members_member_photo",
+                    "label": "Member Photo",
+                    "name": "member_photo",
+                    "aria-label": "",
+                    "type": "image",
+                    "instructions": "",
+                    "required": 0,
+                    "conditional_logic": 0,
+                    "wrapper": {
+                        "width": "",
+                        "class": "",
+                        "id": ""
+                    },
+                    "return_format": "array",
+                    "preview_size": "medium",
+                    "library": "all",
+                    "min_width": "",
+                    "min_height": "",
+                    "min_size": "",
+                    "max_width": "",
+                    "max_height": "",
+                    "max_size": "",
+                    "mime_types": ""
+                },
+                {
+                    "key": "field_about_committee_members_member_display_order",
+                    "label": "Member Display Order",
+                    "name": "member_display_order",
+                    "aria-label": "",
+                    "type": "number",
+                    "instructions": "",
+                    "required": 0,
+                    "conditional_logic": 0,
+                    "wrapper": {
+                        "width": "",
+                        "class": "",
+                        "id": ""
+                    },
+                    "default_value": 0,
+                    "placeholder": "",
+                    "min": "",
+                    "max": "",
+                    "step": "",
+                    "prepend": "",
+                    "append": ""
+                }
+            ]
+        }
+    ],
+    "location": [
+        [
+            {
+                "param": "page",
+                "operator": "==",
+                "value": "3"
+            }
+        ]
+    ],
+    "menu_order": 0,
+    "position": "normal",
+    "style": "default",
+    "label_placement": "top",
+    "instruction_placement": "label",
+    "hide_on_screen": "",
+    "active": true,
+    "description": "Location rule (Page == a specific page) is a placeholder for the page with slug \"about\" — ACF has no native slug-matching rule, so once that page exists, open this field group and reselect it in Location so the stored ID matches.",
+    "show_in_rest": 0,
+    "modified": 1789257600
+}

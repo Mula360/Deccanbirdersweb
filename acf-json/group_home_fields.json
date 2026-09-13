@@ -1,0 +1,309 @@
+{
+    "key": "group_home_fields",
+    "title": "Home Page",
+    "fields": [
+        {
+            "key": "field_home_hero_badge",
+            "label": "Hero Badge",
+            "name": "hero_badge",
+            "aria-label": "",
+            "type": "text",
+            "instructions": "",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "",
+                "class": "",
+                "id": ""
+            },
+            "default_value": "Founded 1980 · Hyderabad",
+            "maxlength": "",
+            "placeholder": "",
+            "prepend": "",
+            "append": ""
+        },
+        {
+            "key": "field_home_hero_title",
+            "label": "Hero Title",
+            "name": "hero_title",
+            "aria-label": "",
+            "type": "text",
+            "instructions": "",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "",
+                "class": "",
+                "id": ""
+            },
+            "default_value": "Spreading the message of bird conservation",
+            "maxlength": "",
+            "placeholder": "",
+            "prepend": "",
+            "append": ""
+        },
+        {
+            "key": "field_home_hero_subtitle",
+            "label": "Hero Subtitle",
+            "name": "hero_subtitle",
+            "aria-label": "",
+            "type": "textarea",
+            "instructions": "",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "",
+                "class": "",
+                "id": ""
+            },
+            "default_value": "Since 1980, the Deccan Birders have documented the birds of the Deccan Plateau through field trips, citizen science, and the monthly PITTA bulletin.",
+            "maxlength": "",
+            "rows": 3,
+            "placeholder": "",
+            "new_lines": ""
+        },
+        {
+            "key": "field_home_hero_bg_image",
+            "label": "Hero Background Image",
+            "name": "hero_bg_image",
+            "aria-label": "",
+            "type": "image",
+            "instructions": "",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "",
+                "class": "",
+                "id": ""
+            },
+            "return_format": "url",
+            "preview_size": "medium",
+            "library": "all",
+            "min_width": "",
+            "min_height": "",
+            "min_size": "",
+            "max_width": "",
+            "max_height": "",
+            "max_size": "",
+            "mime_types": ""
+        },
+        {
+            "key": "field_home_stats",
+            "label": "Stats",
+            "name": "stats",
+            "aria-label": "",
+            "type": "repeater",
+            "instructions": "",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "",
+                "class": "",
+                "id": ""
+            },
+            "collapsed": "field_home_stats_stat_number",
+            "min": 4,
+            "max": 4,
+            "layout": "table",
+            "button_label": "Add stat",
+            "sub_fields": [
+                {
+                    "key": "field_home_stats_stat_number",
+                    "label": "Stat Number",
+                    "name": "stat_number",
+                    "aria-label": "",
+                    "type": "text",
+                    "instructions": "",
+                    "required": 0,
+                    "conditional_logic": 0,
+                    "wrapper": {
+                        "width": "",
+                        "class": "",
+                        "id": ""
+                    },
+                    "default_value": "",
+                    "maxlength": "",
+                    "placeholder": "",
+                    "prepend": "",
+                    "append": ""
+                },
+                {
+                    "key": "field_home_stats_stat_label",
+                    "label": "Stat Label",
+                    "name": "stat_label",
+                    "aria-label": "",
+                    "type": "text",
+                    "instructions": "",
+                    "required": 0,
+                    "conditional_logic": 0,
+                    "wrapper": {
+                        "width": "",
+                        "class": "",
+                        "id": ""
+                    },
+                    "default_value": "",
+                    "maxlength": "",
+                    "placeholder": "",
+                    "prepend": "",
+                    "append": ""
+                }
+            ],
+            "default_value": [
+                { "stat_number": "1980", "stat_label": "Year founded" },
+                { "stat_number": "570+", "stat_label": "Active members" },
+                { "stat_number": "12", "stat_label": "PITTA issues yearly" },
+                { "stat_number": "45+", "stat_label": "Years of records" }
+            ]
+        },
+        {
+            "key": "field_home_bird_facts",
+            "label": "Bird Facts",
+            "name": "bird_facts",
+            "aria-label": "",
+            "type": "repeater",
+            "instructions": "Used by the [db_bird_fact] shortcode, which picks one at random.",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "",
+                "class": "",
+                "id": ""
+            },
+            "collapsed": "field_home_bird_facts_bird_name",
+            "min": 4,
+            "max": 12,
+            "layout": "table",
+            "button_label": "Add bird fact",
+            "sub_fields": [
+                {
+                    "key": "field_home_bird_facts_bird_name",
+                    "label": "Bird Name",
+                    "name": "bird_name",
+                    "aria-label": "",
+                    "type": "text",
+                    "instructions": "",
+                    "required": 0,
+                    "conditional_logic": 0,
+                    "wrapper": {
+                        "width": "",
+                        "class": "",
+                        "id": ""
+                    },
+                    "default_value": "",
+                    "maxlength": "",
+                    "placeholder": "",
+                    "prepend": "",
+                    "append": ""
+                },
+                {
+                    "key": "field_home_bird_facts_fact_text",
+                    "label": "Fact Text",
+                    "name": "fact_text",
+                    "aria-label": "",
+                    "type": "textarea",
+                    "instructions": "",
+                    "required": 0,
+                    "conditional_logic": 0,
+                    "wrapper": {
+                        "width": "",
+                        "class": "",
+                        "id": ""
+                    },
+                    "default_value": "",
+                    "maxlength": "",
+                    "rows": 3,
+                    "placeholder": "",
+                    "new_lines": ""
+                }
+            ],
+            "default_value": [
+                { "bird_name": "Indian Peafowl", "fact_text": "India's national bird — the male's iridescent train is a set of elongated upper tail coverts, not the bird's true tail feathers." },
+                { "bird_name": "Painted Stork", "fact_text": "Gets its pink flush from carotenoid pigments in the crustaceans it eats, the same mechanism that colours a flamingo." },
+                { "bird_name": "Sarus Crane", "fact_text": "The world's tallest flying bird, standing up to 1.8 metres, and one that mates for life." },
+                { "bird_name": "Indian Roller", "fact_text": "Named for the dramatic aerobatic rolls it performs during courtship display; it is Telangana's state bird." },
+                { "bird_name": "Purple Sunbird", "fact_text": "One of the smallest birds in the region — breeding males lose their iridescent plumage outside the breeding season." },
+                { "bird_name": "Black-necked Stork", "fact_text": "India's only stork with a resident breeding population; pairs form long-term bonds and rarely migrate." },
+                { "bird_name": "Amur Falcon", "fact_text": "Undertakes one of the longest migrations of any raptor, passing through Northeast India en route from Siberia to southern Africa." },
+                { "bird_name": "Great Indian Bustard", "fact_text": "One of the heaviest flying birds in the world, now critically endangered with fewer than 150 individuals left in the wild." }
+            ]
+        },
+        {
+            "key": "field_home_birding_jokes",
+            "label": "Birding Jokes",
+            "name": "birding_jokes",
+            "aria-label": "",
+            "type": "repeater",
+            "instructions": "Used by the [db_birding_joke] shortcode, which picks one at random.",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "",
+                "class": "",
+                "id": ""
+            },
+            "collapsed": "field_home_birding_jokes_joke_text",
+            "min": 4,
+            "max": 12,
+            "layout": "table",
+            "button_label": "Add joke",
+            "sub_fields": [
+                {
+                    "key": "field_home_birding_jokes_joke_text",
+                    "label": "Joke Text",
+                    "name": "joke_text",
+                    "aria-label": "",
+                    "type": "textarea",
+                    "instructions": "",
+                    "required": 0,
+                    "conditional_logic": 0,
+                    "wrapper": {
+                        "width": "",
+                        "class": "",
+                        "id": ""
+                    },
+                    "default_value": "",
+                    "maxlength": "",
+                    "rows": 3,
+                    "placeholder": "",
+                    "new_lines": ""
+                }
+            ],
+            "default_value": [
+                { "joke_text": "Why did the birder bring a ladder to the field trip? To get a better vantage on all the little tweets." },
+                { "joke_text": "Why don't birders ever get lost? They always follow the flyway." },
+                { "joke_text": "How do you know a birder had a bad day? They got a lifer and forgot to bring the binoculars." },
+                { "joke_text": "What did one owl say to the other after a long night of birding? 'Whooo's counting?'" },
+                { "joke_text": "Why did the sunbird refuse to share its nectar? It was feeling a little tweet-ish." },
+                { "joke_text": "What's a birder's favourite kind of music? Anything with a good warble." },
+                { "joke_text": "Why do birders make terrible secret keepers? They always spill the sighting." },
+                { "joke_text": "Why was the eBird checklist such an honest witness? It couldn't fudge a species it hadn't actually seen." }
+            ]
+        }
+    ],
+    "location": [
+        [
+            {
+                "param": "page_template",
+                "operator": "==",
+                "value": "front-page.php"
+            }
+        ],
+        [
+            {
+                "param": "page",
+                "operator": "==",
+                "value": "2"
+            }
+        ]
+    ],
+    "menu_order": 0,
+    "position": "normal",
+    "style": "default",
+    "label_placement": "top",
+    "instruction_placement": "label",
+    "hide_on_screen": "",
+    "active": true,
+    "description": "Second location rule (Page == a specific page) is a placeholder for the page with slug \"home\" — ACF has no native slug-matching rule, so once that page exists, open this field group and reselect it in Location so the stored ID matches.",
+    "show_in_rest": 0,
+    "modified": 1789257600
+}
