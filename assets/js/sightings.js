@@ -13,8 +13,8 @@
  *   </div>
  *
  *   <div class="region-toggle">
- *     <button class="region-btn active" data-region="IN-TG">Telangana</button>
- *     <button class="region-btn" data-region="IN-AP">Andhra Pradesh</button>
+ *     <button class="region-btn" data-region="IN-TG">Telangana</button>
+ *     <button class="region-btn active" data-region="IN-AP">Andhra Pradesh</button>
  *   </div>
  *
  *   <div class="tab-panel" id="sightings-notable" role="tabpanel"></div>
@@ -36,8 +36,11 @@
  *   <div id="home-sightings-rows"></div>
  */
 
+(function () {
+'use strict';
+
 const API      = (window.DB_CONFIG?.api_base || '').replace(/\/$/, '');
-let region     = new URLSearchParams(location.search).get('region') || 'IN-TG';
+let region     = new URLSearchParams(location.search).get('region') || 'IN-AP';
 let activeTab  = 'notable';
 let controller = null;
 
@@ -384,23 +387,25 @@ function renderOnThisDay(data) {
  * Tab switching
  * ---------------------------------------------------------------------- */
 
-document.querySelectorAll('.tab-btn').forEach((btn) => {
-  btn.addEventListener('click', async () => {
-    const tab = btn.dataset.tab;
-    activeTab = tab;
+function initTabSwitching() {
+  document.querySelectorAll('.tab-btn').forEach((btn) => {
+    btn.addEventListener('click', async () => {
+      const tab = btn.dataset.tab;
+      activeTab = tab;
 
-    document.querySelectorAll('.tab-btn').forEach((b) => {
-      b.classList.toggle('active', b === btn);
-      b.setAttribute('aria-selected', b === btn);
-    });
-    document.querySelectorAll('.tab-panel').forEach((p) => {
-      const isActive = p.id === `sightings-${tab}`;
-      p.hidden = !isActive;
-    });
+      document.querySelectorAll('.tab-btn').forEach((b) => {
+        b.classList.toggle('active', b === btn);
+        b.setAttribute('aria-selected', b === btn);
+      });
+      document.querySelectorAll('.tab-panel').forEach((p) => {
+        const isActive = p.id === `sightings-${tab}`;
+        p.hidden = !isActive;
+      });
 
-    await loadTab(tab);
+      await loadTab(tab);
+    });
   });
-});
+}
 
 async function loadTab(tab) {
   switch (tab) {
@@ -426,23 +431,25 @@ async function loadTab(tab) {
  * Region toggle
  * ---------------------------------------------------------------------- */
 
-document.querySelectorAll('.region-btn').forEach((btn) => {
-  btn.addEventListener('click', () => {
-    region = btn.dataset.region;
-    document.querySelectorAll('.region-btn').forEach((b) => b.classList.toggle('active', b === btn));
+function initRegionToggle() {
+  document.querySelectorAll('.region-btn').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      region = btn.dataset.region;
+      document.querySelectorAll('.region-btn').forEach((b) => b.classList.toggle('active', b === btn));
 
-    const url = new URL(location.href);
-    url.searchParams.set('region', region);
-    history.pushState({}, '', url);
+      const url = new URL(location.href);
+      url.searchParams.set('region', region);
+      history.pushState({}, '', url);
 
-    // Changing region invalidates any cached lookup index and hotspot data.
-    lookupIndex = null;
-    hotspotSpeciesCache.clear();
+      // Changing region invalidates any cached lookup index and hotspot data.
+      lookupIndex = null;
+      hotspotSpeciesCache.clear();
 
-    loadTab(activeTab);
-    loadOnThisDay();
+      loadTab(activeTab);
+      loadOnThisDay();
+    });
   });
-});
+}
 
 /* -------------------------------------------------------------------------
  * On This Day
@@ -476,6 +483,9 @@ async function initHomeStrip() {
  * ---------------------------------------------------------------------- */
 
 document.addEventListener('DOMContentLoaded', () => {
+  initTabSwitching();
+  initRegionToggle();
+
   if (document.getElementById('sightings-notable')) {
     // Full sightings page
     loadTab('notable');
@@ -485,3 +495,5 @@ document.addEventListener('DOMContentLoaded', () => {
     initHomeStrip();
   }
 });
+
+})();

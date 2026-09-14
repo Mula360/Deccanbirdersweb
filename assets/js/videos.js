@@ -4,6 +4,9 @@
  * endpoint (DB_CONFIG.api_base) at /api/videos.
  */
 
+(function () {
+'use strict';
+
 const API = (window.DB_CONFIG?.api_base || '').replace(/\/$/, '');
 
 function escapeHtml(str) {
@@ -54,3 +57,5 @@ async function initVideos() {
 }
 
 document.addEventListener('DOMContentLoaded', initVideos);
+
+})();

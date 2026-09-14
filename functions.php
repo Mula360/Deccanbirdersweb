@@ -55,7 +55,7 @@ add_action('wp_enqueue_scripts', function() {
     'api_base' => rtrim(get_option('db_api_base_url', 'https://deccan-birders-api.vercel.app'), '/'),
     'ajax_url' => admin_url('admin-ajax.php'),
     'nonce'    => wp_create_nonce('db_contact_nonce'),
-    'region'   => 'IN-TG',
+    'region'   => 'IN-AP',
   ]);
 });
 

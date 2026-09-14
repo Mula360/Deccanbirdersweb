@@ -9,6 +9,9 @@
  * WordPress, not the calendar.
  */
 
+(function () {
+'use strict';
+
 const API = (window.DB_CONFIG?.api_base || '').replace(/\/$/, '');
 
 /* -------------------------------------------------------------------------
@@ -202,17 +205,22 @@ async function initEventsPage() {
  * Tab switching on events page
  * ---------------------------------------------------------------------- */
 
-document.querySelectorAll('.tab-btn[data-tab]').forEach((btn) => {
-  btn.addEventListener('click', () => {
-    document.querySelectorAll('.tab-btn').forEach((b) => b.classList.toggle('active', b === btn));
-    document.querySelectorAll('.events-tab-panel').forEach((p) => {
-      p.hidden = p.id !== `events-${btn.dataset.tab}`;
+function initEventsTabSwitching() {
+  document.querySelectorAll('.tab-btn[data-tab]').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.tab-btn').forEach((b) => b.classList.toggle('active', b === btn));
+      document.querySelectorAll('.events-tab-panel').forEach((p) => {
+        p.hidden = p.id !== `events-${btn.dataset.tab}`;
+      });
     });
   });
-});
+}
 
 document.addEventListener('DOMContentLoaded', () => {
+  initEventsTabSwitching();
   initHomeEvents();
   initHomePastEvents();
   initEventsPage();
 });
+
+})();
