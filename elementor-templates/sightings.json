@@ -1,7 +1,7 @@
 {
   "content": [
     {
-      "id": "f1adeb2",
+      "id": "4852e0f",
       "elType": "section",
       "settings": {
         "background_background": "classic",
@@ -9,7 +9,7 @@
       },
       "elements": [
         {
-          "id": "4fe57a3",
+          "id": "cb62dc8",
           "elType": "column",
           "settings": {
             "_column_size": 100,
@@ -24,7 +24,7 @@
           },
           "elements": [
             {
-              "id": "967167a",
+              "id": "32fe400",
               "elType": "widget",
               "settings": {
                 "editor": "<p style=\"text-transform:uppercase;letter-spacing:.08em;font-size:12px;font-weight:700;font-family:Sora,sans-serif;color:#2B72B8;margin:0 0 8px;\">Live From eBird</p>"
@@ -33,7 +33,7 @@
               "widgetType": "text-editor"
             },
             {
-              "id": "b181f07",
+              "id": "9470043",
               "elType": "widget",
               "settings": {
                 "title": "Recent Sightings",
@@ -63,7 +63,7 @@
       "isInner": false
     },
     {
-      "id": "3af9539",
+      "id": "0896ae3",
       "elType": "section",
       "settings": {
         "background_background": "classic",
@@ -71,7 +71,7 @@
       },
       "elements": [
         {
-          "id": "9ed23f7",
+          "id": "871400a",
           "elType": "column",
           "settings": {
             "_column_size": 100,
@@ -87,7 +87,7 @@
           },
           "elements": [
             {
-              "id": "fd6c0ac",
+              "id": "fd387c9",
               "elType": "widget",
               "settings": {
                 "editor": "<p>Every record below is pulled from checklists submitted to eBird for the region. Submit yours and it appears here.</p>",
@@ -109,7 +109,7 @@
       "isInner": false
     },
     {
-      "id": "5e9ce50",
+      "id": "dd9198e",
       "elType": "section",
       "settings": {
         "background_background": "classic",
@@ -117,7 +117,7 @@
       },
       "elements": [
         {
-          "id": "4a15cdc",
+          "id": "d64f003",
           "elType": "column",
           "settings": {
             "_column_size": 100,
@@ -132,7 +132,7 @@
           },
           "elements": [
             {
-              "id": "2a2a138",
+              "id": "c64da72",
               "elType": "widget",
               "settings": {
                 "html": "<div class=\"region-toggle\" role=\"group\" aria-label=\"Region\">\n  <button class=\"region-btn active\" data-region=\"IN-TG\">Telangana</button>\n  <button class=\"region-btn\" data-region=\"IN-AP\">Andhra Pradesh</button>\n</div>\n<p class=\"sightings-updated-note\">Updated every 15 minutes</p>\n<div class=\"tab-bar\" role=\"tablist\">\n  <button role=\"tab\" class=\"tab-btn active\" data-tab=\"notable\" aria-selected=\"true\">Notable</button>\n  <button role=\"tab\" class=\"tab-btn\" data-tab=\"recent\" aria-selected=\"false\">All recent</button>\n  <button role=\"tab\" class=\"tab-btn\" data-tab=\"hotspots\" aria-selected=\"false\">Hotspots</button>\n</div>\n<div class=\"tab-panels\">\n  <div id=\"sightings-notable\" role=\"tabpanel\" class=\"tab-panel active\"></div>\n  <div id=\"sightings-recent\" role=\"tabpanel\" class=\"tab-panel\" hidden></div>\n  <div id=\"sightings-hotspots\" role=\"tabpanel\" class=\"tab-panel\" hidden></div>\n</div>"
@@ -147,7 +147,7 @@
       "isInner": false
     },
     {
-      "id": "f7bc5e3",
+      "id": "f84d071",
       "elType": "section",
       "settings": {
         "background_background": "classic",
@@ -155,7 +155,7 @@
       },
       "elements": [
         {
-          "id": "27721b8",
+          "id": "b7bc4f0",
           "elType": "column",
           "settings": {
             "_column_size": 100,
@@ -171,7 +171,7 @@
           },
           "elements": [
             {
-              "id": "f8724cf",
+              "id": "0316c8e",
               "elType": "widget",
               "settings": {
                 "editor": "<p style=\"text-transform:uppercase;letter-spacing:.1em;font-size:11px;font-weight:600;font-family:Sora,sans-serif;color:#2B72B8;margin:0 0 8px;\">Where Can I See It Now?</p>",
@@ -181,7 +181,7 @@
               "widgetType": "text-editor"
             },
             {
-              "id": "41c57cb",
+              "id": "41c41d0",
               "elType": "widget",
               "settings": {
                 "title": "Look up the nearest recent sighting of a species",
@@ -206,7 +206,7 @@
               "widgetType": "heading"
             },
             {
-              "id": "fac42f8",
+              "id": "3a92e65",
               "elType": "widget",
               "settings": {
                 "html": "<p>Type a species name. Results are the closest checklists in the last two weeks, with distance from Hyderabad.</p>\n<div class=\"autocomplete\">\n  <input type=\"search\" id=\"species-search-input\" class=\"autocomplete-input\" placeholder=\"Type a bird name...\" autocomplete=\"off\">\n  <div class=\"autocomplete-dropdown\" id=\"species-search-dropdown\" hidden></div>\n</div>\n<div id=\"species-search-results\"></div>"
@@ -221,7 +221,7 @@
       "isInner": false
     },
     {
-      "id": "2c216f9",
+      "id": "b37e616",
       "elType": "section",
       "settings": {
         "background_background": "classic",
@@ -229,7 +229,7 @@
       },
       "elements": [
         {
-          "id": "ed4a5fd",
+          "id": "a52b058",
           "elType": "column",
           "settings": {
             "_column_size": 100,
@@ -244,7 +244,7 @@
           },
           "elements": [
             {
-              "id": "2820b89",
+              "id": "3f6389f",
               "elType": "widget",
               "settings": {
                 "html": "<h2 class=\"otd-heading\">On this day — <span id=\"otd-date\"></span></h2>\n<div id=\"sightings-otd\"></div>\n<script>\n  var otdDateEl = document.getElementById('otd-date');\n  if (otdDateEl) {\n    otdDateEl.textContent = new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'long' });\n  }\n</script>"

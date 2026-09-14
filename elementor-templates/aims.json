@@ -1,7 +1,7 @@
 {
   "content": [
     {
-      "id": "e139c63",
+      "id": "4816661",
       "elType": "section",
       "settings": {
         "background_background": "classic",
@@ -9,7 +9,7 @@
       },
       "elements": [
         {
-          "id": "fcd9e8e",
+          "id": "0c7f384",
           "elType": "column",
           "settings": {
             "_column_size": 100,
@@ -24,7 +24,7 @@
           },
           "elements": [
             {
-              "id": "52de6bb",
+              "id": "2967dca",
               "elType": "widget",
               "settings": {
                 "editor": "<p style=\"text-transform:uppercase;letter-spacing:.08em;font-size:12px;font-weight:700;font-family:Sora,sans-serif;color:#2B72B8;margin:0 0 8px;\">The Society</p>"
@@ -33,7 +33,7 @@
               "widgetType": "text-editor"
             },
             {
-              "id": "e28e94d",
+              "id": "27dfceb",
               "elType": "widget",
               "settings": {
                 "title": "Aims and Objectives",
@@ -63,7 +63,7 @@
       "isInner": false
     },
     {
-      "id": "67463f4",
+      "id": "3006361",
       "elType": "section",
       "settings": {
         "background_background": "classic",
@@ -71,7 +71,7 @@
       },
       "elements": [
         {
-          "id": "36bb7f1",
+          "id": "1333da7",
           "elType": "column",
           "settings": {
             "_column_size": 100,
@@ -87,7 +87,7 @@
           },
           "elements": [
             {
-              "id": "031a7fd",
+              "id": "28f42f3",
               "elType": "widget",
               "settings": {
                 "shortcode": "[db_aims]"

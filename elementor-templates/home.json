@@ -1,7 +1,7 @@
 {
   "content": [
     {
-      "id": "2b7ca04",
+      "id": "47d8aee",
       "elType": "section",
       "settings": {
         "background_background": "classic",
@@ -16,7 +16,7 @@
       },
       "elements": [
         {
-          "id": "63a0a91",
+          "id": "2e93135",
           "elType": "column",
           "settings": {
             "_column_size": 70,
@@ -32,7 +32,7 @@
           },
           "elements": [
             {
-              "id": "318c448",
+              "id": "9ae294a",
               "elType": "widget",
               "settings": {
                 "editor": "<span style=\"display:inline-block;background:#F2B705;color:#16241D;padding:7px 18px;border-radius:999px;font-family:Sora,sans-serif;font-weight:600;font-size:13px;letter-spacing:.02em;\">Founded 1980 · Hyderabad</span>",
@@ -42,10 +42,10 @@
               "widgetType": "text-editor"
             },
             {
-              "id": "2a3b483",
+              "id": "95439fe",
               "elType": "widget",
               "settings": {
-                "title": "Spreading the message of bird conservation.",
+                "title": "Spreading the message of bird conservation across Telangana, Andhra Pradesh and India",
                 "header_size": "h1",
                 "align": "left",
                 "title_color": "#FFFFFF",
@@ -53,12 +53,12 @@
                 "typography_font_family": "Sora",
                 "typography_font_size": {
                   "unit": "px",
-                  "size": 64,
+                  "size": 56,
                   "sizes": []
                 },
                 "typography_font_size_mobile": {
                   "unit": "px",
-                  "size": 36,
+                  "size": 32,
                   "sizes": []
                 },
                 "typography_font_weight": "700"
@@ -67,10 +67,10 @@
               "widgetType": "heading"
             },
             {
-              "id": "c88489a",
+              "id": "2dd2315",
               "elType": "widget",
               "settings": {
-                "editor": "<p>Deccan Birders is a non-governmental organization with the primary objective of spreading the message of bird conservation across Telangana, Andhra Pradesh and India.</p>",
+                "editor": "<p>Deccan Birders is a non-governmental organization with the primary objective of spreading the message of bird conservation.</p>",
                 "text_color": "rgba(255,255,255,0.82)",
                 "typography_typography": "custom",
                 "typography_font_family": "Source Sans 3",
@@ -84,21 +84,21 @@
               "widgetType": "text-editor"
             },
             {
-              "id": "7068e88",
+              "id": "81b9978",
               "elType": "section",
               "settings": {
                 "gap": "narrow"
               },
               "elements": [
                 {
-                  "id": "e449642",
+                  "id": "02af8d0",
                   "elType": "column",
                   "settings": {
                     "_column_size": 50
                   },
                   "elements": [
                     {
-                      "id": "228b4a3",
+                      "id": "4fbb729",
                       "elType": "widget",
                       "settings": {
                         "text": "Apply for membership",
@@ -130,14 +130,14 @@
                   "isInner": true
                 },
                 {
-                  "id": "b1336a0",
+                  "id": "1b7a25d",
                   "elType": "column",
                   "settings": {
                     "_column_size": 50
                   },
                   "elements": [
                     {
-                      "id": "dd3d81f",
+                      "id": "2e38e6d",
                       "elType": "widget",
                       "settings": {
                         "text": "See our activities",
@@ -188,7 +188,7 @@
       "isInner": false
     },
     {
-      "id": "7eecb7f",
+      "id": "afd891f",
       "elType": "section",
       "settings": {
         "background_background": "classic",
@@ -206,7 +206,7 @@
       },
       "elements": [
         {
-          "id": "d96ddfe",
+          "id": "4f98db4",
           "elType": "column",
           "settings": {
             "_column_size": 25,
@@ -222,7 +222,7 @@
           },
           "elements": [
             {
-              "id": "03b0f4d",
+              "id": "91a3648",
               "elType": "widget",
               "settings": {
                 "starting_number": 0,
@@ -245,7 +245,7 @@
               "widgetType": "counter"
             },
             {
-              "id": "cb0257a",
+              "id": "df48a25",
               "elType": "widget",
               "settings": {
                 "editor": "<p style=\"text-align:center;color:#5C6B63;font-size:14px;margin:6px 0 0;\">Founded, as the Birdwatchers Society of Andhra Pradesh</p>",
@@ -258,7 +258,7 @@
           "isInner": false
         },
         {
-          "id": "829299f",
+          "id": "f0da0e2",
           "elType": "column",
           "settings": {
             "_column_size": 25,
@@ -274,7 +274,7 @@
           },
           "elements": [
             {
-              "id": "06870e4",
+              "id": "2723db1",
               "elType": "widget",
               "settings": {
                 "starting_number": 0,
@@ -297,7 +297,7 @@
               "widgetType": "counter"
             },
             {
-              "id": "386106c",
+              "id": "0155e08",
               "elType": "widget",
               "settings": {
                 "editor": "<p style=\"text-align:center;color:#5C6B63;font-size:14px;margin:6px 0 0;\">Members across the Deccan and beyond</p>",
@@ -310,7 +310,7 @@
           "isInner": false
         },
         {
-          "id": "02f0056",
+          "id": "48a3571",
           "elType": "column",
           "settings": {
             "_column_size": 25,
@@ -326,7 +326,7 @@
           },
           "elements": [
             {
-              "id": "99cdcff",
+              "id": "38a8ce7",
               "elType": "widget",
               "settings": {
                 "starting_number": 0,
@@ -349,7 +349,7 @@
               "widgetType": "counter"
             },
             {
-              "id": "53e46b9",
+              "id": "4f8c1a6",
               "elType": "widget",
               "settings": {
                 "editor": "<p style=\"text-align:center;color:#5C6B63;font-size:14px;margin:6px 0 0;\">Issues of PITTA published every year</p>",
@@ -362,7 +362,7 @@
           "isInner": false
         },
         {
-          "id": "47c2599",
+          "id": "bc1f8ce",
           "elType": "column",
           "settings": {
             "_column_size": 25,
@@ -378,7 +378,7 @@
           },
           "elements": [
             {
-              "id": "ac84d13",
+              "id": "e721fd2",
               "elType": "widget",
               "settings": {
                 "starting_number": 0,
@@ -401,7 +401,7 @@
               "widgetType": "counter"
             },
             {
-              "id": "db8ff41",
+              "id": "bf0edc8",
               "elType": "widget",
               "settings": {
                 "editor": "<p style=\"text-align:center;color:#5C6B63;font-size:14px;margin:6px 0 0;\">Years of field records and waterfowl counts</p>",
@@ -417,7 +417,7 @@
       "isInner": false
     },
     {
-      "id": "bd81197",
+      "id": "43268ce",
       "elType": "section",
       "settings": {
         "background_background": "classic",
@@ -425,7 +425,7 @@
       },
       "elements": [
         {
-          "id": "b6e8ce7",
+          "id": "2979a72",
           "elType": "column",
           "settings": {
             "_column_size": 100,
@@ -441,7 +441,7 @@
           },
           "elements": [
             {
-              "id": "2d27759",
+              "id": "e292a83",
               "elType": "widget",
               "settings": {
                 "editor": "<p style=\"text-transform:uppercase;letter-spacing:.1em;font-size:11px;font-weight:600;font-family:Sora,sans-serif;color:#17924C;margin:0 0 8px;\">Upcoming</p>",
@@ -451,7 +451,7 @@
               "widgetType": "text-editor"
             },
             {
-              "id": "432431b",
+              "id": "ccc2a7f",
               "elType": "widget",
               "settings": {
                 "title": "Come out with us",
@@ -476,7 +476,7 @@
               "widgetType": "heading"
             },
             {
-              "id": "a14df4a",
+              "id": "d07fc12",
               "elType": "widget",
               "settings": {
                 "editor": "<p>Trips run most weekends. Turn up, borrow a pair of binoculars, and put your name on the checklist.</p>",
@@ -492,7 +492,7 @@
               "widgetType": "text-editor"
             },
             {
-              "id": "3991cc9",
+              "id": "c3a58d6",
               "elType": "widget",
               "settings": {
                 "html": "<div class=\"events-grid\" id=\"home-events-grid\">\n  <div class=\"event-card\"><div class=\"date-block\"><span class=\"sk-block\" style=\"width:36px\"></span></div>\n    <div class=\"event-info\"><span class=\"sk-block\" style=\"width:70%;margin-bottom:8px\"></span><span class=\"sk-block\" style=\"width:50%\"></span></div></div>\n  <div class=\"event-card\"><div class=\"date-block\"><span class=\"sk-block\" style=\"width:36px\"></span></div>\n    <div class=\"event-info\"><span class=\"sk-block\" style=\"width:70%;margin-bottom:8px\"></span><span class=\"sk-block\" style=\"width:50%\"></span></div></div>\n  <div class=\"event-card\"><div class=\"date-block\"><span class=\"sk-block\" style=\"width:36px\"></span></div>\n    <div class=\"event-info\"><span class=\"sk-block\" style=\"width:70%;margin-bottom:8px\"></span><span class=\"sk-block\" style=\"width:50%\"></span></div></div>\n</div>"
@@ -501,7 +501,7 @@
               "widgetType": "html"
             },
             {
-              "id": "632ef69",
+              "id": "aa5ba12",
               "elType": "widget",
               "settings": {
                 "text": "Full calendar →",
@@ -546,7 +546,7 @@
       "isInner": false
     },
     {
-      "id": "0fdfb99",
+      "id": "a7f8f1c",
       "elType": "section",
       "settings": {
         "background_background": "classic",
@@ -554,7 +554,7 @@
       },
       "elements": [
         {
-          "id": "435c863",
+          "id": "8286d25",
           "elType": "column",
           "settings": {
             "_column_size": 100,
@@ -570,7 +570,7 @@
           },
           "elements": [
             {
-              "id": "733b3c7",
+              "id": "a110b3d",
               "elType": "widget",
               "settings": {
                 "title": "Where we've been",
@@ -589,7 +589,7 @@
               "widgetType": "heading"
             },
             {
-              "id": "91d468a",
+              "id": "c7678cb",
               "elType": "widget",
               "settings": {
                 "html": "<div class=\"past-events-grid\" id=\"home-past-events-grid\">\n  <div class=\"event-card past-event-card\"><div class=\"past-event-species\"><span class=\"sk-block\" style=\"width:24px\"></span></div>\n    <div class=\"event-info\"><span class=\"sk-block\" style=\"width:70%;margin-bottom:8px\"></span><span class=\"sk-block\" style=\"width:50%\"></span></div></div>\n  <div class=\"event-card past-event-card\"><div class=\"past-event-species\"><span class=\"sk-block\" style=\"width:24px\"></span></div>\n    <div class=\"event-info\"><span class=\"sk-block\" style=\"width:70%;margin-bottom:8px\"></span><span class=\"sk-block\" style=\"width:50%\"></span></div></div>\n  <div class=\"event-card past-event-card\"><div class=\"past-event-species\"><span class=\"sk-block\" style=\"width:24px\"></span></div>\n    <div class=\"event-info\"><span class=\"sk-block\" style=\"width:70%;margin-bottom:8px\"></span><span class=\"sk-block\" style=\"width:50%\"></span></div></div>\n</div>"
@@ -598,7 +598,7 @@
               "widgetType": "html"
             },
             {
-              "id": "98934b5",
+              "id": "0a3903a",
               "elType": "widget",
               "settings": {
                 "text": "All past events →",
@@ -643,7 +643,7 @@
       "isInner": false
     },
     {
-      "id": "de94a71",
+      "id": "6c1edbe",
       "elType": "section",
       "settings": {
         "background_background": "classic",
@@ -651,7 +651,7 @@
       },
       "elements": [
         {
-          "id": "f04368b",
+          "id": "88a76dc",
           "elType": "column",
           "settings": {
             "_column_size": 100,
@@ -667,7 +667,7 @@
           },
           "elements": [
             {
-              "id": "6f1ae96",
+              "id": "fe7a4f5",
               "elType": "widget",
               "settings": {
                 "editor": "<p style=\"text-transform:uppercase;letter-spacing:.1em;font-size:11px;font-weight:600;font-family:Sora,sans-serif;color:#17924C;margin:0 0 8px;\">What We Do</p>",
@@ -677,7 +677,7 @@
               "widgetType": "text-editor"
             },
             {
-              "id": "14c8fd2",
+              "id": "d4442bf",
               "elType": "widget",
               "settings": {
                 "title": "An array of activities",
@@ -702,7 +702,7 @@
               "widgetType": "heading"
             },
             {
-              "id": "c362be0",
+              "id": "c54151f",
               "elType": "widget",
               "settings": {
                 "editor": "<p>Deccan Birders organizes field trips, lectures, film and slide shows, nature camps, treks, waterfowl counts, bird ringing, etc.</p>",
@@ -718,7 +718,7 @@
               "widgetType": "text-editor"
             },
             {
-              "id": "ee4b4ce",
+              "id": "cdf9604",
               "elType": "widget",
               "settings": {
                 "html": "<div class=\"activity-preview-grid\"><div class=\"activity-preview-card\"><span class=\"activity-preview-cadence\">EVERY MONTH</span><span class=\"activity-preview-title\">Monthly Field Trips</span></div><div class=\"activity-preview-card\"><span class=\"activity-preview-cadence\">TWELVE ISSUES A YEAR</span><span class=\"activity-preview-title\">PITTA – Monthly Newsletter</span></div><div class=\"activity-preview-card\"><span class=\"activity-preview-cadence\">ONCE A YEAR</span><span class=\"activity-preview-title\">Annual Bird Race</span></div><div class=\"activity-preview-card\"><span class=\"activity-preview-cadence\">EVERY WINTER</span><span class=\"activity-preview-title\">Annual Waterfowl Census</span></div><div class=\"activity-preview-card\"><span class=\"activity-preview-cadence\">THROUGH THE YEAR</span><span class=\"activity-preview-title\">Webinars</span></div><div class=\"activity-preview-card\"><span class=\"activity-preview-cadence\">ONCE A YEAR</span><span class=\"activity-preview-title\">Annual Nature Camps and Trekking</span></div></div>"
@@ -727,7 +727,7 @@
               "widgetType": "html"
             },
             {
-              "id": "44340a4",
+              "id": "26b3dc0",
               "elType": "widget",
               "settings": {
                 "text": "All activities →",
@@ -772,7 +772,7 @@
       "isInner": false
     },
     {
-      "id": "c0d10f6",
+      "id": "3142d5a",
       "elType": "section",
       "settings": {
         "background_background": "classic",
@@ -780,7 +780,7 @@
       },
       "elements": [
         {
-          "id": "26f6b75",
+          "id": "ed9175a",
           "elType": "column",
           "settings": {
             "_column_size": 100,
@@ -796,7 +796,7 @@
           },
           "elements": [
             {
-              "id": "3bbe659",
+              "id": "8687ef5",
               "elType": "widget",
               "settings": {
                 "editor": "<p style=\"text-transform:uppercase;letter-spacing:.1em;font-size:11px;font-weight:600;font-family:Sora,sans-serif;color:#2B72B8;margin:0 0 8px;\">PITTA · Monthly Newsletter</p>"
@@ -805,7 +805,7 @@
               "widgetType": "text-editor"
             },
             {
-              "id": "124fac1",
+              "id": "6ecf4f3",
               "elType": "widget",
               "settings": {
                 "title": "Forty-five years of trip reports, in one archive.",
@@ -829,7 +829,7 @@
               "widgetType": "heading"
             },
             {
-              "id": "30023e4",
+              "id": "5c748b0",
               "elType": "widget",
               "settings": {
                 "html": "<ul class=\"pitta-teaser-list\"><li>Trip reports by members with great details and pictures</li><li>Bird of the month column</li><li>Opportunity to print your articles</li></ul>"
@@ -838,7 +838,7 @@
               "widgetType": "html"
             },
             {
-              "id": "dc19150",
+              "id": "279d70d",
               "elType": "widget",
               "settings": {
                 "text": "Browse PITTA archives",
@@ -873,7 +873,7 @@
       "isInner": false
     },
     {
-      "id": "8415f4f",
+      "id": "6de2dc2",
       "elType": "section",
       "settings": {
         "background_background": "classic",
@@ -881,7 +881,7 @@
       },
       "elements": [
         {
-          "id": "dc7a1fb",
+          "id": "8dc3c5c",
           "elType": "column",
           "settings": {
             "_column_size": 100,
@@ -897,7 +897,7 @@
           },
           "elements": [
             {
-              "id": "c2a2770",
+              "id": "5796c98",
               "elType": "widget",
               "settings": {
                 "editor": "<p style=\"text-transform:uppercase;letter-spacing:.1em;font-size:11px;font-weight:600;font-family:Sora,sans-serif;color:#17924C;margin:0 0 8px;\">Live From eBird · Telangana</p>",
@@ -907,7 +907,7 @@
               "widgetType": "text-editor"
             },
             {
-              "id": "86391da",
+              "id": "b7c9f0a",
               "elType": "widget",
               "settings": {
                 "title": "What's being seen right now",
@@ -932,7 +932,7 @@
               "widgetType": "heading"
             },
             {
-              "id": "32d1b00",
+              "id": "df66079",
               "elType": "widget",
               "settings": {
                 "html": "<div class=\"sightings-rows\" id=\"home-sightings-rows\">\n  <div class=\"sighting-row sighting-skeleton\"><span class=\"sk-block\" style=\"width:130px\"></span><span class=\"sk-block\" style=\"width:80px;margin-left:12px\"></span><span class=\"sk-block\" style=\"width:100px;margin-left:12px\"></span></div>\n  <div class=\"sighting-row sighting-skeleton\"><span class=\"sk-block\" style=\"width:130px\"></span><span class=\"sk-block\" style=\"width:80px;margin-left:12px\"></span><span class=\"sk-block\" style=\"width:100px;margin-left:12px\"></span></div>\n  <div class=\"sighting-row sighting-skeleton\"><span class=\"sk-block\" style=\"width:130px\"></span><span class=\"sk-block\" style=\"width:80px;margin-left:12px\"></span><span class=\"sk-block\" style=\"width:100px;margin-left:12px\"></span></div>\n  <div class=\"sighting-row sighting-skeleton\"><span class=\"sk-block\" style=\"width:130px\"></span><span class=\"sk-block\" style=\"width:80px;margin-left:12px\"></span><span class=\"sk-block\" style=\"width:100px;margin-left:12px\"></span></div>\n</div>"
@@ -941,7 +941,7 @@
               "widgetType": "html"
             },
             {
-              "id": "cb0a5d1",
+              "id": "82c7387",
               "elType": "widget",
               "settings": {
                 "text": "Notable sightings and hotspots →",
@@ -986,7 +986,7 @@
       "isInner": false
     },
     {
-      "id": "a3c5211",
+      "id": "14a4aae",
       "elType": "section",
       "settings": {
         "background_background": "classic",
@@ -994,7 +994,7 @@
       },
       "elements": [
         {
-          "id": "8ea6d79",
+          "id": "f3d2d04",
           "elType": "column",
           "settings": {
             "_column_size": 100,
@@ -1009,7 +1009,7 @@
           },
           "elements": [
             {
-              "id": "b5c3068",
+              "id": "d055bec",
               "elType": "widget",
               "settings": {
                 "title": "This week at the hide",
@@ -1028,7 +1028,7 @@
               "widgetType": "heading"
             },
             {
-              "id": "4480651",
+              "id": "f1c4217",
               "elType": "widget",
               "settings": {
                 "editor": "<p style=\"color:#5C6B63;font-size:13px;margin-top:4px;\">Week of 14 Sep – 20 Sep · changes every Monday</p>"
@@ -1043,7 +1043,7 @@
       "isInner": false
     },
     {
-      "id": "4d01dc9",
+      "id": "5be1c38",
       "elType": "section",
       "settings": {
         "background_background": "classic",
@@ -1051,7 +1051,7 @@
       },
       "elements": [
         {
-          "id": "253a735",
+          "id": "70d2923",
           "elType": "column",
           "settings": {
             "_column_size": 50,
@@ -1066,7 +1066,7 @@
           },
           "elements": [
             {
-              "id": "e792943",
+              "id": "44f237a",
               "elType": "widget",
               "settings": {
                 "shortcode": "[db_birding_joke]"
@@ -1078,7 +1078,7 @@
           "isInner": false
         },
         {
-          "id": "08465cf",
+          "id": "89f9405",
           "elType": "column",
           "settings": {
             "_column_size": 50,
@@ -1093,7 +1093,7 @@
           },
           "elements": [
             {
-              "id": "28798a7",
+              "id": "e0fbc4f",
               "elType": "widget",
               "settings": {
                 "shortcode": "[db_bird_fact]"
@@ -1108,7 +1108,7 @@
       "isInner": false
     },
     {
-      "id": "1e9bc24",
+      "id": "92e5c7a",
       "elType": "section",
       "settings": {
         "background_background": "classic",
@@ -1116,7 +1116,7 @@
       },
       "elements": [
         {
-          "id": "138086e",
+          "id": "b8abce5",
           "elType": "column",
           "settings": {
             "_column_size": 100,
@@ -1132,7 +1132,7 @@
           },
           "elements": [
             {
-              "id": "dc675e0",
+              "id": "8b3199c",
               "elType": "widget",
               "settings": {
                 "html": "<h2 class=\"otd-heading\">On this day — <span id=\"otd-date\"></span></h2>\n<div id=\"sightings-otd\"></div>\n<script>\n  var otdDateEl = document.getElementById('otd-date');\n  if (otdDateEl) {\n    otdDateEl.textContent = new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'long' });\n  }\n</script>"
@@ -1141,7 +1141,7 @@
               "widgetType": "html"
             },
             {
-              "id": "efc4e6f",
+              "id": "9b8c09c",
               "elType": "widget",
               "settings": {
                 "text": "More from the archive →",
@@ -1186,7 +1186,7 @@
       "isInner": false
     },
     {
-      "id": "c4e05bf",
+      "id": "726c017",
       "elType": "section",
       "settings": {
         "background_background": "classic",
@@ -1194,7 +1194,7 @@
       },
       "elements": [
         {
-          "id": "998f712",
+          "id": "c36b514",
           "elType": "column",
           "settings": {
             "_column_size": 100,
@@ -1209,7 +1209,7 @@
           },
           "elements": [
             {
-              "id": "02e8d0b",
+              "id": "52c7961",
               "elType": "widget",
               "settings": {
                 "title": "From members' cameras",
@@ -1234,7 +1234,7 @@
               "widgetType": "heading"
             },
             {
-              "id": "877e171",
+              "id": "7a748c9",
               "elType": "widget",
               "settings": {
                 "text": "Full gallery →",
@@ -1279,7 +1279,7 @@
       "isInner": false
     },
     {
-      "id": "07e297b",
+      "id": "675a379",
       "elType": "section",
       "settings": {
         "background_background": "classic",
@@ -1287,7 +1287,7 @@
       },
       "elements": [
         {
-          "id": "3bf9ca0",
+          "id": "e954b8b",
           "elType": "column",
           "settings": {
             "_column_size": 100,
@@ -1304,7 +1304,7 @@
           },
           "elements": [
             {
-              "id": "be48461",
+              "id": "ec67869",
               "elType": "widget",
               "settings": {
                 "editor": "<p style=\"text-align:center;color:#FFFFFF;font-family:Sora,sans-serif;font-weight:700;font-size:26px;margin:0 0 20px;\">Join 500+ birders across the Deccan Plateau</p>",
@@ -1314,7 +1314,7 @@
               "widgetType": "text-editor"
             },
             {
-              "id": "3d657c0",
+              "id": "8957c2d",
               "elType": "widget",
               "settings": {
                 "text": "Become a member →",
