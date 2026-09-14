@@ -1,7 +1,7 @@
 {
   "content": [
     {
-      "id": "2023493",
+      "id": "a928653",
       "elType": "section",
       "settings": {
         "background_background": "classic",
@@ -9,7 +9,7 @@
       },
       "elements": [
         {
-          "id": "7c059e6",
+          "id": "19f20de",
           "elType": "column",
           "settings": {
             "_column_size": 100,
@@ -24,7 +24,7 @@
           },
           "elements": [
             {
-              "id": "ce54b0e",
+              "id": "dbfd454",
               "elType": "widget",
               "settings": {
                 "editor": "<p style=\"text-transform:uppercase;letter-spacing:.08em;font-size:12px;font-weight:700;font-family:Sora,sans-serif;color:#2B72B8;margin:0 0 8px;\">Membership</p>"
@@ -33,7 +33,7 @@
               "widgetType": "text-editor"
             },
             {
-              "id": "597c762",
+              "id": "1a7da88",
               "elType": "widget",
               "settings": {
                 "title": "Join 500+ members",
@@ -63,7 +63,7 @@
       "isInner": false
     },
     {
-      "id": "1aa72fd",
+      "id": "42867b7",
       "elType": "section",
       "settings": {
         "background_background": "classic",
@@ -71,7 +71,7 @@
       },
       "elements": [
         {
-          "id": "ee5975d",
+          "id": "f8a9fda",
           "elType": "column",
           "settings": {
             "_column_size": 100,
@@ -87,7 +87,7 @@
           },
           "elements": [
             {
-              "id": "3e6e4ea",
+              "id": "72463b5",
               "elType": "widget",
               "settings": {
                 "editor": "<p>Stay in the loop with everything you need to know about bird watching.</p>",
@@ -109,7 +109,7 @@
       "isInner": false
     },
     {
-      "id": "f443b88",
+      "id": "59711a9",
       "elType": "section",
       "settings": {
         "background_background": "classic",
@@ -117,7 +117,7 @@
       },
       "elements": [
         {
-          "id": "72fe7c0",
+          "id": "92ed6a8",
           "elType": "column",
           "settings": {
             "_column_size": 100,
@@ -133,7 +133,7 @@
           },
           "elements": [
             {
-              "id": "791c9dd",
+              "id": "22775c1",
               "elType": "widget",
               "settings": {
                 "shortcode": "[db_membership_tiers]"

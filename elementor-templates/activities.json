@@ -1,7 +1,7 @@
 {
   "content": [
     {
-      "id": "b47c670",
+      "id": "58fcfd9",
       "elType": "section",
       "settings": {
         "background_background": "classic",
@@ -9,7 +9,7 @@
       },
       "elements": [
         {
-          "id": "138db99",
+          "id": "63de799",
           "elType": "column",
           "settings": {
             "_column_size": 100,
@@ -24,7 +24,7 @@
           },
           "elements": [
             {
-              "id": "7f4c08f",
+              "id": "cfb331e",
               "elType": "widget",
               "settings": {
                 "editor": "<p style=\"text-transform:uppercase;letter-spacing:.08em;font-size:12px;font-weight:700;font-family:Sora,sans-serif;color:#2B72B8;margin:0 0 8px;\">Activities</p>"
@@ -33,7 +33,7 @@
               "widgetType": "text-editor"
             },
             {
-              "id": "893eee9",
+              "id": "7627ed4",
               "elType": "widget",
               "settings": {
                 "title": "An array of activities",
@@ -63,7 +63,7 @@
       "isInner": false
     },
     {
-      "id": "78f576c",
+      "id": "79c0964",
       "elType": "section",
       "settings": {
         "background_background": "classic",
@@ -71,7 +71,7 @@
       },
       "elements": [
         {
-          "id": "608f032",
+          "id": "df01fb3",
           "elType": "column",
           "settings": {
             "_column_size": 100,
@@ -87,7 +87,7 @@
           },
           "elements": [
             {
-              "id": "4bdd551",
+              "id": "6924410",
               "elType": "widget",
               "settings": {
                 "editor": "<p>Deccan Birders organizes field trips, lectures, film and slide shows, nature camps, treks, waterfowl counts, bird ringing, etc.</p>",
@@ -109,7 +109,7 @@
       "isInner": false
     },
     {
-      "id": "a7435e0",
+      "id": "c0fcbea",
       "elType": "section",
       "settings": {
         "background_background": "classic",
@@ -125,7 +125,7 @@
       },
       "elements": [
         {
-          "id": "ae7b58e",
+          "id": "162c347",
           "elType": "column",
           "settings": {
             "_column_size": 50,
@@ -141,7 +141,7 @@
           },
           "elements": [
             {
-              "id": "554d13d",
+              "id": "9f3eea9",
               "elType": "widget",
               "settings": {
                 "editor": "<p style=\"display:inline-block;background:#E6F4EC;color:#0F7A3E;padding:5px 14px;border-radius:999px;font-family:Sora,sans-serif;font-weight:600;font-size:11px;text-transform:uppercase;letter-spacing:.05em;margin:0 0 12px;\">Every month</p>"
@@ -150,7 +150,7 @@
               "widgetType": "text-editor"
             },
             {
-              "id": "b3cdb02",
+              "id": "f89ed30",
               "elType": "widget",
               "settings": {
                 "title": "Monthly Field Trips",
@@ -174,7 +174,7 @@
               "widgetType": "heading"
             },
             {
-              "id": "e882a86",
+              "id": "9a83082",
               "elType": "widget",
               "settings": {
                 "editor": "<ul><li>Visit to all the birding hot spots around Hyderabad</li><li>Mingle with the experts</li><li>Experience the joy of live bird sightings</li></ul>",
@@ -193,7 +193,7 @@
           "isInner": false
         },
         {
-          "id": "ac1c17d",
+          "id": "a0d2726",
           "elType": "column",
           "settings": {
             "_column_size": 50,
@@ -208,7 +208,7 @@
           },
           "elements": [
             {
-              "id": "4380c92",
+              "id": "98465fb",
               "elType": "widget",
               "settings": {
                 "image": {
@@ -227,7 +227,7 @@
       "isInner": false
     },
     {
-      "id": "3ee3885",
+      "id": "1f2aa8a",
       "elType": "section",
       "settings": {
         "background_background": "classic",
@@ -244,7 +244,7 @@
       },
       "elements": [
         {
-          "id": "d526158",
+          "id": "2af51ac",
           "elType": "column",
           "settings": {
             "_column_size": 50,
@@ -259,7 +259,7 @@
           },
           "elements": [
             {
-              "id": "b97b77f",
+              "id": "b09cd31",
               "elType": "widget",
               "settings": {
                 "image": {
@@ -275,7 +275,7 @@
           "isInner": false
         },
         {
-          "id": "f996b3d",
+          "id": "ae1f4a9",
           "elType": "column",
           "settings": {
             "_column_size": 50,
@@ -291,7 +291,7 @@
           },
           "elements": [
             {
-              "id": "648b75e",
+              "id": "fd6e13d",
               "elType": "widget",
               "settings": {
                 "editor": "<p style=\"display:inline-block;background:#E6F4EC;color:#0F7A3E;padding:5px 14px;border-radius:999px;font-family:Sora,sans-serif;font-weight:600;font-size:11px;text-transform:uppercase;letter-spacing:.05em;margin:0 0 12px;\">Twelve issues a year</p>"
@@ -300,7 +300,7 @@
               "widgetType": "text-editor"
             },
             {
-              "id": "bc4f158",
+              "id": "25b33ac",
               "elType": "widget",
               "settings": {
                 "title": "PITTA – Monthly Newsletter",
@@ -324,7 +324,7 @@
               "widgetType": "heading"
             },
             {
-              "id": "1847abe",
+              "id": "36070de",
               "elType": "widget",
               "settings": {
                 "editor": "<ul><li>Trip reports by members with great details and pictures</li><li>Bird of the month column</li><li>Opportunity to print your articles</li></ul>",
@@ -346,7 +346,7 @@
       "isInner": false
     },
     {
-      "id": "bc53ed1",
+      "id": "f5dea20",
       "elType": "section",
       "settings": {
         "background_background": "classic",
@@ -362,7 +362,7 @@
       },
       "elements": [
         {
-          "id": "2ea414a",
+          "id": "5444f9b",
           "elType": "column",
           "settings": {
             "_column_size": 50,
@@ -378,7 +378,7 @@
           },
           "elements": [
             {
-              "id": "f74ecde",
+              "id": "2c1c650",
               "elType": "widget",
               "settings": {
                 "editor": "<p style=\"display:inline-block;background:#E6F4EC;color:#0F7A3E;padding:5px 14px;border-radius:999px;font-family:Sora,sans-serif;font-weight:600;font-size:11px;text-transform:uppercase;letter-spacing:.05em;margin:0 0 12px;\">Once a year</p>"
@@ -387,7 +387,7 @@
               "widgetType": "text-editor"
             },
             {
-              "id": "f23d2c2",
+              "id": "f3e4baa",
               "elType": "widget",
               "settings": {
                 "title": "Annual Bird Race",
@@ -411,7 +411,7 @@
               "widgetType": "heading"
             },
             {
-              "id": "dfb6233",
+              "id": "dd83a19",
               "elType": "widget",
               "settings": {
                 "editor": "<ul><li>Full day birding with an assigned team</li><li>Team with the maximum sightings wins</li><li>Sumptuous dinner to celebrate the day</li></ul>",
@@ -430,7 +430,7 @@
           "isInner": false
         },
         {
-          "id": "1a1009e",
+          "id": "ae54638",
           "elType": "column",
           "settings": {
             "_column_size": 50,
@@ -445,7 +445,7 @@
           },
           "elements": [
             {
-              "id": "64ce497",
+              "id": "4f58c8f",
               "elType": "widget",
               "settings": {
                 "image": {
@@ -464,7 +464,7 @@
       "isInner": false
     },
     {
-      "id": "9f3c120",
+      "id": "551cca1",
       "elType": "section",
       "settings": {
         "background_background": "classic",
@@ -481,7 +481,7 @@
       },
       "elements": [
         {
-          "id": "9c4966f",
+          "id": "afae940",
           "elType": "column",
           "settings": {
             "_column_size": 50,
@@ -496,7 +496,7 @@
           },
           "elements": [
             {
-              "id": "c005d3e",
+              "id": "b90ee9e",
               "elType": "widget",
               "settings": {
                 "image": {
@@ -512,7 +512,7 @@
           "isInner": false
         },
         {
-          "id": "c9bcb89",
+          "id": "a985e5b",
           "elType": "column",
           "settings": {
             "_column_size": 50,
@@ -528,7 +528,7 @@
           },
           "elements": [
             {
-              "id": "b165c49",
+              "id": "5cea2b7",
               "elType": "widget",
               "settings": {
                 "editor": "<p style=\"display:inline-block;background:#E6F4EC;color:#0F7A3E;padding:5px 14px;border-radius:999px;font-family:Sora,sans-serif;font-weight:600;font-size:11px;text-transform:uppercase;letter-spacing:.05em;margin:0 0 12px;\">Every winter</p>"
@@ -537,7 +537,7 @@
               "widgetType": "text-editor"
             },
             {
-              "id": "3339f8b",
+              "id": "552599c",
               "elType": "widget",
               "settings": {
                 "title": "Annual Waterfowl Census",
@@ -561,7 +561,7 @@
               "widgetType": "heading"
             },
             {
-              "id": "7e7e4a2",
+              "id": "3d66aba",
               "elType": "widget",
               "settings": {
                 "editor": "<ul><li>Census performed every Winter season</li><li>Volunteering opportunity to do the census</li><li>Data submitted to Wetlands International</li></ul>",
@@ -583,7 +583,7 @@
       "isInner": false
     },
     {
-      "id": "18c6be1",
+      "id": "2a79bf5",
       "elType": "section",
       "settings": {
         "background_background": "classic",
@@ -599,7 +599,7 @@
       },
       "elements": [
         {
-          "id": "d33e274",
+          "id": "76bce69",
           "elType": "column",
           "settings": {
             "_column_size": 50,
@@ -615,7 +615,7 @@
           },
           "elements": [
             {
-              "id": "18e28d9",
+              "id": "22f09ce",
               "elType": "widget",
               "settings": {
                 "editor": "<p style=\"display:inline-block;background:#E6F4EC;color:#0F7A3E;padding:5px 14px;border-radius:999px;font-family:Sora,sans-serif;font-weight:600;font-size:11px;text-transform:uppercase;letter-spacing:.05em;margin:0 0 12px;\">Through the year</p>"
@@ -624,7 +624,7 @@
               "widgetType": "text-editor"
             },
             {
-              "id": "a2bead4",
+              "id": "8282fda",
               "elType": "widget",
               "settings": {
                 "title": "Webinars",
@@ -648,7 +648,7 @@
               "widgetType": "heading"
             },
             {
-              "id": "6fb88c5",
+              "id": "4f54e32",
               "elType": "widget",
               "settings": {
                 "editor": "<ul><li>Talks by eminent ornithologists</li><li>Network with the experts</li><li>Become aware of the latest developments</li></ul>",
@@ -667,7 +667,7 @@
           "isInner": false
         },
         {
-          "id": "b23ee24",
+          "id": "f8aa217",
           "elType": "column",
           "settings": {
             "_column_size": 50,
@@ -682,7 +682,7 @@
           },
           "elements": [
             {
-              "id": "b383b6f",
+              "id": "9517eff",
               "elType": "widget",
               "settings": {
                 "image": {
@@ -701,7 +701,7 @@
       "isInner": false
     },
     {
-      "id": "591bbde",
+      "id": "d28d342",
       "elType": "section",
       "settings": {
         "background_background": "classic",
@@ -718,7 +718,7 @@
       },
       "elements": [
         {
-          "id": "961b9ea",
+          "id": "f54f6f6",
           "elType": "column",
           "settings": {
             "_column_size": 50,
@@ -733,7 +733,7 @@
           },
           "elements": [
             {
-              "id": "00241a4",
+              "id": "b8b8fc3",
               "elType": "widget",
               "settings": {
                 "image": {
@@ -749,7 +749,7 @@
           "isInner": false
         },
         {
-          "id": "eb2e226",
+          "id": "85ca6ed",
           "elType": "column",
           "settings": {
             "_column_size": 50,
@@ -765,7 +765,7 @@
           },
           "elements": [
             {
-              "id": "8c78bc7",
+              "id": "833fa8f",
               "elType": "widget",
               "settings": {
                 "editor": "<p style=\"display:inline-block;background:#E6F4EC;color:#0F7A3E;padding:5px 14px;border-radius:999px;font-family:Sora,sans-serif;font-weight:600;font-size:11px;text-transform:uppercase;letter-spacing:.05em;margin:0 0 12px;\">Once a year</p>"
@@ -774,7 +774,7 @@
               "widgetType": "text-editor"
             },
             {
-              "id": "d6d2460",
+              "id": "22d34f8",
               "elType": "widget",
               "settings": {
                 "title": "Annual Nature Camps and Trekking",
@@ -798,7 +798,7 @@
               "widgetType": "heading"
             },
             {
-              "id": "763a945",
+              "id": "f884cb4",
               "elType": "widget",
               "settings": {
                 "editor": "<ul><li>National and International camps</li><li>Focus on the bird watching</li><li>Exclusive access to sanctuaries wherever possible</li></ul>",

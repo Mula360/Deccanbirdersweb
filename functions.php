@@ -124,7 +124,7 @@ add_action('phpmailer_init', function($m) {
 });
 
 /* -----------------------------------------------------------------------
- * 7. AJAX contact form handler
+ * 7. AJAX form handlers
  * ---------------------------------------------------------------------*/
 add_action('wp_ajax_nopriv_db_contact', 'db_handle_contact');
 add_action('wp_ajax_db_contact', 'db_handle_contact');
@@ -144,6 +144,55 @@ function db_handle_contact() {
   $body    = "<p><strong>From:</strong> $name ($email)</p><p><strong>Subject:</strong> $subject</p><p>$message</p>";
   wp_mail($to, "Website enquiry: $subject", $body, $headers);
   wp_mail($email, 'We received your message — Deccan Birders', "<p>Hi $name,</p><p>Thank you for getting in touch. We will reply within 2 working days.</p><p>— Deccan Birders</p>", $headers);
+  wp_send_json(['success' => true]);
+}
+
+add_action('wp_ajax_nopriv_db_volunteer', 'db_handle_volunteer');
+add_action('wp_ajax_db_volunteer', 'db_handle_volunteer');
+function db_handle_volunteer() {
+  if (!wp_verify_nonce($_POST['nonce'] ?? '', 'db_contact_nonce')) {
+    wp_send_json(['success' => false, 'message' => 'Security check failed.']);
+  }
+  $name          = sanitize_text_field($_POST['name'] ?? '');
+  $email         = sanitize_email($_POST['email'] ?? '');
+  $help_with_raw = $_POST['help_with'] ?? [];
+  $help_with     = is_array($help_with_raw)
+    ? array_map('sanitize_text_field', $help_with_raw)
+    : array_filter([sanitize_text_field($help_with_raw)]);
+  if (!$name || !$email) {
+    wp_send_json(['success' => false, 'message' => 'Please fill in all required fields.']);
+  }
+  $to           = 'info@deccanbirders.org';
+  $headers      = ['Content-Type: text/html; charset=UTF-8', "Reply-To: $name <$email>"];
+  $help_with_str = $help_with ? implode(', ', $help_with) : 'Not specified';
+  $body         = "<p><strong>From:</strong> $name ($email)</p><p><strong>Would like to help with:</strong> $help_with_str</p>";
+  wp_mail($to, "New volunteer: $name", $body, $headers);
+  wp_mail($email, 'Thank you for volunteering — Deccan Birders', "<p>Hi $name,</p><p>Thank you for offering to help. A committee member will be in touch soon.</p><p>— Deccan Birders</p>", $headers);
+  wp_send_json(['success' => true]);
+}
+
+add_action('wp_ajax_nopriv_db_sighting_report', 'db_handle_sighting_report');
+add_action('wp_ajax_db_sighting_report', 'db_handle_sighting_report');
+function db_handle_sighting_report() {
+  if (!wp_verify_nonce($_POST['nonce'] ?? '', 'db_contact_nonce')) {
+    wp_send_json(['success' => false, 'message' => 'Security check failed.']);
+  }
+  $name     = sanitize_text_field($_POST['name'] ?? '');
+  $email    = sanitize_email($_POST['email'] ?? '');
+  $species  = sanitize_text_field($_POST['species'] ?? '');
+  $location = sanitize_text_field($_POST['location'] ?? '');
+  $date     = sanitize_text_field($_POST['date'] ?? '');
+  $notes    = sanitize_textarea_field($_POST['notes'] ?? '');
+  if (!$name || !$email || !$species || !$location) {
+    wp_send_json(['success' => false, 'message' => 'Please fill in all required fields.']);
+  }
+  $to      = 'info@deccanbirders.org';
+  $headers = ['Content-Type: text/html; charset=UTF-8', "Reply-To: $name <$email>"];
+  $body    = "<p><strong>From:</strong> $name ($email)</p><p><strong>Species:</strong> $species</p><p><strong>Location:</strong> $location</p>"
+    . ($date ? "<p><strong>Date:</strong> $date</p>" : '')
+    . ($notes ? "<p><strong>Notes:</strong> $notes</p>" : '');
+  wp_mail($to, "Sighting report: $species at $location", $body, $headers);
+  wp_mail($email, 'We received your sighting report — Deccan Birders', "<p>Hi $name,</p><p>Thank you for reporting your sighting of $species at $location. We appreciate your contribution to our records.</p><p>— Deccan Birders</p>", $headers);
   wp_send_json(['success' => true]);
 }
 

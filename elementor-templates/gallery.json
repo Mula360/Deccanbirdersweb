@@ -1,7 +1,7 @@
 {
   "content": [
     {
-      "id": "1427529",
+      "id": "0d2360c",
       "elType": "section",
       "settings": {
         "background_background": "classic",
@@ -9,7 +9,7 @@
       },
       "elements": [
         {
-          "id": "270b796",
+          "id": "3279e77",
           "elType": "column",
           "settings": {
             "_column_size": 100,
@@ -24,7 +24,7 @@
           },
           "elements": [
             {
-              "id": "0465a23",
+              "id": "127e02e",
               "elType": "widget",
               "settings": {
                 "editor": "<p style=\"text-transform:uppercase;letter-spacing:.08em;font-size:12px;font-weight:700;font-family:Sora,sans-serif;color:#2B72B8;margin:0 0 8px;\">Gallery</p>"
@@ -33,7 +33,7 @@
               "widgetType": "text-editor"
             },
             {
-              "id": "af79ec9",
+              "id": "ac4c8b8",
               "elType": "widget",
               "settings": {
                 "title": "From members' cameras",
@@ -63,7 +63,7 @@
       "isInner": false
     },
     {
-      "id": "9a391b7",
+      "id": "99eeb87",
       "elType": "section",
       "settings": {
         "background_background": "classic",
@@ -71,7 +71,7 @@
       },
       "elements": [
         {
-          "id": "0003973",
+          "id": "caa2e3e",
           "elType": "column",
           "settings": {
             "_column_size": 100,
@@ -87,7 +87,7 @@
           },
           "elements": [
             {
-              "id": "2cfa781",
+              "id": "97aee67",
               "elType": "widget",
               "settings": {
                 "editor": "<p>Newest first. Every photograph on this site was taken by a member of Deccan Birders, on a society trip or on their own time.</p>",
@@ -109,7 +109,7 @@
       "isInner": false
     },
     {
-      "id": "aa75899",
+      "id": "6c34156",
       "elType": "section",
       "settings": {
         "background_background": "classic",
@@ -117,7 +117,7 @@
       },
       "elements": [
         {
-          "id": "3b9394c",
+          "id": "61cdbf7",
           "elType": "column",
           "settings": {
             "_column_size": 100,
@@ -132,7 +132,7 @@
           },
           "elements": [
             {
-              "id": "67a448b",
+              "id": "6ba459a",
               "elType": "widget",
               "settings": {
                 "html": "<div class=\"tab-bar\">\n  <button class=\"tab-btn active\" data-tab=\"photos\">Photographs</button>\n  <button class=\"tab-btn\" data-tab=\"videos\">Videos</button>\n</div>"
@@ -147,7 +147,7 @@
       "isInner": false
     },
     {
-      "id": "0023979",
+      "id": "d8638dc",
       "elType": "section",
       "settings": {
         "background_background": "classic",
@@ -155,7 +155,7 @@
       },
       "elements": [
         {
-          "id": "dbfe19d",
+          "id": "6dc1a36",
           "elType": "column",
           "settings": {
             "_column_size": 100,
@@ -171,7 +171,7 @@
           },
           "elements": [
             {
-              "id": "834292c",
+              "id": "0c6a73c",
               "elType": "widget",
               "settings": {
                 "shortcode": "[db_photo_gallery]"
@@ -186,7 +186,7 @@
       "isInner": false
     },
     {
-      "id": "85e0828",
+      "id": "785fda3",
       "elType": "section",
       "settings": {
         "background_background": "classic",
@@ -194,7 +194,7 @@
       },
       "elements": [
         {
-          "id": "dd6ad3c",
+          "id": "74f87ae",
           "elType": "column",
           "settings": {
             "_column_size": 100,
@@ -210,7 +210,7 @@
           },
           "elements": [
             {
-              "id": "79b9a09",
+              "id": "82c34e7",
               "elType": "widget",
               "settings": {
                 "html": "<div id=\"videos-grid\"></div>"
@@ -225,7 +225,7 @@
       "isInner": false
     },
     {
-      "id": "5bf70a5",
+      "id": "5b0e58d",
       "elType": "section",
       "settings": {
         "background_background": "classic",
@@ -233,14 +233,14 @@
       },
       "elements": [
         {
-          "id": "e332124",
+          "id": "c0b5ed5",
           "elType": "column",
           "settings": {
             "_column_size": 100
           },
           "elements": [
             {
-              "id": "69a654a",
+              "id": "1fe5fd1",
               "elType": "widget",
               "settings": {
                 "html": "<script>\n(function () {\n  var photosPanel = document.getElementById('photos-panel');\n  var videosPanel = document.getElementById('videos-panel');\n  if (videosPanel) videosPanel.hidden = true;\n  document.querySelectorAll('.tab-btn[data-tab]').forEach(function (btn) {\n    btn.addEventListener('click', function () {\n      document.querySelectorAll('.tab-btn').forEach(function (b) { b.classList.toggle('active', b === btn); });\n      if (photosPanel) photosPanel.hidden = btn.dataset.tab !== 'photos';\n      if (videosPanel) videosPanel.hidden = btn.dataset.tab !== 'videos';\n    });\n  });\n})();\n</script>"
@@ -255,7 +255,7 @@
       "isInner": false
     },
     {
-      "id": "4a90682",
+      "id": "2527d74",
       "elType": "section",
       "settings": {
         "background_background": "classic",
@@ -263,7 +263,7 @@
       },
       "elements": [
         {
-          "id": "3c7c0fc",
+          "id": "3c9d53a",
           "elType": "column",
           "settings": {
             "_column_size": 100,
@@ -279,7 +279,7 @@
           },
           "elements": [
             {
-              "id": "1a48fc8",
+              "id": "a2aca50",
               "elType": "widget",
               "settings": {
                 "editor": "<p style=\"text-transform:uppercase;letter-spacing:.1em;font-size:11px;font-weight:600;font-family:Sora,sans-serif;color:#2B72B8;margin:0 0 8px;\">Members Only</p>",
@@ -289,7 +289,7 @@
               "widgetType": "text-editor"
             },
             {
-              "id": "6863f05",
+              "id": "157cac1",
               "elType": "widget",
               "settings": {
                 "title": "Submit a photograph",
@@ -314,7 +314,7 @@
               "widgetType": "heading"
             },
             {
-              "id": "bfea9ef",
+              "id": "f9e6b65",
               "elType": "widget",
               "settings": {
                 "editor": "<p>Your entry goes to <a href=\"mailto:photos@deccanbirders.org\">photos@deccanbirders.org</a> for review. Once a committee member approves it, the photograph appears in this gallery credited to you by name.</p><ul><li>Tell us the name you would like the credit to read.</li><li>One bird per frame, no baiting, no nest photography during breeding.</li><li>Approvals usually take a week; you'll hear back either way.</li></ul>",
@@ -330,7 +330,7 @@
               "widgetType": "text-editor"
             },
             {
-              "id": "1798f9a",
+              "id": "ed136e2",
               "elType": "widget",
               "settings": {
                 "html": "<form id=\"db-photo-submit-form\" class=\"submission-form\" novalidate>\n  <div class=\"form-field\">\n    <label for=\"ps-name\">Photographer name</label>\n    <input type=\"text\" id=\"ps-name\" name=\"name\" required>\n  </div>\n  <div class=\"form-field\">\n    <label for=\"ps-email\">Email</label>\n    <input type=\"email\" id=\"ps-email\" name=\"email\" required>\n  </div>\n  <div class=\"form-field\">\n    <label for=\"ps-species\">Species</label>\n    <input type=\"text\" id=\"ps-species\" name=\"species\" required>\n  </div>\n  <div class=\"form-field\">\n    <label for=\"ps-location\">Where and when</label>\n    <input type=\"text\" id=\"ps-location\" name=\"location\" required>\n  </div>\n  <div class=\"form-field\">\n    <label for=\"ps-photo\">Photograph</label>\n    <div class=\"dropzone\">Drop a JPEG here, or browse\n      <input type=\"file\" id=\"ps-photo\" name=\"photo\" accept=\"image/jpeg\" required>\n      <p class=\"form-hint\">Up to 10 MB. Please keep the EXIF data intact.</p>\n    </div>\n  </div>\n  <label class=\"form-checkbox\">\n    <input type=\"checkbox\" name=\"consent\" required>\n    I took this photograph and allow Deccan Birders to publish it with my credit.\n  </label>\n  <button type=\"submit\" class=\"btn btn-primary\">Send for approval</button>\n</form>"
