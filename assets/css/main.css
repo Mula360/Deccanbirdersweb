@@ -1257,6 +1257,47 @@ body.lightbox-open { overflow: hidden; }
 .contact-info-label { display: block; font-family: var(--font-head); font-weight: 700; font-size: 11px; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-muted); margin-top: 14px; }
 .contact-info-block p { margin-top: 4px; font-size: 15px; }
 
+/* -------------------------------------------------------------------------
+   Page-template section layout (replaces what used to be per-section
+   Elementor settings — background, padding, min-height, centering — now
+   that pages render from PHP templates instead of Elementor data)
+   ---------------------------------------------------------------------- */
+.hero-dark {
+  background: var(--ink);
+  min-height: 85vh;
+  display: flex;
+  align-items: flex-end;
+  padding: 0 20px 80px;
+}
+.hero-dark.hero-dark--short { min-height: 40vh; align-items: center; padding: 60px 20px; }
+.hero-dark-inner { max-width: var(--max-w); margin: 0 auto; width: 100%; }
+.hero-dark h1 { color: #fff; }
+.hero-dark p { color: rgba(255, 255, 255, 0.82); font-size: 18px; }
+.hero-buttons { display: flex; gap: 16px; flex-wrap: wrap; margin-top: 24px; }
+
+.hero-light { background: #fff; padding: 60px 20px 30px; }
+.hero-light-inner { max-width: var(--max-w); margin: 0 auto; }
+
+.section-white { background: #fff; }
+.section-surface { background: var(--surface); }
+.section-boxed { max-width: var(--max-w); margin: 0 auto; padding: 0 20px; }
+
+.stats-bar {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  background: #fff;
+  border-bottom: 1px solid var(--border);
+}
+.stats-bar .stat-col { text-align: center; padding: 32px 12px; }
+.stats-bar .stat-number { font-family: var(--font-head); font-weight: 700; font-size: 40px; color: var(--ink); }
+.stats-bar .stat-label { color: var(--text-muted); font-size: 14px; margin-top: 6px; }
+
+.join-band { background: var(--ink); text-align: center; padding: 60px 20px; }
+.join-band p { color: #fff; font-family: var(--font-head); font-weight: 700; font-size: 26px; margin-bottom: 20px; }
+
+.two-col-60-40 { display: grid; grid-template-columns: 60% 40%; gap: 30px; }
+.two-col-50-50 { display: grid; grid-template-columns: 1fr 1fr; gap: 30px; }
+
 /* =========================================================================
    Responsive breakpoints
    ========================================================================= */
@@ -1293,4 +1334,6 @@ body.lightbox-open { overflow: hidden; }
   .pitta-month-grid { grid-template-columns: repeat(3, 1fr); }
   .activity-preview-grid { grid-template-columns: 1fr 1fr; }
   .library-columns { grid-template-columns: 1fr; gap: 24px; }
+  .stats-bar { grid-template-columns: repeat(2, 1fr); }
+  .two-col-60-40, .two-col-50-50 { grid-template-columns: 1fr; }
 }
