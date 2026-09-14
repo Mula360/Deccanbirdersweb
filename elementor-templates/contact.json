@@ -1,7 +1,7 @@
 {
   "content": [
     {
-      "id": "b78cf8f",
+      "id": "d4225b6",
       "elType": "section",
       "settings": {
         "background_background": "classic",
@@ -9,7 +9,7 @@
       },
       "elements": [
         {
-          "id": "7c55947",
+          "id": "bb68339",
           "elType": "column",
           "settings": {
             "_column_size": 100,
@@ -24,7 +24,7 @@
           },
           "elements": [
             {
-              "id": "60b7cb4",
+              "id": "1252379",
               "elType": "widget",
               "settings": {
                 "editor": "<p style=\"text-transform:uppercase;letter-spacing:.08em;font-size:12px;font-weight:700;font-family:Sora,sans-serif;color:#2B72B8;margin:0 0 8px;\">Contact</p>"
@@ -33,7 +33,7 @@
               "widgetType": "text-editor"
             },
             {
-              "id": "b86e3aa",
+              "id": "5fda10c",
               "elType": "widget",
               "settings": {
                 "title": "Get in touch",
@@ -63,7 +63,7 @@
       "isInner": false
     },
     {
-      "id": "6d9baa9",
+      "id": "e7f9410",
       "elType": "section",
       "settings": {
         "background_background": "classic",
@@ -71,7 +71,7 @@
       },
       "elements": [
         {
-          "id": "18e7a9b",
+          "id": "5b0a8fc",
           "elType": "column",
           "settings": {
             "_column_size": 60,
@@ -86,7 +86,7 @@
           },
           "elements": [
             {
-              "id": "42bb520",
+              "id": "20c70f5",
               "elType": "widget",
               "settings": {
                 "title": "Send us a message",
@@ -110,7 +110,7 @@
               "widgetType": "heading"
             },
             {
-              "id": "7dd8f10",
+              "id": "f336a58",
               "elType": "widget",
               "settings": {
                 "editor": "<p>Questions about membership, trips or a bird you can't identify.</p>",
@@ -126,7 +126,7 @@
               "widgetType": "text-editor"
             },
             {
-              "id": "f98f013",
+              "id": "b32cc5f",
               "elType": "widget",
               "settings": {
                 "html": "<form id=\"db-contact-form\" class=\"submission-form\" novalidate>\n  <div class=\"form-field\">\n    <label for=\"cf-name\">Name</label>\n    <input type=\"text\" id=\"cf-name\" name=\"name\" required>\n    <span class=\"field-error\" id=\"error-name\"></span>\n  </div>\n  <div class=\"form-field\">\n    <label for=\"cf-email\">Email</label>\n    <input type=\"email\" id=\"cf-email\" name=\"email\" required>\n    <span class=\"field-error\" id=\"error-email\"></span>\n  </div>\n  <div class=\"form-field\">\n    <label for=\"cf-message\">Message</label>\n    <textarea id=\"cf-message\" name=\"message\" rows=\"5\" required></textarea>\n    <span class=\"field-error\" id=\"error-message\"></span>\n  </div>\n  <p class=\"field-error\" id=\"form-global-error\"></p>\n  <button type=\"submit\" class=\"btn btn-primary\">Send message</button>\n</form>"
@@ -138,7 +138,7 @@
           "isInner": false
         },
         {
-          "id": "daa0bb3",
+          "id": "43e657d",
           "elType": "column",
           "settings": {
             "_column_size": 40,
@@ -153,7 +153,7 @@
           },
           "elements": [
             {
-              "id": "bbde65c",
+              "id": "d4a096e",
               "elType": "widget",
               "settings": {
                 "html": "<div class=\"contact-info-block\">\n  <h3>Phone and WhatsApp</h3>\n  <span class=\"contact-info-label\">Enquiries</span>\n  <p>+91 97388 40070</p>\n  <span class=\"contact-info-label\">Email</span>\n  <p><a href=\"mailto:info@deccanbirders.org\">info@deccanbirders.org</a></p>\n</div>"
@@ -168,7 +168,7 @@
       "isInner": false
     },
     {
-      "id": "30faceb",
+      "id": "8f058b4",
       "elType": "section",
       "settings": {
         "background_background": "classic",
@@ -176,7 +176,7 @@
       },
       "elements": [
         {
-          "id": "d417173",
+          "id": "d2f7562",
           "elType": "column",
           "settings": {
             "_column_size": 100,
@@ -192,7 +192,7 @@
           },
           "elements": [
             {
-              "id": "7a407fa",
+              "id": "949d656",
               "elType": "widget",
               "settings": {
                 "editor": "<p style=\"text-transform:uppercase;letter-spacing:.1em;font-size:11px;font-weight:600;font-family:Sora,sans-serif;color:#17924C;margin:0 0 8px;\">Report a Sighting</p>",
@@ -202,7 +202,7 @@
               "widgetType": "text-editor"
             },
             {
-              "id": "2f74310",
+              "id": "1f11994",
               "elType": "widget",
               "settings": {
                 "title": "Seen something unusual?",
@@ -227,7 +227,7 @@
               "widgetType": "heading"
             },
             {
-              "id": "6b8ec1f",
+              "id": "cb9c646",
               "elType": "widget",
               "settings": {
                 "editor": "<p>Tell us what you saw, where and when.</p>",
@@ -243,7 +243,7 @@
               "widgetType": "text-editor"
             },
             {
-              "id": "13aa020",
+              "id": "2be63e2",
               "elType": "widget",
               "settings": {
                 "html": "<form id=\"db-sighting-report-form\" class=\"submission-form\" novalidate>\n  <div class=\"form-field\">\n    <label for=\"sr-name\">Name</label>\n    <input type=\"text\" id=\"sr-name\" name=\"name\" required>\n    <span class=\"field-error\" id=\"sr-error-name\"></span>\n  </div>\n  <div class=\"form-field\">\n    <label for=\"sr-email\">Email</label>\n    <input type=\"email\" id=\"sr-email\" name=\"email\" required>\n    <span class=\"field-error\" id=\"sr-error-email\"></span>\n  </div>\n  <div class=\"form-field\">\n    <label for=\"sr-species\">Species</label>\n    <input type=\"text\" id=\"sr-species\" name=\"species\" required>\n    <span class=\"field-error\" id=\"sr-error-species\"></span>\n  </div>\n  <div class=\"form-field\">\n    <label for=\"sr-location\">Location</label>\n    <input type=\"text\" id=\"sr-location\" name=\"location\" required>\n    <span class=\"field-error\" id=\"sr-error-location\"></span>\n  </div>\n  <div class=\"form-field\">\n    <label for=\"sr-date\">Date</label>\n    <input type=\"text\" id=\"sr-date\" name=\"date\" placeholder=\"e.g. 14 September 2026\">\n  </div>\n  <div class=\"form-field\">\n    <label for=\"sr-notes\">Notes</label>\n    <textarea id=\"sr-notes\" name=\"notes\" rows=\"3\"></textarea>\n  </div>\n  <p class=\"field-error\" id=\"sr-error-global\"></p>\n  <button type=\"submit\" class=\"btn btn-secondary\">Submit</button>\n</form>"
@@ -258,7 +258,7 @@
       "isInner": false
     },
     {
-      "id": "db44c83",
+      "id": "976e7a9",
       "elType": "section",
       "settings": {
         "background_background": "classic",
@@ -266,7 +266,7 @@
       },
       "elements": [
         {
-          "id": "b5db5ed",
+          "id": "b6b05f6",
           "elType": "column",
           "settings": {
             "_column_size": 100,
@@ -282,7 +282,7 @@
           },
           "elements": [
             {
-              "id": "007a2d3",
+              "id": "5b78f1f",
               "elType": "widget",
               "settings": {
                 "editor": "<p style=\"text-transform:uppercase;letter-spacing:.1em;font-size:11px;font-weight:600;font-family:Sora,sans-serif;color:#17924C;margin:0 0 8px;\">Volunteer</p>",
@@ -292,7 +292,7 @@
               "widgetType": "text-editor"
             },
             {
-              "id": "5188a8e",
+              "id": "6bd45f5",
               "elType": "widget",
               "settings": {
                 "title": "Put your hand up",
@@ -317,7 +317,7 @@
               "widgetType": "heading"
             },
             {
-              "id": "1ff70e1",
+              "id": "d7cf8f9",
               "elType": "widget",
               "settings": {
                 "editor": "<p>Help with the winter waterfowl census, field trip coordination, school outreach, or the PITTA newsletter.</p>",
@@ -333,7 +333,7 @@
               "widgetType": "text-editor"
             },
             {
-              "id": "e187992",
+              "id": "4cc42cc",
               "elType": "widget",
               "settings": {
                 "html": "<form id=\"db-volunteer-form\" class=\"submission-form\" novalidate>\n  <div class=\"form-field\">\n    <label for=\"vf-name\">Name</label>\n    <input type=\"text\" id=\"vf-name\" name=\"name\" required>\n    <span class=\"field-error\" id=\"vf-error-name\"></span>\n  </div>\n  <div class=\"form-field\">\n    <label for=\"vf-email\">Email</label>\n    <input type=\"email\" id=\"vf-email\" name=\"email\" required>\n    <span class=\"field-error\" id=\"vf-error-email\"></span>\n  </div>\n  <div class=\"form-field\">\n    <label>I'd like to help with</label>\n    <label class=\"form-checkbox\"><input type=\"checkbox\" name=\"help_with[]\" value=\"Annual waterfowl census\"> Annual waterfowl census</label>\n    <label class=\"form-checkbox\"><input type=\"checkbox\" name=\"help_with[]\" value=\"Field trip coordination\"> Field trip coordination</label>\n    <label class=\"form-checkbox\"><input type=\"checkbox\" name=\"help_with[]\" value=\"School and college outreach\"> School and college outreach</label>\n    <label class=\"form-checkbox\"><input type=\"checkbox\" name=\"help_with[]\" value=\"PITTA newsletter\"> PITTA newsletter</label>\n  </div>\n  <p class=\"field-error\" id=\"vf-error-global\"></p>\n  <button type=\"submit\" class=\"btn btn-secondary\">Submit</button>\n</form>"
@@ -348,7 +348,7 @@
       "isInner": false
     },
     {
-      "id": "215a2dc",
+      "id": "80876c8",
       "elType": "section",
       "settings": {
         "background_background": "classic",
@@ -356,7 +356,7 @@
       },
       "elements": [
         {
-          "id": "eb73b8b",
+          "id": "4dfe1cc",
           "elType": "column",
           "settings": {
             "_column_size": 100,
@@ -372,7 +372,7 @@
           },
           "elements": [
             {
-              "id": "7afb4f4",
+              "id": "3f46d50",
               "elType": "widget",
               "settings": {
                 "editor": "<p style=\"text-transform:uppercase;letter-spacing:.1em;font-size:11px;font-weight:600;font-family:Sora,sans-serif;color:#2B72B8;margin:0 0 8px;\">Members Only</p>",
@@ -382,7 +382,7 @@
               "widgetType": "text-editor"
             },
             {
-              "id": "a970e2b",
+              "id": "abd24f2",
               "elType": "widget",
               "settings": {
                 "title": "Submit a photograph",
@@ -407,7 +407,7 @@
               "widgetType": "heading"
             },
             {
-              "id": "2851423",
+              "id": "d7143d1",
               "elType": "widget",
               "settings": {
                 "editor": "<p>Your entry goes to <a href=\"mailto:photos@deccanbirders.org\">photos@deccanbirders.org</a> for review. Once a committee member approves it, the photograph appears in the gallery credited to you by name.</p><ul><li>Tell us the name you would like the credit to read.</li><li>One bird per frame, no baiting, no nest photography during breeding.</li><li>Approvals usually take a week; you'll hear back either way.</li></ul>",
@@ -423,7 +423,7 @@
               "widgetType": "text-editor"
             },
             {
-              "id": "4a4a218",
+              "id": "5427d02",
               "elType": "widget",
               "settings": {
                 "html": "<form id=\"db-photo-submit-form\" class=\"submission-form\" novalidate>\n  <div class=\"form-field\">\n    <label for=\"ps-name-2\">Photographer name</label>\n    <input type=\"text\" id=\"ps-name-2\" name=\"name\" required>\n  </div>\n  <div class=\"form-field\">\n    <label for=\"ps-email-2\">Email</label>\n    <input type=\"email\" id=\"ps-email-2\" name=\"email\" required>\n  </div>\n  <div class=\"form-field\">\n    <label for=\"ps-species-2\">Species</label>\n    <input type=\"text\" id=\"ps-species-2\" name=\"species\" required>\n  </div>\n  <div class=\"form-field\">\n    <label for=\"ps-location-2\">Where and when</label>\n    <input type=\"text\" id=\"ps-location-2\" name=\"location\" required>\n  </div>\n  <div class=\"form-field\">\n    <label for=\"ps-photo-2\">Photograph</label>\n    <div class=\"dropzone\">Drop a JPEG here, or browse\n      <input type=\"file\" id=\"ps-photo-2\" name=\"photo\" accept=\"image/jpeg\" required>\n      <p class=\"form-hint\">Up to 10 MB. Please keep the EXIF data intact.</p>\n    </div>\n  </div>\n  <label class=\"form-checkbox\">\n    <input type=\"checkbox\" name=\"consent\" required>\n    I took this photograph and allow Deccan Birders to publish it with my credit.\n  </label>\n  <button type=\"submit\" class=\"btn btn-primary\">Send for approval</button>\n</form>"

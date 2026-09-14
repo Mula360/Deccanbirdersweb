@@ -1,7 +1,7 @@
 {
   "content": [
     {
-      "id": "79f4789",
+      "id": "454179b",
       "elType": "section",
       "settings": {
         "background_background": "classic",
@@ -9,7 +9,7 @@
       },
       "elements": [
         {
-          "id": "cf33441",
+          "id": "059ba07",
           "elType": "column",
           "settings": {
             "_column_size": 100,
@@ -24,7 +24,7 @@
           },
           "elements": [
             {
-              "id": "6c4e632",
+              "id": "30e21c6",
               "elType": "widget",
               "settings": {
                 "editor": "<p style=\"text-transform:uppercase;letter-spacing:.08em;font-size:12px;font-weight:700;font-family:Sora,sans-serif;color:#2B72B8;margin:0 0 8px;\">Events</p>"
@@ -33,7 +33,7 @@
               "widgetType": "text-editor"
             },
             {
-              "id": "12d57cc",
+              "id": "b86320c",
               "elType": "widget",
               "settings": {
                 "title": "Bird walks and events",
@@ -63,7 +63,7 @@
       "isInner": false
     },
     {
-      "id": "661c2c6",
+      "id": "2f98a99",
       "elType": "section",
       "settings": {
         "background_background": "classic",
@@ -71,7 +71,7 @@
       },
       "elements": [
         {
-          "id": "a07fcd3",
+          "id": "1eb0cc4",
           "elType": "column",
           "settings": {
             "_column_size": 100,
@@ -87,7 +87,7 @@
           },
           "elements": [
             {
-              "id": "bc32b61",
+              "id": "8303a64",
               "elType": "widget",
               "settings": {
                 "editor": "<p>Walks run most weekends and are open to everyone, members or not. Past outings keep their checklist totals so you can see what a site produces at a given time of year.</p>",
@@ -109,7 +109,7 @@
       "isInner": false
     },
     {
-      "id": "c40d758",
+      "id": "19ababb",
       "elType": "section",
       "settings": {
         "background_background": "classic",
@@ -117,7 +117,7 @@
       },
       "elements": [
         {
-          "id": "df028ec",
+          "id": "107e105",
           "elType": "column",
           "settings": {
             "_column_size": 100,
@@ -132,7 +132,7 @@
           },
           "elements": [
             {
-              "id": "6afeaa6",
+              "id": "f01da59",
               "elType": "widget",
               "settings": {
                 "html": "<div class=\"tab-bar\">\n  <button class=\"tab-btn active\" data-tab=\"upcoming\">Upcoming</button>\n  <button class=\"tab-btn\" data-tab=\"past\">Past events</button>\n</div>\n<div class=\"events-tab-panel\" id=\"events-upcoming\"></div>\n<div class=\"events-tab-panel\" id=\"events-past\" hidden></div>"
@@ -147,7 +147,7 @@
       "isInner": false
     },
     {
-      "id": "829ea50",
+      "id": "d6e66e2",
       "elType": "section",
       "settings": {
         "background_background": "classic",
@@ -155,7 +155,7 @@
       },
       "elements": [
         {
-          "id": "05a93ce",
+          "id": "e4fed4d",
           "elType": "column",
           "settings": {
             "_column_size": 100,
@@ -172,7 +172,7 @@
           },
           "elements": [
             {
-              "id": "9a4d500",
+              "id": "43f6a94",
               "elType": "widget",
               "settings": {
                 "editor": "<p style=\"text-align:center;color:#FFFFFF;font-family:Sora,sans-serif;font-weight:700;font-size:26px;margin:0 0 20px;\">Join 500+ birders across the Deccan Plateau</p>",
@@ -182,7 +182,7 @@
               "widgetType": "text-editor"
             },
             {
-              "id": "5887249",
+              "id": "3862b32",
               "elType": "widget",
               "settings": {
                 "text": "Become a member →",

@@ -1,7 +1,7 @@
 {
   "content": [
     {
-      "id": "0747f86",
+      "id": "f522ccf",
       "elType": "section",
       "settings": {
         "background_background": "classic",
@@ -9,7 +9,7 @@
       },
       "elements": [
         {
-          "id": "03ca881",
+          "id": "6e201a9",
           "elType": "column",
           "settings": {
             "_column_size": 100,
@@ -24,7 +24,7 @@
           },
           "elements": [
             {
-              "id": "3d75dd1",
+              "id": "4c5dfa8",
               "elType": "widget",
               "settings": {
                 "editor": "<p style=\"text-transform:uppercase;letter-spacing:.08em;font-size:12px;font-weight:700;font-family:Sora,sans-serif;color:#2B72B8;margin:0 0 8px;\">Library</p>"
@@ -33,7 +33,7 @@
               "widgetType": "text-editor"
             },
             {
-              "id": "6bce284",
+              "id": "6349d7d",
               "elType": "widget",
               "settings": {
                 "title": "Archives",
@@ -63,7 +63,7 @@
       "isInner": false
     },
     {
-      "id": "b9f3340",
+      "id": "4f20abe",
       "elType": "section",
       "settings": {
         "background_background": "classic",
@@ -71,7 +71,7 @@
       },
       "elements": [
         {
-          "id": "64753ce",
+          "id": "5614f79",
           "elType": "column",
           "settings": {
             "_column_size": 100,
@@ -87,7 +87,7 @@
           },
           "elements": [
             {
-              "id": "3e45e0f",
+              "id": "88560aa",
               "elType": "widget",
               "settings": {
                 "html": "<div class=\"library-columns\">\n  <div class=\"library-col\">\n    <h3>Society</h3>\n    <ul><li><a href=\"#\" target=\"_blank\" rel=\"noopener\">Memorandum, Rules and Regulations</a></li></ul>\n  </div>\n  <div class=\"library-col\">\n    <h3>Publications</h3>\n    <ul>\n      <li><a href=\"#\" target=\"_blank\" rel=\"noopener\">Aasheesh Pittie and Siraj A. Taher: Mid-winter Waterbird Census in Andhra Pradesh: 1987–1996</a></li>\n      <li><a href=\"#\" target=\"_blank\" rel=\"noopener\">Aasheesh Pittie: Checklist of birds of Andhra Pradesh (Version 1.1)</a></li>\n    </ul>\n  </div>\n</div>"
@@ -102,7 +102,7 @@
       "isInner": false
     },
     {
-      "id": "26eccdf",
+      "id": "4d5963b",
       "elType": "section",
       "settings": {
         "background_background": "classic",
@@ -110,7 +110,7 @@
       },
       "elements": [
         {
-          "id": "b5383f7",
+          "id": "b077c62",
           "elType": "column",
           "settings": {
             "_column_size": 100,
@@ -126,7 +126,7 @@
           },
           "elements": [
             {
-              "id": "a847cda",
+              "id": "3c187a0",
               "elType": "widget",
               "settings": {
                 "editor": "<p>PITTA is Deccan Birders' monthly bulletin published since 1980. Pick a year to see every issue. Issues from 2010–2013 are hosted on archive.org; later years on Google Drive.</p>",
@@ -148,7 +148,7 @@
       "isInner": false
     },
     {
-      "id": "acac192",
+      "id": "06bc724",
       "elType": "section",
       "settings": {
         "background_background": "classic",
@@ -156,7 +156,7 @@
       },
       "elements": [
         {
-          "id": "54f18f9",
+          "id": "b9623f0",
           "elType": "column",
           "settings": {
             "_column_size": 100,
@@ -172,7 +172,7 @@
           },
           "elements": [
             {
-              "id": "9912d54",
+              "id": "b63d215",
               "elType": "widget",
               "settings": {
                 "shortcode": "[db_pitta_accordion]"

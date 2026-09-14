@@ -1,7 +1,7 @@
 {
   "content": [
     {
-      "id": "478b839",
+      "id": "30f1a19",
       "elType": "section",
       "settings": {
         "background_background": "classic",
@@ -9,7 +9,7 @@
       },
       "elements": [
         {
-          "id": "7aa39c2",
+          "id": "880c50d",
           "elType": "column",
           "settings": {
             "_column_size": 100,
@@ -24,7 +24,7 @@
           },
           "elements": [
             {
-              "id": "06f2ff8",
+              "id": "ead9663",
               "elType": "widget",
               "settings": {
                 "editor": "<p style=\"text-transform:uppercase;letter-spacing:.08em;font-size:12px;font-weight:700;font-family:Sora,sans-serif;color:#2B72B8;margin:0 0 8px;\">The Society</p>"
@@ -33,7 +33,7 @@
               "widgetType": "text-editor"
             },
             {
-              "id": "8243ced",
+              "id": "304d41d",
               "elType": "widget",
               "settings": {
                 "title": "About Us",
@@ -63,7 +63,7 @@
       "isInner": false
     },
     {
-      "id": "9036a8b",
+      "id": "175bd4f",
       "elType": "section",
       "settings": {
         "background_background": "classic",
@@ -71,7 +71,7 @@
       },
       "elements": [
         {
-          "id": "14d499a",
+          "id": "6d43f77",
           "elType": "column",
           "settings": {
             "_column_size": 100,
@@ -86,7 +86,7 @@
           },
           "elements": [
             {
-              "id": "5d8dcdd",
+              "id": "3e3a0fb",
               "elType": "widget",
               "settings": {
                 "image": {
@@ -105,7 +105,7 @@
       "isInner": false
     },
     {
-      "id": "ea02504",
+      "id": "a1c4186",
       "elType": "section",
       "settings": {
         "background_background": "classic",
@@ -113,7 +113,7 @@
       },
       "elements": [
         {
-          "id": "08c0b88",
+          "id": "743988e",
           "elType": "column",
           "settings": {
             "_column_size": 60,
@@ -128,7 +128,7 @@
           },
           "elements": [
             {
-              "id": "856c9f9",
+              "id": "bf7f844",
               "elType": "widget",
               "settings": {
                 "editor": "<p>Deccan Birders is a non-governmental organization founded in 1980 (as Birdwatchers Society of Andhra Pradesh and renamed Deccan Birders in 2018) with the primary objective of spreading the message of bird conservation. Deccan Birders is registered under the Public Societies Registration Act – I of 1350F.</p>",
@@ -147,7 +147,7 @@
           "isInner": false
         },
         {
-          "id": "781bef6",
+          "id": "a4630a7",
           "elType": "column",
           "settings": {
             "_column_size": 40,
@@ -162,7 +162,7 @@
           },
           "elements": [
             {
-              "id": "3c9237f",
+              "id": "a056ae1",
               "elType": "widget",
               "settings": {
                 "html": "<div class=\"card-links\"><a class=\"card-link\" href=\"#committee\"><span class=\"card-link-title\">Executive Committee →</span><span class=\"card-link-desc\">The members who run the society.</span></a><a class=\"card-link\" href=\"/aims\"><span class=\"card-link-title\">Aims and Objectives →</span><span class=\"card-link-desc\">What we set out to do, in eight points.</span></a></div>"
@@ -171,7 +171,7 @@
               "widgetType": "html"
             },
             {
-              "id": "9a1a6eb",
+              "id": "3bc11fd",
               "elType": "widget",
               "settings": {
                 "html": "<div class=\"contact-note\">For more details, contact <a href=\"mailto:secretary@deccanbirders.org\">secretary@deccanbirders.org</a>, <a href=\"mailto:president@deccanbirders.org\">president@deccanbirders.org</a>, or <a href=\"mailto:treasurer@deccanbirders.org\">treasurer@deccanbirders.org</a></div>"
@@ -186,7 +186,7 @@
       "isInner": false
     },
     {
-      "id": "45935a4",
+      "id": "ab48bc7",
       "elType": "section",
       "settings": {
         "background_background": "classic",
@@ -194,7 +194,7 @@
       },
       "elements": [
         {
-          "id": "c77fe85",
+          "id": "68c12d3",
           "elType": "column",
           "settings": {
             "_column_size": 100,
@@ -210,7 +210,7 @@
           },
           "elements": [
             {
-              "id": "e471e48",
+              "id": "7fbf7f9",
               "elType": "widget",
               "settings": {
                 "title": "Executive Committee",
@@ -235,7 +235,7 @@
               "widgetType": "heading"
             },
             {
-              "id": "ee46ef4",
+              "id": "04b85de",
               "elType": "widget",
               "settings": {
                 "editor": "<p style=\"text-align:center;\">Ten members, elected by the society, who run the trips, the newsletter and the census work.</p>",
@@ -251,7 +251,7 @@
               "widgetType": "text-editor"
             },
             {
-              "id": "dd6629d",
+              "id": "c25e8bf",
               "elType": "widget",
               "settings": {
                 "shortcode": "[db_committee_grid]"
@@ -266,7 +266,7 @@
       "isInner": false
     },
     {
-      "id": "bbf63a4",
+      "id": "611cf55",
       "elType": "section",
       "settings": {
         "background_background": "classic",
@@ -274,7 +274,7 @@
       },
       "elements": [
         {
-          "id": "e0def55",
+          "id": "9165a1a",
           "elType": "column",
           "settings": {
             "_column_size": 100,
@@ -291,7 +291,7 @@
           },
           "elements": [
             {
-              "id": "4d9fa1d",
+              "id": "a4eb48b",
               "elType": "widget",
               "settings": {
                 "editor": "<p style=\"text-align:center;color:#FFFFFF;font-family:Sora,sans-serif;font-weight:700;font-size:26px;margin:0 0 20px;\">Join 500+ birders across the Deccan Plateau</p>",
@@ -301,7 +301,7 @@
               "widgetType": "text-editor"
             },
             {
-              "id": "d3ba702",
+              "id": "f499874",
               "elType": "widget",
               "settings": {
                 "text": "Become a member →",

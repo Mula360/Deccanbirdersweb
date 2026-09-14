@@ -19,7 +19,7 @@ if (!$photos) {
   <?php endforeach; ?>
 </div>
 
-<div class="photo-masonry" id="photo-grid">
+<div class="photo-masonry" id="photos-grid">
   <?php foreach ($photos as $photo):
     $img      = get_field('photo', $photo->ID);
     $species  = get_field('species_name', $photo->ID);
@@ -52,7 +52,7 @@ if (!$photos) {
 (function () {
   'use strict';
 
-  var grid    = document.getElementById('photo-grid');
+  var grid    = document.getElementById("photos-grid");
   var lightbox = document.getElementById('db-lightbox');
   if (!grid || !lightbox) return;
 
