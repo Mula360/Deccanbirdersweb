@@ -34,7 +34,9 @@
 (function () {
 'use strict';
 
-const API      = (window.DB_CONFIG?.api_base || '').replace(/\/$/, '');
+// Same-origin WP REST proxy (see functions.php) — avoids the Vercel API's
+// CORS restriction to the production domain, and caches responses server-side.
+const API      = '/wp-json/db/v1';
 const region   = 'IN';
 let activeTab  = 'notable';
 let controller = null;
@@ -111,7 +113,7 @@ async function fetchTab(tab, extra = {}) {
   controller = new AbortController();
   const params = new URLSearchParams({ region, tab, ...extra });
   try {
-    const res  = await fetch(`${API}/api/sightings?${params}`, { signal: controller.signal });
+    const res  = await fetch(`${API}/sightings?${params}`, { signal: controller.signal });
     const json = await res.json();
     if (json.error) {
       console.error('Sightings API error:', json.message);

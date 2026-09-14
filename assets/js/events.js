@@ -12,7 +12,9 @@
 (function () {
 'use strict';
 
-const API = (window.DB_CONFIG?.api_base || '').replace(/\/$/, '');
+// Same-origin WP REST proxy (see functions.php) — avoids the Vercel API's
+// CORS restriction to the production domain, and caches responses server-side.
+const API = '/wp-json/db/v1';
 
 /* -------------------------------------------------------------------------
  * Utilities
@@ -87,7 +89,7 @@ async function initHomeEvents() {
   const grid = document.getElementById('home-events-grid');
   if (!grid) return;
   try {
-    const res  = await fetch(`${API}/api/events`);
+    const res  = await fetch(`${API}/events`);
     const json = await res.json();
     if (json.error) throw new Error(json.message || 'Request failed');
     const data = json.data || [];
@@ -128,7 +130,7 @@ async function fetchMergedPastEvents() {
   }
 
   try {
-    const res  = await fetch(`${API}/api/events?scope=past`);
+    const res  = await fetch(`${API}/events?scope=past`);
     const json = await res.json();
     if (json.error) throw new Error(json.message || 'Request failed');
     calendarPastEvents = (json.data || []).map((ev) => ({ source: 'calendar', sortDate: ev.date, event: ev }));
@@ -189,7 +191,7 @@ async function initEventsPage() {
   if (!upcoming) return;
 
   try {
-    const res  = await fetch(`${API}/api/events`);
+    const res  = await fetch(`${API}/events`);
     const json = await res.json();
     if (json.error) throw new Error(json.message || 'Request failed');
     const data = json.data || [];

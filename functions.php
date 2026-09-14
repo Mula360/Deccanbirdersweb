@@ -262,6 +262,84 @@ function db_sc_aims($atts) {
 }
 
 /* -----------------------------------------------------------------------
+ * 8b. Same-origin proxy for the deccan-birders-api Vercel endpoints
+ *
+ * The Vercel API's CORS config only allows the eventual production domain
+ * (deccanbirders.org), so a browser on this Hostinger preview domain gets
+ * every /api/events, /api/sightings and /api/videos response blocked by
+ * CORS even though the API itself returns good data. Proxying through a
+ * REST route on this same site sidesteps CORS entirely (same origin) and
+ * doubles as a server-side cache, so eBird/Calendar/YouTube aren't hit on
+ * every page view.
+ * ---------------------------------------------------------------------*/
+function db_api_base() {
+  return rtrim(get_option('db_api_base_url', 'https://deccan-birders-api.vercel.app'), '/');
+}
+
+/**
+ * Fetch a Vercel API path, cached in a transient. $allowed_params whitelists
+ * which query args from the incoming request are forwarded upstream.
+ */
+function db_proxy_fetch($path, WP_REST_Request $request, array $allowed_params, $ttl) {
+  $query = [];
+  foreach ($allowed_params as $param) {
+    $val = $request->get_param($param);
+    if ($val !== null && $val !== '') $query[$param] = $val;
+  }
+  ksort($query);
+  $cache_key = 'db_proxy_' . md5($path . '?' . http_build_query($query));
+
+  $cached = get_transient($cache_key);
+  if ($cached !== false) return $cached;
+
+  $url = db_api_base() . $path . (($query) ? ('?' . http_build_query($query)) : '');
+  $res = wp_remote_get($url, ['timeout' => 12]);
+
+  if (is_wp_error($res)) {
+    return ['error' => true, 'message' => $res->get_error_message()];
+  }
+  $code = wp_remote_retrieve_response_code($res);
+  $body = json_decode(wp_remote_retrieve_body($res), true);
+
+  if ($code !== 200 || !is_array($body)) {
+    return ['error' => true, 'message' => 'Upstream API returned HTTP ' . $code];
+  }
+  if (empty($body['error'])) {
+    set_transient($cache_key, $body, $ttl);
+  }
+  return $body;
+}
+
+add_action('rest_api_init', function() {
+  register_rest_route('db/v1', '/events', [
+    'methods'             => 'GET',
+    'permission_callback' => '__return_true',
+    'callback'            => function(WP_REST_Request $request) {
+      $ttl = $request->get_param('scope') === 'past' ? 6 * HOUR_IN_SECONDS : HOUR_IN_SECONDS;
+      return rest_ensure_response(db_proxy_fetch('/api/events', $request, ['scope'], $ttl));
+    },
+  ]);
+
+  register_rest_route('db/v1', '/sightings', [
+    'methods'             => 'GET',
+    'permission_callback' => '__return_true',
+    'callback'            => function(WP_REST_Request $request) {
+      $tab = $request->get_param('tab');
+      $ttl = in_array($tab, ['hotspots', 'hotspot_species', 'onthisday'], true) ? DAY_IN_SECONDS : 15 * MINUTE_IN_SECONDS;
+      return rest_ensure_response(db_proxy_fetch('/api/sightings', $request, ['region', 'tab', 'm', 'd', 'locId', 'speciesCode'], $ttl));
+    },
+  ]);
+
+  register_rest_route('db/v1', '/videos', [
+    'methods'             => 'GET',
+    'permission_callback' => '__return_true',
+    'callback'            => function(WP_REST_Request $request) {
+      return rest_ensure_response(db_proxy_fetch('/api/videos', $request, [], 6 * HOUR_IN_SECONDS));
+    },
+  ]);
+});
+
+/* -----------------------------------------------------------------------
  * 9. Seed data — runs once
  * ---------------------------------------------------------------------*/
 add_action('init', function() {

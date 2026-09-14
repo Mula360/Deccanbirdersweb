@@ -7,7 +7,9 @@
 (function () {
 'use strict';
 
-const API = (window.DB_CONFIG?.api_base || '').replace(/\/$/, '');
+// Same-origin WP REST proxy (see functions.php) — avoids the Vercel API's
+// CORS restriction to the production domain, and caches responses server-side.
+const API = '/wp-json/db/v1';
 
 function escapeHtml(str) {
   const div = document.createElement('div');
@@ -28,7 +30,7 @@ async function initVideos() {
   </div>`;
 
   try {
-    const res  = await fetch(`${API}/api/videos`);
+    const res  = await fetch(`${API}/videos`);
     const json = await res.json();
     if (json.error) throw new Error(json.message || 'Request failed');
     const data = json.data || [];
