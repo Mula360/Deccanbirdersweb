@@ -643,6 +643,86 @@ body.nav-open { overflow: hidden; }
 .autocomplete-empty { padding: 14px 16px; color: var(--text-muted); font-size: 13px; }
 
 /* -------------------------------------------------------------------------
+   Card links (About page: "Executive Committee →", "Aims and Objectives →")
+   ---------------------------------------------------------------------- */
+.card-links { display: flex; flex-direction: column; gap: 12px; }
+.card-link {
+  display: block;
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-card);
+  padding: 20px 24px;
+  text-decoration: none;
+  transition: border-color 150ms, transform 150ms;
+}
+.card-link:hover { border-color: var(--blue); transform: translateX(2px); }
+.card-link-title { display: block; font-family: var(--font-head); font-weight: 700; font-size: 17px; color: var(--ink); margin-bottom: 4px; }
+.card-link-desc { display: block; font-size: 13px; color: var(--text-muted); }
+.contact-note {
+  background: var(--blue-light);
+  border-radius: var(--radius-sm);
+  padding: 16px 20px;
+  font-size: 14px;
+  color: var(--text-body);
+}
+
+/* -------------------------------------------------------------------------
+   Numbered aims list ([db_aims] / Aims page)
+   ---------------------------------------------------------------------- */
+.aims-list { display: flex; flex-direction: column; gap: 20px; max-width: 820px; margin: 0 auto; }
+.aim-row { display: flex; gap: 20px; align-items: flex-start; }
+.aim-number {
+  flex-shrink: 0;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: var(--green-light);
+  color: var(--green-dark);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-head);
+  font-weight: 700;
+  font-size: 15px;
+}
+.aim-row p { color: var(--text-body); font-size: 15px; line-height: 1.7; padding-top: 6px; }
+
+/* -------------------------------------------------------------------------
+   Photo submission / volunteer forms (Gallery, Contact)
+   ---------------------------------------------------------------------- */
+.submission-form { display: flex; flex-direction: column; gap: 18px; max-width: 560px; }
+.submission-form label { font-family: var(--font-head); font-weight: 600; font-size: 14px; color: var(--ink); margin-bottom: 6px; display: block; }
+.submission-form input[type="text"],
+.submission-form input[type="email"],
+.submission-form input[type="file"],
+.submission-form select,
+.submission-form textarea {
+  width: 100%;
+  font-family: var(--font-body);
+  font-size: 15px;
+  padding: 12px 16px;
+  border: 2px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: white;
+  color: var(--ink);
+  transition: border-color 150ms;
+}
+.submission-form input:focus,
+.submission-form select:focus,
+.submission-form textarea:focus { outline: none; border-color: var(--blue); }
+.submission-form .form-hint { font-size: 12px; color: var(--text-muted); margin-top: 4px; }
+.submission-form .form-checkbox { display: flex; align-items: flex-start; gap: 8px; font-size: 13px; color: var(--text-muted); }
+.submission-form .form-checkbox input { width: auto; margin-top: 3px; }
+.dropzone {
+  border: 2px dashed var(--border);
+  border-radius: var(--radius-sm);
+  padding: 24px;
+  text-align: center;
+  color: var(--text-muted);
+  font-size: 14px;
+}
+
+/* -------------------------------------------------------------------------
    Fact / humour cards ([db_bird_fact], [db_birding_joke])
    ---------------------------------------------------------------------- */
 .fact-card, .humour-card {
@@ -687,8 +767,9 @@ body.nav-open { overflow: hidden; }
   font-weight: 700;
   font-size: 22px;
 }
-.member-name { font-family: var(--font-head); font-weight: 700; font-size: 16px; color: var(--ink); }
-.member-role { color: var(--text-muted); font-size: 13px; margin-top: 2px; }
+.member-photo-pending { color: var(--border); font-size: 10px; text-transform: uppercase; letter-spacing: 0.05em; margin: -6px 0 6px; }
+.member-role { color: var(--green); font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; margin-top: 2px; }
+.member-name { font-family: var(--font-head); font-weight: 700; font-size: 16px; color: var(--ink); margin-top: 2px; }
 .member-email { display: inline-block; font-size: 13px; margin-top: 6px; }
 
 /* -------------------------------------------------------------------------
@@ -828,38 +909,40 @@ body.lightbox-open { overflow: hidden; }
 .pitta-year[open] .pitta-year-heading::after { transform: rotate(45deg); }
 .pitta-count { font-family: var(--font-body); font-weight: 400; font-size: 13px; color: var(--text-muted); }
 
-.pitta-issues { padding: 0 20px 16px; display: flex; flex-direction: column; gap: 8px; }
-.pitta-row {
+.pitta-month-grid {
+  padding: 4px 20px 20px;
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 8px;
+}
+.pitta-month-cell {
   display: flex;
+  flex-direction: column;
   align-items: center;
-  flex-wrap: wrap;
-  gap: 12px;
-  padding: 10px 0;
-  border-top: 1px solid var(--border-light);
-}
-.pitta-row:first-child { border-top: none; }
-.pitta-vol { font-family: var(--font-head); font-weight: 600; font-size: 13px; color: var(--text-muted); white-space: nowrap; }
-.pitta-title { flex: 1; min-width: 160px; font-size: 14px; color: var(--ink); }
-.pitta-part-badge {
-  font-size: 11px;
-  font-weight: 600;
-  padding: 2px 8px;
-  border-radius: var(--radius-btn);
-  background: var(--yellow);
-  color: var(--ink);
-}
-.btn-pitta-link {
-  font-family: var(--font-head);
-  font-weight: 600;
-  font-size: 13px;
-  color: var(--blue);
+  gap: 4px;
+  padding: 12px 6px;
+  border-radius: var(--radius-sm);
+  background: var(--surface);
   text-decoration: none;
-  white-space: nowrap;
+  text-align: center;
 }
-.btn-pitta-link:hover { text-decoration: underline; }
+.pitta-month-label {
+  font-family: var(--font-head);
+  font-weight: 700;
+  font-size: 12px;
+  letter-spacing: 0.04em;
+  color: var(--text-muted);
+}
+.pitta-month-action { font-size: 12px; color: var(--border); }
+.pitta-month-cell.has-issue { background: var(--blue-light); cursor: pointer; transition: background 150ms; }
+.pitta-month-cell.has-issue .pitta-month-label { color: var(--blue-dark); }
+.pitta-month-cell.has-issue .pitta-month-action { color: var(--blue); font-weight: 600; }
+.pitta-month-cell.has-issue:hover { background: var(--blue); }
+.pitta-month-cell.has-issue:hover .pitta-month-label,
+.pitta-month-cell.has-issue:hover .pitta-month-action { color: #fff; }
 
 /* -------------------------------------------------------------------------
-   Membership tier cards ([db_membership_tiers])
+   Membership application options + benefits ([db_membership_tiers])
    ---------------------------------------------------------------------- */
 .btn-outline-dark {
   background: transparent;
@@ -868,66 +951,42 @@ body.lightbox-open { overflow: hidden; }
 }
 .btn-outline-dark:hover { background: var(--ink); color: #fff; border-color: var(--ink); }
 
-.tiers-grid {
+.apply-options {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(2, 1fr);
   gap: 24px;
+  margin-bottom: 48px;
 }
-.tier-card {
+.apply-option {
   border: 1px solid var(--border);
   border-radius: var(--radius-card);
   padding: 32px 28px;
   background: #fff;
-  text-align: center;
-  position: relative;
-  transition: transform 150ms, box-shadow 150ms;
 }
-.tier-card:hover { transform: translateY(-4px); box-shadow: 0 8px 24px rgba(22, 36, 29, 0.08); }
-.tier-card--popular {
-  border: 2px solid var(--blue);
-  box-shadow: 0 12px 28px rgba(43, 114, 184, 0.16);
-  transform: translateY(-4px);
-}
-.tier-popular-badge {
-  position: absolute;
-  top: -13px;
-  left: 50%;
-  transform: translateX(-50%);
-  background: var(--blue);
-  color: #fff;
-  font-family: var(--font-head);
-  font-size: 11px;
-  font-weight: 600;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-  padding: 4px 14px;
-  border-radius: var(--radius-btn);
-  white-space: nowrap;
-}
-.tier-name { font-family: var(--font-head); font-weight: 700; font-size: 18px; color: var(--ink); }
-.tier-price { font-family: var(--font-head); font-weight: 700; font-size: 2rem; color: var(--green); margin-top: 12px; }
-.tier-period { font-size: 13px; color: var(--text-muted); margin-bottom: 20px; }
-.tier-features {
-  text-align: left;
+.apply-option h3 { font-family: var(--font-head); font-weight: 700; font-size: 20px; color: var(--ink); margin: 8px 0 12px; }
+.apply-option p { color: var(--text-body); font-size: 15px; margin-bottom: 20px; }
+
+.membership-benefits-heading { font-family: var(--font-head); font-weight: 700; font-size: 24px; color: var(--ink); margin-bottom: 20px; text-align: center; }
+.benefit-list {
+  max-width: 640px;
+  margin: 0 auto;
   display: flex;
   flex-direction: column;
-  gap: 10px;
-  margin-bottom: 24px;
+  gap: 14px;
 }
-.tier-features li {
-  font-size: 14px;
+.benefit-list li {
+  font-size: 16px;
   color: var(--text-body);
-  padding-left: 24px;
+  padding-left: 30px;
   position: relative;
 }
-.tier-features li::before {
+.benefit-list li::before {
   content: '✓';
   position: absolute;
   left: 0;
   color: var(--green);
   font-weight: 700;
 }
-.tier-card .btn { width: 100%; }
 
 /* -------------------------------------------------------------------------
    Milestone timeline ([db_milestones]) — year left, dot centre, text right
@@ -1040,13 +1099,18 @@ body.lightbox-open { overflow: hidden; }
 .form-success { text-align: center; padding: 40px 20px; }
 
 /* -------------------------------------------------------------------------
-   Contact form
+   Contact / submission forms (contact form, volunteer form, photo upload)
    ---------------------------------------------------------------------- */
-.db-contact-form { display: flex; flex-direction: column; gap: 18px; max-width: 560px; }
-.db-contact-form label { font-family: var(--font-head); font-weight: 600; font-size: 14px; color: var(--ink); margin-bottom: 6px; display: block; }
+.db-contact-form,
+.submission-form { display: flex; flex-direction: column; gap: 18px; max-width: 560px; }
+.db-contact-form label,
+.submission-form label { font-family: var(--font-head); font-weight: 600; font-size: 14px; color: var(--ink); margin-bottom: 6px; display: block; }
 .db-contact-form input,
 .db-contact-form select,
-.db-contact-form textarea {
+.db-contact-form textarea,
+.submission-form input,
+.submission-form select,
+.submission-form textarea {
   width: 100%;
   font-family: var(--font-body);
   font-size: 15px;
@@ -1059,8 +1123,13 @@ body.lightbox-open { overflow: hidden; }
 }
 .db-contact-form input:focus,
 .db-contact-form select:focus,
-.db-contact-form textarea:focus { outline: none; border-color: var(--blue); }
-.db-contact-form textarea { min-height: 140px; resize: vertical; }
+.db-contact-form textarea:focus,
+.submission-form input:focus,
+.submission-form select:focus,
+.submission-form textarea:focus { outline: none; border-color: var(--blue); }
+.db-contact-form textarea,
+.submission-form textarea { min-height: 140px; resize: vertical; }
+.form-field { margin-bottom: 20px; }
 .field-error { display: block; color: #B3261E; font-size: 12px; margin-top: 4px; min-height: 16px; }
 #form-global-error { color: #B3261E; font-size: 14px; min-height: 20px; }
 
@@ -1128,6 +1197,66 @@ body.lightbox-open { overflow: hidden; }
   text-align: center;
 }
 
+/* -------------------------------------------------------------------------
+   Home page extras: activity preview grid, PITTA teaser, past-events grid
+   ---------------------------------------------------------------------- */
+.activity-preview-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+}
+.activity-preview-card {
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 18px 16px;
+}
+.activity-preview-cadence {
+  display: block;
+  font-family: var(--font-head);
+  font-weight: 700;
+  font-size: 10px;
+  letter-spacing: 0.06em;
+  color: var(--text-muted);
+  margin-bottom: 6px;
+}
+.activity-preview-title { display: block; font-family: var(--font-head); font-weight: 700; font-size: 15px; color: var(--ink); }
+
+.pitta-teaser-list { display: flex; flex-direction: column; gap: 8px; margin: 16px 0 24px; }
+.pitta-teaser-list li { padding-left: 22px; position: relative; font-size: 15px; color: var(--text-body); }
+.pitta-teaser-list li::before { content: '•'; position: absolute; left: 0; color: var(--blue); font-weight: 700; }
+
+.past-events-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 16px;
+}
+
+.otd-heading { font-family: var(--font-head); font-weight: 700; font-size: 24px; color: var(--ink); margin-bottom: 20px; }
+
+.sightings-updated-note { color: var(--text-muted); font-size: 13px; margin: 8px 0 20px; }
+
+/* -------------------------------------------------------------------------
+   Archives — Library documents section
+   ---------------------------------------------------------------------- */
+.library-columns {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 32px;
+}
+.library-col h3 { font-family: var(--font-head); font-weight: 700; font-size: 15px; color: var(--ink); margin-bottom: 12px; }
+.library-col ul { display: flex; flex-direction: column; gap: 8px; }
+.library-col li { font-size: 14px; }
+.library-col a { color: var(--blue); }
+
+/* -------------------------------------------------------------------------
+   Contact page — phone/email info block
+   ---------------------------------------------------------------------- */
+.contact-info-block { background: #fff; border: 1px solid var(--border); border-radius: var(--radius-card); padding: 28px; }
+.contact-info-block h3 { font-family: var(--font-head); font-weight: 700; font-size: 18px; color: var(--ink); margin-bottom: 16px; }
+.contact-info-label { display: block; font-family: var(--font-head); font-weight: 700; font-size: 11px; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-muted); margin-top: 14px; }
+.contact-info-block p { margin-top: 4px; font-size: 15px; }
+
 /* =========================================================================
    Responsive breakpoints
    ========================================================================= */
@@ -1140,7 +1269,6 @@ body.lightbox-open { overflow: hidden; }
   .activity-row:nth-child(even) .activity-media,
   .activity-row:nth-child(even) .activity-text { order: initial; }
   .photo-masonry { columns: 3 180px; }
-  .tiers-grid { grid-template-columns: repeat(2, 1fr); }
 }
 
 /* 640px — grid/layout stacking */
@@ -1151,7 +1279,7 @@ body.lightbox-open { overflow: hidden; }
   .aims-grid {
     grid-template-columns: 1fr 1fr;
   }
-  .tiers-grid { grid-template-columns: 1fr; }
+  .apply-options { grid-template-columns: 1fr; }
   .photo-masonry { columns: 2 140px; }
   .hotspot-row { flex-wrap: wrap; }
   .sighting-row .locality { flex-basis: 100%; }
@@ -1162,4 +1290,7 @@ body.lightbox-open { overflow: hidden; }
     gap: 12px;
   }
   .milestone-item::before { left: 86px; }
+  .pitta-month-grid { grid-template-columns: repeat(3, 1fr); }
+  .activity-preview-grid { grid-template-columns: 1fr 1fr; }
+  .library-columns { grid-template-columns: 1fr; gap: 24px; }
 }

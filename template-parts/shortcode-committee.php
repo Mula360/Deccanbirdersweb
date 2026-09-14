@@ -28,8 +28,11 @@ usort($members, fn($a, $b) => ($a['member_display_order'] ?? 99) - ($b['member_d
         </span>
       <?php endif; ?>
     </div>
+    <?php if (!$has_photo): ?>
+      <p class="member-photo-pending">Photograph to follow</p>
+    <?php endif; ?>
+    <p class="member-role"><?php echo esc_html(strtoupper($m['member_role'])); ?></p>
     <h3 class="member-name"><?php echo esc_html($m['member_name']); ?></h3>
-    <p class="member-role"><?php echo esc_html($m['member_role']); ?></p>
     <?php if (!empty($m['member_email'])): ?>
       <a href="mailto:<?php echo esc_attr($m['member_email']); ?>" class="member-email">
         <?php echo esc_html($m['member_email']); ?>

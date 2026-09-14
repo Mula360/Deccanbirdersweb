@@ -1,74 +1,101 @@
 {
   "content": [
     {
-      "id": "f75517b",
+      "id": "6a96c92",
       "elType": "section",
       "settings": {
         "background_background": "classic",
-        "background_color": "#16241D",
-        "height": "min-height",
-        "custom_height": {
-          "unit": "vh",
-          "size": 35,
-          "sizes": []
-        },
-        "content_position": "middle"
+        "background_color": "#FFFFFF"
       },
       "elements": [
         {
-          "id": "e24b3f4",
+          "id": "37e9549",
           "elType": "column",
           "settings": {
             "_column_size": 100,
-            "content_position": "center",
-            "align": "center",
             "padding": {
               "unit": "px",
               "top": "60",
               "right": "20",
-              "bottom": "60",
+              "bottom": "30",
               "left": "20",
               "isLinked": false
             }
           },
           "elements": [
             {
-              "id": "f0af204",
+              "id": "74d13f1",
               "elType": "widget",
               "settings": {
-                "title": "Events & Trips",
+                "editor": "<p style=\"text-transform:uppercase;letter-spacing:.08em;font-size:12px;font-weight:700;font-family:Sora,sans-serif;color:#2B72B8;margin:0 0 8px;\">Events</p>"
+              },
+              "elements": [],
+              "widgetType": "text-editor"
+            },
+            {
+              "id": "eb4b964",
+              "elType": "widget",
+              "settings": {
+                "title": "Bird walks and events",
                 "header_size": "h1",
-                "align": "center",
-                "title_color": "#FFFFFF",
+                "title_color": "#16241D",
                 "typography_typography": "custom",
                 "typography_font_family": "Sora",
                 "typography_font_size": {
                   "unit": "px",
-                  "size": 48,
+                  "size": 44,
                   "sizes": []
                 },
                 "typography_font_size_mobile": {
                   "unit": "px",
-                  "size": 32,
+                  "size": 30,
                   "sizes": []
                 },
-                "typography_font_weight": "700"
+                "typography_font_weight": "800"
               },
               "elements": [],
               "widgetType": "heading"
+            }
+          ],
+          "isInner": false
+        }
+      ],
+      "isInner": false
+    },
+    {
+      "id": "cf3b463",
+      "elType": "section",
+      "settings": {
+        "background_background": "classic",
+        "background_color": "#FFFFFF"
+      },
+      "elements": [
+        {
+          "id": "8b9212c",
+          "elType": "column",
+          "settings": {
+            "_column_size": 100,
+            "padding": {
+              "unit": "px",
+              "top": "0",
+              "right": "20",
+              "bottom": "30",
+              "left": "20",
+              "isLinked": false
             },
+            "content_width": "boxed"
+          },
+          "elements": [
             {
-              "id": "1bca0a2",
+              "id": "6a1e0d2",
               "elType": "widget",
               "settings": {
-                "editor": "<p>Trips are usually planned on the second Sunday of each month. Non-members welcome — ₹100 contribution to the kitty.</p>",
-                "align": "center",
-                "text_color": "rgba(255,255,255,0.82)",
+                "editor": "<p>Walks run most weekends and are open to everyone, members or not. Past outings keep their checklist totals so you can see what a site produces at a given time of year.</p>",
                 "typography_typography": "custom",
                 "typography_font_family": "Source Sans 3",
                 "typography_font_size": {
                   "unit": "px",
-                  "size": 18,
+                  "size": 16,
                   "sizes": []
                 }
               },
@@ -82,7 +109,7 @@
       "isInner": false
     },
     {
-      "id": "d1e5301",
+      "id": "5c0179e",
       "elType": "section",
       "settings": {
         "background_background": "classic",
@@ -90,13 +117,13 @@
       },
       "elements": [
         {
-          "id": "14d2f25",
+          "id": "7123725",
           "elType": "column",
           "settings": {
             "_column_size": 100,
             "padding": {
               "unit": "px",
-              "top": "60",
+              "top": "20",
               "right": "20",
               "bottom": "80",
               "left": "20",
@@ -105,10 +132,10 @@
           },
           "elements": [
             {
-              "id": "875022e",
+              "id": "4ddd3fc",
               "elType": "widget",
               "settings": {
-                "html": "<div class=\"tab-bar\">\n  <button class=\"tab-btn active\" data-tab=\"upcoming\">Upcoming</button>\n  <button class=\"tab-btn\" data-tab=\"past\">Past trips</button>\n</div>\n<div class=\"events-tab-panel\" id=\"events-upcoming\"></div>\n<div class=\"events-tab-panel\" id=\"events-past\" hidden></div>"
+                "html": "<div class=\"tab-bar\">\n  <button class=\"tab-btn active\" data-tab=\"upcoming\">Upcoming</button>\n  <button class=\"tab-btn\" data-tab=\"past\">Past events</button>\n</div>\n<div class=\"events-tab-panel\" id=\"events-upcoming\"></div>\n<div class=\"events-tab-panel\" id=\"events-past\" hidden></div>"
               },
               "elements": [],
               "widgetType": "html"
@@ -120,7 +147,7 @@
       "isInner": false
     },
     {
-      "id": "d041bed",
+      "id": "3bcd7bf",
       "elType": "section",
       "settings": {
         "background_background": "classic",
@@ -128,7 +155,7 @@
       },
       "elements": [
         {
-          "id": "10cb816",
+          "id": "0e99ae4",
           "elType": "column",
           "settings": {
             "_column_size": 100,
@@ -145,17 +172,17 @@
           },
           "elements": [
             {
-              "id": "47425a2",
+              "id": "0d8cfe6",
               "elType": "widget",
               "settings": {
-                "editor": "<p style=\"text-align:center;color:#FFFFFF;font-family:Sora,sans-serif;font-weight:700;font-size:26px;margin:0 0 20px;\">Join 570+ birders across the Deccan Plateau</p>",
+                "editor": "<p style=\"text-align:center;color:#FFFFFF;font-family:Sora,sans-serif;font-weight:700;font-size:26px;margin:0 0 20px;\">Join 500+ birders across the Deccan Plateau</p>",
                 "align": "center"
               },
               "elements": [],
               "widgetType": "text-editor"
             },
             {
-              "id": "19ad64f",
+              "id": "3b5e7a4",
               "elType": "widget",
               "settings": {
                 "text": "Become a member →",

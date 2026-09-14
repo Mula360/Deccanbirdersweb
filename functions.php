@@ -157,6 +157,7 @@ add_shortcode('db_committee_grid',   'db_sc_committee');
 add_shortcode('db_photo_gallery',    'db_sc_gallery');
 add_shortcode('db_pitta_accordion',  'db_sc_pitta');
 add_shortcode('db_membership_tiers', 'db_sc_tiers');
+add_shortcode('db_aims',             'db_sc_aims');
 
 function db_sc_bird_fact($atts) {
   ob_start();
@@ -197,6 +198,12 @@ function db_sc_pitta($atts) {
 function db_sc_tiers($atts) {
   ob_start();
   get_template_part('template-parts/shortcode-membership-tiers');
+  return ob_get_clean();
+}
+
+function db_sc_aims($atts) {
+  ob_start();
+  get_template_part('template-parts/shortcode-aims');
   return ob_get_clean();
 }
 
@@ -251,6 +258,7 @@ add_action('init', function() {
     update_field('year',         $year,  $id);
     update_field('volume',       $vol,   $id);
     update_field('issue_number', $issue, $id);
+    update_field('month',        $issue, $id); // PITTA is monthly: issue N of a volume year is month N
     update_field('archive_url',  $url,   $id);
     update_field('url_type',     $type,  $id);
     update_field('is_part',      false,  $id);

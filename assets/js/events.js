@@ -82,35 +82,15 @@ async function initHomeEvents() {
 }
 
 /* -------------------------------------------------------------------------
- * Full Events page — upcoming (Vercel API) + past (WP REST / ACF)
+ * Past events — merged from two sources:
+ *  1. WordPress db_event posts with a full write-up (species count, leader,
+ *     turnout, highlights, PITTA report link) — the richer card.
+ *  2. The Google Calendar feed itself (via ?scope=past), for trips that
+ *     happened but haven't had a write-up added in WordPress yet.
+ * Shared by the full Events page and the homepage "Where we've been" strip.
  * ---------------------------------------------------------------------- */
 
-async function initEventsPage() {
-  const upcoming = document.getElementById('events-upcoming');
-  if (!upcoming) return;
-
-  try {
-    const res  = await fetch(`${API}/api/events`);
-    const json = await res.json();
-    if (json.error) throw new Error(json.message || 'Request failed');
-    const data = json.data || [];
-    if (!data.length) {
-      upcoming.innerHTML = '<div class="events-empty"><p>No upcoming trips scheduled. We plan trips every month — check back soon.</p></div>';
-    } else {
-      upcoming.innerHTML = `<div class="events-list">${data.map(renderEventCard).join('')}</div>`;
-    }
-  } catch (e) {
-    upcoming.innerHTML = '<p>Could not load events.</p>';
-  }
-
-  // Past events — merged from two sources:
-  //  1. WordPress db_event posts with a full write-up (species count, leader,
-  //     turnout, highlights, PITTA report link) — the richer card.
-  //  2. The Google Calendar feed itself (via ?scope=past), for trips that
-  //     happened but haven't had a write-up added in WordPress yet.
-  const past = document.getElementById('events-past');
-  if (!past) return;
-
+async function fetchMergedPastEvents() {
   let wpPastEvents = [];
   let calendarPastEvents = [];
   let wpFailed = false;
@@ -143,31 +123,79 @@ async function initEventsPage() {
   const merged = [...wpPastEvents, ...calendarPastEvents]
     .sort((a, b) => new Date(b.sortDate) - new Date(a.sortDate));
 
+  return { merged, bothFailed: wpFailed && calendarFailed };
+}
+
+function renderPastEventCard(item) {
+  if (item.source === 'wp') {
+    const e = item.post;
+    return `
+    <div class="event-card past-event-card">
+      <div class="past-event-species">${escapeHtml(e.acf?.species_count ?? '—')}<span>species</span></div>
+      <div class="event-info">
+        <div class="event-title">${e.title.rendered}</div>
+        <div class="event-meta">${escapeHtml(e.acf?.event_date || '')} · ${escapeHtml(e.acf?.location || '')}</div>
+        <div class="event-meta">Led by ${escapeHtml(e.acf?.leader || '—')} · ${escapeHtml(e.acf?.turnout ?? '?')} participants</div>
+        ${e.acf?.highlights ? `<div class="event-highlights">${escapeHtml(e.acf.highlights)}</div>` : ''}
+        ${e.acf?.report_link ? `<a href="${escapeHtml(e.acf.report_link)}" class="pitta-link" target="_blank" rel="noopener">PITTA report →</a>` : ''}
+      </div>
+    </div>`;
+  }
+  // Calendar-only record: no write-up yet, so render with the plain event card.
+  return renderEventCard(item.event);
+}
+
+/* -------------------------------------------------------------------------
+ * Homepage "Where we've been" strip (past events preview)
+ * ---------------------------------------------------------------------- */
+
+async function initHomePastEvents() {
+  const grid = document.getElementById('home-past-events-grid');
+  if (!grid) return;
+
+  const { merged, bothFailed } = await fetchMergedPastEvents();
+
   if (!merged.length) {
-    past.innerHTML = (wpFailed && calendarFailed)
-      ? '<p>Could not load past events.</p>'
-      : '<p>No past trip records yet.</p>';
+    grid.innerHTML = bothFailed ? '<p>Could not load past events.</p>' : '<p>No past trip records yet.</p>';
     return;
   }
 
-  past.innerHTML = merged.map((item) => {
-    if (item.source === 'wp') {
-      const e = item.post;
-      return `
-      <div class="event-card past-event-card">
-        <div class="past-event-species">${escapeHtml(e.acf?.species_count ?? '—')}<span>species</span></div>
-        <div class="event-info">
-          <div class="event-title">${e.title.rendered}</div>
-          <div class="event-meta">${escapeHtml(e.acf?.event_date || '')} · ${escapeHtml(e.acf?.location || '')}</div>
-          <div class="event-meta">Led by ${escapeHtml(e.acf?.leader || '—')} · ${escapeHtml(e.acf?.turnout ?? '?')} participants</div>
-          ${e.acf?.highlights ? `<div class="event-highlights">${escapeHtml(e.acf.highlights)}</div>` : ''}
-          ${e.acf?.report_link ? `<a href="${escapeHtml(e.acf.report_link)}" class="pitta-link" target="_blank" rel="noopener">PITTA report →</a>` : ''}
-        </div>
-      </div>`;
+  grid.innerHTML = merged.slice(0, 3).map(renderPastEventCard).join('');
+}
+
+/* -------------------------------------------------------------------------
+ * Full Events page — upcoming (Vercel API) + past (WP REST / ACF)
+ * ---------------------------------------------------------------------- */
+
+async function initEventsPage() {
+  const upcoming = document.getElementById('events-upcoming');
+  if (!upcoming) return;
+
+  try {
+    const res  = await fetch(`${API}/api/events`);
+    const json = await res.json();
+    if (json.error) throw new Error(json.message || 'Request failed');
+    const data = json.data || [];
+    if (!data.length) {
+      upcoming.innerHTML = '<div class="events-empty"><p>No upcoming trips scheduled. We plan trips every month — check back soon.</p></div>';
+    } else {
+      upcoming.innerHTML = `<div class="events-list">${data.map(renderEventCard).join('')}</div>`;
     }
-    // Calendar-only record: no write-up yet, so render with the plain event card.
-    return renderEventCard(item.event);
-  }).join('');
+  } catch (e) {
+    upcoming.innerHTML = '<p>Could not load events.</p>';
+  }
+
+  const past = document.getElementById('events-past');
+  if (!past) return;
+
+  const { merged, bothFailed } = await fetchMergedPastEvents();
+
+  if (!merged.length) {
+    past.innerHTML = bothFailed ? '<p>Could not load past events.</p>' : '<p>No past trip records yet.</p>';
+    return;
+  }
+
+  past.innerHTML = merged.map(renderPastEventCard).join('');
 }
 
 /* -------------------------------------------------------------------------
@@ -185,5 +213,6 @@ document.querySelectorAll('.tab-btn[data-tab]').forEach((btn) => {
 
 document.addEventListener('DOMContentLoaded', () => {
   initHomeEvents();
+  initHomePastEvents();
   initEventsPage();
 });

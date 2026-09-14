@@ -8,7 +8,7 @@
             "name": "aims",
             "aria-label": "",
             "type": "repeater",
-            "instructions": "",
+            "instructions": "The society's official numbered aims and objectives, as registered.",
             "required": 0,
             "conditional_logic": 0,
             "wrapper": {
@@ -16,36 +16,16 @@
                 "class": "",
                 "id": ""
             },
-            "collapsed": "field_aims_aims_aim_title",
+            "collapsed": "field_aims_aims_aim_text",
             "min": 1,
-            "max": 10,
+            "max": 20,
             "layout": "table",
             "button_label": "Add aim",
             "sub_fields": [
                 {
-                    "key": "field_aims_aims_aim_title",
-                    "label": "Aim Title",
-                    "name": "aim_title",
-                    "aria-label": "",
-                    "type": "text",
-                    "instructions": "",
-                    "required": 0,
-                    "conditional_logic": 0,
-                    "wrapper": {
-                        "width": "",
-                        "class": "",
-                        "id": ""
-                    },
-                    "default_value": "",
-                    "maxlength": "",
-                    "placeholder": "",
-                    "prepend": "",
-                    "append": ""
-                },
-                {
-                    "key": "field_aims_aims_aim_description",
-                    "label": "Aim Description",
-                    "name": "aim_description",
+                    "key": "field_aims_aims_aim_text",
+                    "label": "Aim Text",
+                    "name": "aim_text",
                     "aria-label": "",
                     "type": "textarea",
                     "instructions": "",
@@ -64,12 +44,14 @@
                 }
             ],
             "default_value": [
-                { "aim_title": "Promote Bird Conservation", "aim_description": "To create awareness among the public about the need for conservation of birds and their habitats in and around the Deccan Plateau." },
-                { "aim_title": "Encourage Birdwatching", "aim_description": "To encourage the pursuit of birdwatching as a recreational and scientific activity among people of all ages and backgrounds." },
-                { "aim_title": "Document Avifauna", "aim_description": "To systematically record and document the distribution, movement, and population trends of bird species through field trips and citizen science." },
-                { "aim_title": "Support Scientific Research", "aim_description": "To collaborate with researchers, universities, and government bodies by contributing field data for ornithological and ecological studies." },
-                { "aim_title": "Publish PITTA Bulletin", "aim_description": "To publish PITTA, a monthly newsletter, sharing sightings, articles, and updates on birding activities with members and the wider community." },
-                { "aim_title": "Educate the Next Generation", "aim_description": "To inspire and educate students and young naturalists about birds and conservation through nature camps, talks, and outreach programmes." }
+                { "aim_text": "To inculcate in the people, especially the youth a spirit of adventure, a love and appreciation of the beauties of nature, especially the avifauna." },
+                { "aim_text": "To impress upon the people the role of avifauna in life on earth and the urgent need for their protection and conservation." },
+                { "aim_text": "To inculcate in the people a sense of responsibility towards maintaining the environment in a good state and the protection of the other inhabitants of this earth and particularly the avifauna." },
+                { "aim_text": "To work for the protection and conservation of bird sanctuaries, parks and habitats generally all over India and particularly in Telangana and Andhra Pradesh." },
+                { "aim_text": "To promote amongst the people, the knowledge of ornithology in all its branches including particularly the study of bird life of the Oriental Regions, particularly India and the adjoining zoo-geographical regions; both alive and otherwise." },
+                { "aim_text": "To carry out research in all branches of ornithology and to assist with information and advice as well as financially where possible, other institutions and individual in similar pursuits." },
+                { "aim_text": "To provide, equip, maintain and replenish a museum and other repositories for birds, both living and dead, which are suitable and necessary for the study of birds." },
+                { "aim_text": "To do all or any of the above mentioned acts solely or with another or others, for joint management or collaboration or affiliation or any other arrangements with societies or persons having similar or allied objects which may further or benefit the objects of this Society." }
             ]
         }
     ],
@@ -91,5 +73,5 @@
     "active": true,
     "description": "Location rule (Page == a specific page) is a placeholder for the page with slug \"aims\" — ACF has no native slug-matching rule, so once that page exists, open this field group and reselect it in Location so the stored ID matches.",
     "show_in_rest": 0,
-    "modified": 1789257600
+    "modified": 1789344000
 }

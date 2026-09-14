@@ -1,84 +1,101 @@
 {
   "content": [
     {
-      "id": "951ebb2",
+      "id": "b4cf886",
       "elType": "section",
       "settings": {
         "background_background": "classic",
-        "background_color": "#16241D",
-        "height": "min-height",
-        "custom_height": {
-          "unit": "vh",
-          "size": 35,
-          "sizes": []
-        },
-        "content_position": "middle"
+        "background_color": "#FFFFFF"
       },
       "elements": [
         {
-          "id": "7f79c3b",
+          "id": "b5a986d",
           "elType": "column",
           "settings": {
             "_column_size": 100,
-            "content_position": "center",
-            "align": "center",
             "padding": {
               "unit": "px",
               "top": "60",
               "right": "20",
-              "bottom": "60",
+              "bottom": "30",
               "left": "20",
               "isLinked": false
             }
           },
           "elements": [
             {
-              "id": "159ea9a",
+              "id": "2dd229e",
               "elType": "widget",
               "settings": {
-                "editor": "<span style=\"display:inline-block;background:#F2B705;color:#16241D;padding:7px 18px;border-radius:999px;font-family:Sora,sans-serif;font-weight:600;font-size:13px;letter-spacing:.02em;\">Powered by eBird</span>",
-                "align": "center"
+                "editor": "<p style=\"text-transform:uppercase;letter-spacing:.08em;font-size:12px;font-weight:700;font-family:Sora,sans-serif;color:#2B72B8;margin:0 0 8px;\">Live From eBird</p>"
               },
               "elements": [],
               "widgetType": "text-editor"
             },
             {
-              "id": "513f96b",
+              "id": "fde3c7b",
               "elType": "widget",
               "settings": {
-                "title": "Bird Sightings",
+                "title": "Recent Sightings",
                 "header_size": "h1",
-                "align": "center",
-                "title_color": "#FFFFFF",
+                "title_color": "#16241D",
                 "typography_typography": "custom",
                 "typography_font_family": "Sora",
                 "typography_font_size": {
                   "unit": "px",
-                  "size": 48,
+                  "size": 44,
                   "sizes": []
                 },
                 "typography_font_size_mobile": {
                   "unit": "px",
-                  "size": 32,
+                  "size": 30,
                   "sizes": []
                 },
-                "typography_font_weight": "700"
+                "typography_font_weight": "800"
               },
               "elements": [],
               "widgetType": "heading"
+            }
+          ],
+          "isInner": false
+        }
+      ],
+      "isInner": false
+    },
+    {
+      "id": "00041f1",
+      "elType": "section",
+      "settings": {
+        "background_background": "classic",
+        "background_color": "#FFFFFF"
+      },
+      "elements": [
+        {
+          "id": "bca3fb5",
+          "elType": "column",
+          "settings": {
+            "_column_size": 100,
+            "padding": {
+              "unit": "px",
+              "top": "0",
+              "right": "20",
+              "bottom": "30",
+              "left": "20",
+              "isLinked": false
             },
+            "content_width": "boxed"
+          },
+          "elements": [
             {
-              "id": "9ccc1ea",
+              "id": "871f064",
               "elType": "widget",
               "settings": {
-                "editor": "<p>Real-time bird sightings across the Deccan Plateau, powered by eBird — the world's largest citizen-science bird database. Switch between notable, recent, and top hotspot sightings, or look up a species to see where it's been spotted nearby.</p>",
-                "align": "center",
-                "text_color": "rgba(255,255,255,0.82)",
+                "editor": "<p>Every record below is pulled from checklists submitted to eBird for the region. Submit yours and it appears here.</p>",
                 "typography_typography": "custom",
                 "typography_font_family": "Source Sans 3",
                 "typography_font_size": {
                   "unit": "px",
-                  "size": 18,
+                  "size": 16,
                   "sizes": []
                 }
               },
@@ -92,7 +109,7 @@
       "isInner": false
     },
     {
-      "id": "056a0f3",
+      "id": "0a8427b",
       "elType": "section",
       "settings": {
         "background_background": "classic",
@@ -100,25 +117,25 @@
       },
       "elements": [
         {
-          "id": "322a3b4",
+          "id": "8e88b1a",
           "elType": "column",
           "settings": {
             "_column_size": 100,
             "padding": {
               "unit": "px",
-              "top": "60",
+              "top": "0",
               "right": "20",
-              "bottom": "20",
+              "bottom": "40",
               "left": "20",
               "isLinked": false
             }
           },
           "elements": [
             {
-              "id": "e3bbe96",
+              "id": "a29614b",
               "elType": "widget",
               "settings": {
-                "html": "<div class=\"region-toggle\" role=\"group\" aria-label=\"Region\">\n  <button class=\"region-btn active\" data-region=\"IN-TG\">Telangana</button>\n  <button class=\"region-btn\" data-region=\"IN-AP\">Andhra Pradesh</button>\n</div>\n<div class=\"tab-bar\" role=\"tablist\">\n  <button role=\"tab\" class=\"tab-btn active\" data-tab=\"notable\" aria-selected=\"true\">Notable</button>\n  <button role=\"tab\" class=\"tab-btn\" data-tab=\"recent\" aria-selected=\"false\">Recent</button>\n  <button role=\"tab\" class=\"tab-btn\" data-tab=\"hotspots\" aria-selected=\"false\">Hotspots</button>\n  <button role=\"tab\" class=\"tab-btn\" data-tab=\"lookup\" aria-selected=\"false\">Species lookup</button>\n</div>\n<div class=\"tab-panels\">\n  <div id=\"sightings-notable\" role=\"tabpanel\" class=\"tab-panel active\"></div>\n  <div id=\"sightings-recent\" role=\"tabpanel\" class=\"tab-panel\" hidden></div>\n  <div id=\"sightings-hotspots\" role=\"tabpanel\" class=\"tab-panel\" hidden></div>\n  <div id=\"sightings-lookup\" role=\"tabpanel\" class=\"tab-panel\" hidden>\n    <div class=\"autocomplete\">\n      <input type=\"search\" id=\"species-search-input\" class=\"autocomplete-input\" placeholder=\"Type a bird name...\" autocomplete=\"off\">\n      <div class=\"autocomplete-dropdown\" id=\"species-search-dropdown\" hidden></div>\n    </div>\n    <div id=\"species-search-results\"></div>\n  </div>\n</div>"
+                "html": "<div class=\"region-toggle\" role=\"group\" aria-label=\"Region\">\n  <button class=\"region-btn active\" data-region=\"IN-TG\">Telangana</button>\n  <button class=\"region-btn\" data-region=\"IN-AP\">Andhra Pradesh</button>\n</div>\n<p class=\"sightings-updated-note\">Updated every 15 minutes</p>\n<div class=\"tab-bar\" role=\"tablist\">\n  <button role=\"tab\" class=\"tab-btn active\" data-tab=\"notable\" aria-selected=\"true\">Notable</button>\n  <button role=\"tab\" class=\"tab-btn\" data-tab=\"recent\" aria-selected=\"false\">All recent</button>\n  <button role=\"tab\" class=\"tab-btn\" data-tab=\"hotspots\" aria-selected=\"false\">Hotspots</button>\n</div>\n<div class=\"tab-panels\">\n  <div id=\"sightings-notable\" role=\"tabpanel\" class=\"tab-panel active\"></div>\n  <div id=\"sightings-recent\" role=\"tabpanel\" class=\"tab-panel\" hidden></div>\n  <div id=\"sightings-hotspots\" role=\"tabpanel\" class=\"tab-panel\" hidden></div>\n</div>"
               },
               "elements": [],
               "widgetType": "html"
@@ -130,7 +147,7 @@
       "isInner": false
     },
     {
-      "id": "2293c16",
+      "id": "cd856b4",
       "elType": "section",
       "settings": {
         "background_background": "classic",
@@ -138,7 +155,81 @@
       },
       "elements": [
         {
-          "id": "28b7a17",
+          "id": "cf84d32",
+          "elType": "column",
+          "settings": {
+            "_column_size": 100,
+            "padding": {
+              "unit": "px",
+              "top": "40",
+              "right": "20",
+              "bottom": "40",
+              "left": "20",
+              "isLinked": false
+            },
+            "content_width": "boxed"
+          },
+          "elements": [
+            {
+              "id": "ea25b81",
+              "elType": "widget",
+              "settings": {
+                "editor": "<p style=\"text-transform:uppercase;letter-spacing:.1em;font-size:11px;font-weight:600;font-family:Sora,sans-serif;color:#2B72B8;margin:0 0 8px;\">Where Can I See It Now?</p>",
+                "align": "left"
+              },
+              "elements": [],
+              "widgetType": "text-editor"
+            },
+            {
+              "id": "042d29c",
+              "elType": "widget",
+              "settings": {
+                "title": "Look up the nearest recent sighting of a species",
+                "header_size": "h2",
+                "align": "left",
+                "title_color": "#16241D",
+                "typography_typography": "custom",
+                "typography_font_family": "Sora",
+                "typography_font_size": {
+                  "unit": "px",
+                  "size": 32,
+                  "sizes": []
+                },
+                "typography_font_size_mobile": {
+                  "unit": "px",
+                  "size": 24,
+                  "sizes": []
+                },
+                "typography_font_weight": "700"
+              },
+              "elements": [],
+              "widgetType": "heading"
+            },
+            {
+              "id": "c954dce",
+              "elType": "widget",
+              "settings": {
+                "html": "<p>Type a species name. Results are the closest checklists in the last two weeks, with distance from Hyderabad.</p>\n<div class=\"autocomplete\">\n  <input type=\"search\" id=\"species-search-input\" class=\"autocomplete-input\" placeholder=\"Type a bird name...\" autocomplete=\"off\">\n  <div class=\"autocomplete-dropdown\" id=\"species-search-dropdown\" hidden></div>\n</div>\n<div id=\"species-search-results\"></div>"
+              },
+              "elements": [],
+              "widgetType": "html"
+            }
+          ],
+          "isInner": false
+        }
+      ],
+      "isInner": false
+    },
+    {
+      "id": "6de8887",
+      "elType": "section",
+      "settings": {
+        "background_background": "classic",
+        "background_color": "#FFFFFF"
+      },
+      "elements": [
+        {
+          "id": "8c465d5",
           "elType": "column",
           "settings": {
             "_column_size": 100,
@@ -153,10 +244,10 @@
           },
           "elements": [
             {
-              "id": "0074646",
+              "id": "d8c6383",
               "elType": "widget",
               "settings": {
-                "html": "<section class=\"on-this-day\">\n  <h2 class=\"otd-heading\">On this day — <span id=\"otd-date\"></span></h2>\n  <div id=\"sightings-otd\"></div>\n</section>\n<script>\n  var otdDateEl = document.getElementById('otd-date');\n  if (otdDateEl) {\n    otdDateEl.textContent = new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'long' });\n  }\n</script>"
+                "html": "<h2 class=\"otd-heading\">On this day — <span id=\"otd-date\"></span></h2>\n<div id=\"sightings-otd\"></div>\n<script>\n  var otdDateEl = document.getElementById('otd-date');\n  if (otdDateEl) {\n    otdDateEl.textContent = new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'long' });\n  }\n</script>"
               },
               "elements": [],
               "widgetType": "html"

@@ -48,7 +48,7 @@
                     "name": "activity_cadence",
                     "aria-label": "",
                     "type": "text",
-                    "instructions": "e.g. Second Sunday, monthly",
+                    "instructions": "e.g. Every month, Once a year",
                     "required": 0,
                     "conditional_logic": 0,
                     "wrapper": {
@@ -110,34 +110,34 @@
             ],
             "default_value": [
                 {
-                    "activity_title": "Monthly Bird Walks",
-                    "activity_cadence": "Second Sunday, monthly",
-                    "activity_description": "<p>Easy, beginner-friendly walks at accessible city birding spots like KBR National Park. A great way to start birding, with experienced members on hand to help with identification.</p>"
+                    "activity_title": "Monthly Field Trips",
+                    "activity_cadence": "Every month",
+                    "activity_description": "<ul><li>Visit to all the birding hot spots around Hyderabad</li><li>Mingle with the experts</li><li>Experience the joy of live bird sightings</li></ul>"
                 },
                 {
-                    "activity_title": "Field Trips",
-                    "activity_cadence": "Monthly, weekends",
-                    "activity_description": "<p>Full-day excursions to lakes, forests, and reservoirs around Hyderabad and the wider Deccan Plateau, in search of a wider range of species than city parks allow.</p>"
+                    "activity_title": "PITTA – Monthly Newsletter",
+                    "activity_cadence": "Twelve issues a year",
+                    "activity_description": "<ul><li>Trip reports by members with great details and pictures</li><li>Bird of the month column</li><li>Opportunity to print your articles</li></ul>"
                 },
                 {
-                    "activity_title": "Waterfowl Census",
-                    "activity_cadence": "Annually, January",
-                    "activity_description": "<p>An annual citizen-science count of waterbirds across the region's major lakes and wetlands, contributing data to national and international waterbird monitoring efforts.</p>"
+                    "activity_title": "Annual Bird Race",
+                    "activity_cadence": "Once a year",
+                    "activity_description": "<ul><li>Full day birding with an assigned team</li><li>Team with the maximum sightings wins</li><li>Sumptuous dinner to celebrate the day</li></ul>"
                 },
                 {
-                    "activity_title": "Bird Race",
-                    "activity_cadence": "Annually, November",
-                    "activity_description": "<p>A friendly one-day competitive birdwatching event where teams compete to spot the highest number of species, promoting both birding skill and camaraderie.</p>"
+                    "activity_title": "Annual Waterfowl Census",
+                    "activity_cadence": "Every winter",
+                    "activity_description": "<ul><li>Census performed every Winter season</li><li>Volunteering opportunity to do the census</li><li>Data submitted to Wetlands International</li></ul>"
                 },
                 {
-                    "activity_title": "Nature Camps",
-                    "activity_cadence": "Twice yearly",
-                    "activity_description": "<p>Overnight and multi-day camps for members and students at biodiversity-rich locations, combining birdwatching with broader nature education.</p>"
+                    "activity_title": "Webinars",
+                    "activity_cadence": "Through the year",
+                    "activity_description": "<ul><li>Talks by eminent ornithologists</li><li>Network with the experts</li><li>Become aware of the latest developments</li></ul>"
                 },
                 {
-                    "activity_title": "Webinars & Talks",
-                    "activity_cadence": "Monthly, online",
-                    "activity_description": "<p>Online talks by naturalists, researchers, and photographers on topics ranging from bird identification to conservation science, open to members and the public.</p>"
+                    "activity_title": "Annual Nature Camps and Trekking",
+                    "activity_cadence": "Once a year",
+                    "activity_description": "<ul><li>National and International camps</li><li>Focus on the bird watching</li><li>Exclusive access to sanctuaries wherever possible</li></ul>"
                 }
             ]
         }

@@ -16,7 +16,7 @@
                 "class": "",
                 "id": ""
             },
-            "default_value": "",
+            "default_value": "<p>Deccan Birders is a non-governmental organization founded in 1980 (as Birdwatchers Society of Andhra Pradesh and renamed Deccan Birders in 2018) with the primary objective of spreading the message of bird conservation. Deccan Birders is registered under the Public Societies Registration Act – I of 1350F.</p>",
             "tabs": "all",
             "toolbar": "basic",
             "media_upload": 0,
@@ -220,6 +220,18 @@
                     "prepend": "",
                     "append": ""
                 }
+            ],
+            "default_value": [
+                { "member_name": "Humayun Taher", "member_role": "President", "member_email": "president@deccanbirders.org", "member_display_order": 1 },
+                { "member_name": "Umesh Mani", "member_role": "Vice-President 1", "member_email": "", "member_display_order": 2 },
+                { "member_name": "K Sudhir", "member_role": "Vice-President 2", "member_email": "", "member_display_order": 3 },
+                { "member_name": "Srikanth B", "member_role": "Hony. Secretary", "member_email": "secretary@deccanbirders.org", "member_display_order": 4 },
+                { "member_name": "Vikram Penmetsa", "member_role": "Treasurer", "member_email": "treasurer@deccanbirders.org", "member_display_order": 5 },
+                { "member_name": "Dr. Chitra", "member_role": "Committee Member", "member_email": "", "member_display_order": 6 },
+                { "member_name": "Gowthama P", "member_role": "Committee Member", "member_email": "", "member_display_order": 7 },
+                { "member_name": "Gokul Krishna A", "member_role": "Committee Member", "member_email": "", "member_display_order": 8 },
+                { "member_name": "Sathwik Reddy N", "member_role": "Committee Member", "member_email": "", "member_display_order": 9 },
+                { "member_name": "J.V.D. Moorty", "member_role": "Committee Member", "member_email": "", "member_display_order": 10 }
             ]
         }
     ],

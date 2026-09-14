@@ -1,58 +1,57 @@
 {
   "content": [
     {
-      "id": "ba0f2ae",
+      "id": "b47c670",
       "elType": "section",
       "settings": {
         "background_background": "classic",
-        "background_color": "#16241D",
-        "height": "min-height",
-        "custom_height": {
-          "unit": "vh",
-          "size": 35,
-          "sizes": []
-        },
-        "content_position": "middle"
+        "background_color": "#FFFFFF"
       },
       "elements": [
         {
-          "id": "6e1e450",
+          "id": "138db99",
           "elType": "column",
           "settings": {
             "_column_size": 100,
-            "content_position": "center",
-            "align": "center",
             "padding": {
               "unit": "px",
               "top": "60",
               "right": "20",
-              "bottom": "60",
+              "bottom": "30",
               "left": "20",
               "isLinked": false
             }
           },
           "elements": [
             {
-              "id": "f519ae6",
+              "id": "7f4c08f",
               "elType": "widget",
               "settings": {
-                "title": "Our Activities",
+                "editor": "<p style=\"text-transform:uppercase;letter-spacing:.08em;font-size:12px;font-weight:700;font-family:Sora,sans-serif;color:#2B72B8;margin:0 0 8px;\">Activities</p>"
+              },
+              "elements": [],
+              "widgetType": "text-editor"
+            },
+            {
+              "id": "893eee9",
+              "elType": "widget",
+              "settings": {
+                "title": "An array of activities",
                 "header_size": "h1",
-                "align": "center",
-                "title_color": "#FFFFFF",
+                "title_color": "#16241D",
                 "typography_typography": "custom",
                 "typography_font_family": "Sora",
                 "typography_font_size": {
                   "unit": "px",
-                  "size": 48,
+                  "size": 44,
                   "sizes": []
                 },
                 "typography_font_size_mobile": {
                   "unit": "px",
-                  "size": 32,
+                  "size": 30,
                   "sizes": []
                 },
-                "typography_font_weight": "700"
+                "typography_font_weight": "800"
               },
               "elements": [],
               "widgetType": "heading"
@@ -64,111 +63,39 @@
       "isInner": false
     },
     {
-      "id": "73d7759",
+      "id": "78f576c",
       "elType": "section",
       "settings": {
         "background_background": "classic",
-        "background_color": "#FFFFFF",
-        "padding": {
-          "unit": "px",
-          "top": "60",
-          "right": "20",
-          "bottom": "60",
-          "left": "20",
-          "isLinked": false
-        }
+        "background_color": "#FFFFFF"
       },
       "elements": [
         {
-          "id": "655910c",
+          "id": "608f032",
           "elType": "column",
           "settings": {
-            "_column_size": 50,
+            "_column_size": 100,
             "padding": {
               "unit": "px",
               "top": "0",
               "right": "20",
-              "bottom": "0",
-              "left": "0",
-              "isLinked": false
-            }
-          },
-          "elements": [
-            {
-              "id": "b37fd21",
-              "elType": "widget",
-              "settings": {
-                "image": {
-                  "id": "",
-                  "url": ""
-                },
-                "image_alt": "Field Trips — Deccan Birders"
-              },
-              "elements": [],
-              "widgetType": "image"
-            }
-          ],
-          "isInner": false
-        },
-        {
-          "id": "d9afc0e",
-          "elType": "column",
-          "settings": {
-            "_column_size": 50,
-            "content_position": "center",
-            "padding": {
-              "unit": "px",
-              "top": "0",
-              "right": "0",
-              "bottom": "0",
+              "bottom": "40",
               "left": "20",
               "isLinked": false
-            }
+            },
+            "content_width": "boxed"
           },
           "elements": [
             {
-              "id": "ea8a7c1",
+              "id": "4bdd551",
               "elType": "widget",
               "settings": {
-                "title": "Field Trips",
-                "header_size": "h2",
-                "title_color": "#16241D",
-                "typography_typography": "custom",
-                "typography_font_family": "Sora",
-                "typography_font_size": {
-                  "unit": "px",
-                  "size": 28,
-                  "sizes": []
-                },
-                "typography_font_size_mobile": {
-                  "unit": "px",
-                  "size": 22,
-                  "sizes": []
-                },
-                "typography_font_weight": "700"
-              },
-              "elements": [],
-              "widgetType": "heading"
-            },
-            {
-              "id": "433372a",
-              "elType": "widget",
-              "settings": {
-                "editor": "<p style=\"display:inline-block;background:#E6F4EC;color:#0F7A3E;padding:5px 14px;border-radius:999px;font-family:Sora,sans-serif;font-weight:600;font-size:12px;margin:8px 0 16px;\">Monthly, weekends</p>"
-              },
-              "elements": [],
-              "widgetType": "text-editor"
-            },
-            {
-              "id": "2fd1259",
-              "elType": "widget",
-              "settings": {
-                "editor": "<p>Full-day excursions to lakes, forests, and reservoirs around Hyderabad and the wider Deccan Plateau, in search of a wider range of species than city parks allow. Trips are led by experienced members and open to birders of all skill levels.</p>",
+                "editor": "<p>Deccan Birders organizes field trips, lectures, film and slide shows, nature camps, treks, waterfowl counts, bird ringing, etc.</p>",
                 "typography_typography": "custom",
                 "typography_font_family": "Source Sans 3",
                 "typography_font_size": {
                   "unit": "px",
-                  "size": 15,
+                  "size": 16,
                   "sizes": []
                 }
               },
@@ -182,16 +109,134 @@
       "isInner": false
     },
     {
-      "id": "e991ef8",
+      "id": "a7435e0",
+      "elType": "section",
+      "settings": {
+        "background_background": "classic",
+        "background_color": "#FFFFFF",
+        "padding": {
+          "unit": "px",
+          "top": "50",
+          "right": "20",
+          "bottom": "50",
+          "left": "20",
+          "isLinked": false
+        }
+      },
+      "elements": [
+        {
+          "id": "ae7b58e",
+          "elType": "column",
+          "settings": {
+            "_column_size": 50,
+            "content_position": "center",
+            "padding": {
+              "unit": "px",
+              "top": "0",
+              "right": "30",
+              "bottom": "0",
+              "left": "0",
+              "isLinked": false
+            }
+          },
+          "elements": [
+            {
+              "id": "554d13d",
+              "elType": "widget",
+              "settings": {
+                "editor": "<p style=\"display:inline-block;background:#E6F4EC;color:#0F7A3E;padding:5px 14px;border-radius:999px;font-family:Sora,sans-serif;font-weight:600;font-size:11px;text-transform:uppercase;letter-spacing:.05em;margin:0 0 12px;\">Every month</p>"
+              },
+              "elements": [],
+              "widgetType": "text-editor"
+            },
+            {
+              "id": "b3cdb02",
+              "elType": "widget",
+              "settings": {
+                "title": "Monthly Field Trips",
+                "header_size": "h2",
+                "title_color": "#16241D",
+                "typography_typography": "custom",
+                "typography_font_family": "Sora",
+                "typography_font_size": {
+                  "unit": "px",
+                  "size": 26,
+                  "sizes": []
+                },
+                "typography_font_size_mobile": {
+                  "unit": "px",
+                  "size": 21,
+                  "sizes": []
+                },
+                "typography_font_weight": "700"
+              },
+              "elements": [],
+              "widgetType": "heading"
+            },
+            {
+              "id": "e882a86",
+              "elType": "widget",
+              "settings": {
+                "editor": "<ul><li>Visit to all the birding hot spots around Hyderabad</li><li>Mingle with the experts</li><li>Experience the joy of live bird sightings</li></ul>",
+                "typography_typography": "custom",
+                "typography_font_family": "Source Sans 3",
+                "typography_font_size": {
+                  "unit": "px",
+                  "size": 15,
+                  "sizes": []
+                }
+              },
+              "elements": [],
+              "widgetType": "text-editor"
+            }
+          ],
+          "isInner": false
+        },
+        {
+          "id": "ac1c17d",
+          "elType": "column",
+          "settings": {
+            "_column_size": 50,
+            "padding": {
+              "unit": "px",
+              "top": "0",
+              "right": "0",
+              "bottom": "0",
+              "left": "30",
+              "isLinked": false
+            }
+          },
+          "elements": [
+            {
+              "id": "4380c92",
+              "elType": "widget",
+              "settings": {
+                "image": {
+                  "id": "",
+                  "url": ""
+                },
+                "image_alt": "Monthly Field Trips — Deccan Birders"
+              },
+              "elements": [],
+              "widgetType": "image"
+            }
+          ],
+          "isInner": false
+        }
+      ],
+      "isInner": false
+    },
+    {
+      "id": "3ee3885",
       "elType": "section",
       "settings": {
         "background_background": "classic",
         "background_color": "#F5F8F6",
         "padding": {
           "unit": "px",
-          "top": "60",
+          "top": "50",
           "right": "20",
-          "bottom": "60",
+          "bottom": "50",
           "left": "20",
           "isLinked": false
         },
@@ -199,15 +244,14 @@
       },
       "elements": [
         {
-          "id": "65aa352",
+          "id": "d526158",
           "elType": "column",
           "settings": {
             "_column_size": 50,
-            "content_position": "center",
             "padding": {
               "unit": "px",
               "top": "0",
-              "right": "20",
+              "right": "30",
               "bottom": "0",
               "left": "0",
               "isLinked": false
@@ -215,22 +259,63 @@
           },
           "elements": [
             {
-              "id": "25ec6b1",
+              "id": "b97b77f",
               "elType": "widget",
               "settings": {
-                "title": "Waterfowl Census",
+                "image": {
+                  "id": "",
+                  "url": ""
+                },
+                "image_alt": "PITTA – Monthly Newsletter — Deccan Birders"
+              },
+              "elements": [],
+              "widgetType": "image"
+            }
+          ],
+          "isInner": false
+        },
+        {
+          "id": "f996b3d",
+          "elType": "column",
+          "settings": {
+            "_column_size": 50,
+            "content_position": "center",
+            "padding": {
+              "unit": "px",
+              "top": "0",
+              "right": "0",
+              "bottom": "0",
+              "left": "30",
+              "isLinked": false
+            }
+          },
+          "elements": [
+            {
+              "id": "648b75e",
+              "elType": "widget",
+              "settings": {
+                "editor": "<p style=\"display:inline-block;background:#E6F4EC;color:#0F7A3E;padding:5px 14px;border-radius:999px;font-family:Sora,sans-serif;font-weight:600;font-size:11px;text-transform:uppercase;letter-spacing:.05em;margin:0 0 12px;\">Twelve issues a year</p>"
+              },
+              "elements": [],
+              "widgetType": "text-editor"
+            },
+            {
+              "id": "bc4f158",
+              "elType": "widget",
+              "settings": {
+                "title": "PITTA – Monthly Newsletter",
                 "header_size": "h2",
                 "title_color": "#16241D",
                 "typography_typography": "custom",
                 "typography_font_family": "Sora",
                 "typography_font_size": {
                   "unit": "px",
-                  "size": 28,
+                  "size": 26,
                   "sizes": []
                 },
                 "typography_font_size_mobile": {
                   "unit": "px",
-                  "size": 22,
+                  "size": 21,
                   "sizes": []
                 },
                 "typography_font_weight": "700"
@@ -239,19 +324,10 @@
               "widgetType": "heading"
             },
             {
-              "id": "ce397a5",
+              "id": "1847abe",
               "elType": "widget",
               "settings": {
-                "editor": "<p style=\"display:inline-block;background:#E6F4EC;color:#0F7A3E;padding:5px 14px;border-radius:999px;font-family:Sora,sans-serif;font-weight:600;font-size:12px;margin:8px 0 16px;\">Annually, January</p>"
-              },
-              "elements": [],
-              "widgetType": "text-editor"
-            },
-            {
-              "id": "42fdc59",
-              "elType": "widget",
-              "settings": {
-                "editor": "<p>An annual citizen-science count of waterbirds across the region's major lakes and wetlands, contributing data to national and international waterbird monitoring efforts such as the Asian Waterbird Census.</p>",
+                "editor": "<ul><li>Trip reports by members with great details and pictures</li><li>Bird of the month column</li><li>Opportunity to print your articles</li></ul>",
                 "typography_typography": "custom",
                 "typography_font_family": "Source Sans 3",
                 "typography_font_size": {
@@ -265,90 +341,28 @@
             }
           ],
           "isInner": false
-        },
-        {
-          "id": "dd0f629",
-          "elType": "column",
-          "settings": {
-            "_column_size": 50,
-            "padding": {
-              "unit": "px",
-              "top": "0",
-              "right": "0",
-              "bottom": "0",
-              "left": "20",
-              "isLinked": false
-            }
-          },
-          "elements": [
-            {
-              "id": "d3b7750",
-              "elType": "widget",
-              "settings": {
-                "image": {
-                  "id": "",
-                  "url": ""
-                },
-                "image_alt": "Waterfowl Census — Deccan Birders"
-              },
-              "elements": [],
-              "widgetType": "image"
-            }
-          ],
-          "isInner": false
         }
       ],
       "isInner": false
     },
     {
-      "id": "4a1e5a0",
+      "id": "bc53ed1",
       "elType": "section",
       "settings": {
         "background_background": "classic",
         "background_color": "#FFFFFF",
         "padding": {
           "unit": "px",
-          "top": "60",
+          "top": "50",
           "right": "20",
-          "bottom": "60",
+          "bottom": "50",
           "left": "20",
           "isLinked": false
         }
       },
       "elements": [
         {
-          "id": "dcc182d",
-          "elType": "column",
-          "settings": {
-            "_column_size": 50,
-            "padding": {
-              "unit": "px",
-              "top": "0",
-              "right": "20",
-              "bottom": "0",
-              "left": "0",
-              "isLinked": false
-            }
-          },
-          "elements": [
-            {
-              "id": "3302598",
-              "elType": "widget",
-              "settings": {
-                "image": {
-                  "id": "",
-                  "url": ""
-                },
-                "image_alt": "Bird Race — Deccan Birders"
-              },
-              "elements": [],
-              "widgetType": "image"
-            }
-          ],
-          "isInner": false
-        },
-        {
-          "id": "4eea308",
+          "id": "2ea414a",
           "elType": "column",
           "settings": {
             "_column_size": 50,
@@ -356,30 +370,39 @@
             "padding": {
               "unit": "px",
               "top": "0",
-              "right": "0",
+              "right": "30",
               "bottom": "0",
-              "left": "20",
+              "left": "0",
               "isLinked": false
             }
           },
           "elements": [
             {
-              "id": "4d00ef5",
+              "id": "f74ecde",
               "elType": "widget",
               "settings": {
-                "title": "Bird Race",
+                "editor": "<p style=\"display:inline-block;background:#E6F4EC;color:#0F7A3E;padding:5px 14px;border-radius:999px;font-family:Sora,sans-serif;font-weight:600;font-size:11px;text-transform:uppercase;letter-spacing:.05em;margin:0 0 12px;\">Once a year</p>"
+              },
+              "elements": [],
+              "widgetType": "text-editor"
+            },
+            {
+              "id": "f23d2c2",
+              "elType": "widget",
+              "settings": {
+                "title": "Annual Bird Race",
                 "header_size": "h2",
                 "title_color": "#16241D",
                 "typography_typography": "custom",
                 "typography_font_family": "Sora",
                 "typography_font_size": {
                   "unit": "px",
-                  "size": 28,
+                  "size": 26,
                   "sizes": []
                 },
                 "typography_font_size_mobile": {
                   "unit": "px",
-                  "size": 22,
+                  "size": 21,
                   "sizes": []
                 },
                 "typography_font_weight": "700"
@@ -388,19 +411,10 @@
               "widgetType": "heading"
             },
             {
-              "id": "3888a26",
+              "id": "dfb6233",
               "elType": "widget",
               "settings": {
-                "editor": "<p style=\"display:inline-block;background:#E6F4EC;color:#0F7A3E;padding:5px 14px;border-radius:999px;font-family:Sora,sans-serif;font-weight:600;font-size:12px;margin:8px 0 16px;\">Annually, November</p>"
-              },
-              "elements": [],
-              "widgetType": "text-editor"
-            },
-            {
-              "id": "f3f657a",
-              "elType": "widget",
-              "settings": {
-                "editor": "<p>A friendly one-day competitive birdwatching event where teams compete to spot the highest number of species across the city in 12 hours, promoting both birding skill and camaraderie.</p>",
+                "editor": "<ul><li>Full day birding with an assigned team</li><li>Team with the maximum sightings wins</li><li>Sumptuous dinner to celebrate the day</li></ul>",
                 "typography_typography": "custom",
                 "typography_font_family": "Source Sans 3",
                 "typography_font_size": {
@@ -414,21 +428,52 @@
             }
           ],
           "isInner": false
+        },
+        {
+          "id": "1a1009e",
+          "elType": "column",
+          "settings": {
+            "_column_size": 50,
+            "padding": {
+              "unit": "px",
+              "top": "0",
+              "right": "0",
+              "bottom": "0",
+              "left": "30",
+              "isLinked": false
+            }
+          },
+          "elements": [
+            {
+              "id": "64ce497",
+              "elType": "widget",
+              "settings": {
+                "image": {
+                  "id": "",
+                  "url": ""
+                },
+                "image_alt": "Annual Bird Race — Deccan Birders"
+              },
+              "elements": [],
+              "widgetType": "image"
+            }
+          ],
+          "isInner": false
         }
       ],
       "isInner": false
     },
     {
-      "id": "6896234",
+      "id": "9f3c120",
       "elType": "section",
       "settings": {
         "background_background": "classic",
         "background_color": "#F5F8F6",
         "padding": {
           "unit": "px",
-          "top": "60",
+          "top": "50",
           "right": "20",
-          "bottom": "60",
+          "bottom": "50",
           "left": "20",
           "isLinked": false
         },
@@ -436,15 +481,14 @@
       },
       "elements": [
         {
-          "id": "fc5da90",
+          "id": "9c4966f",
           "elType": "column",
           "settings": {
             "_column_size": 50,
-            "content_position": "center",
             "padding": {
               "unit": "px",
               "top": "0",
-              "right": "20",
+              "right": "30",
               "bottom": "0",
               "left": "0",
               "isLinked": false
@@ -452,22 +496,63 @@
           },
           "elements": [
             {
-              "id": "8b83127",
+              "id": "c005d3e",
               "elType": "widget",
               "settings": {
-                "title": "Nature Camps",
+                "image": {
+                  "id": "",
+                  "url": ""
+                },
+                "image_alt": "Annual Waterfowl Census — Deccan Birders"
+              },
+              "elements": [],
+              "widgetType": "image"
+            }
+          ],
+          "isInner": false
+        },
+        {
+          "id": "c9bcb89",
+          "elType": "column",
+          "settings": {
+            "_column_size": 50,
+            "content_position": "center",
+            "padding": {
+              "unit": "px",
+              "top": "0",
+              "right": "0",
+              "bottom": "0",
+              "left": "30",
+              "isLinked": false
+            }
+          },
+          "elements": [
+            {
+              "id": "b165c49",
+              "elType": "widget",
+              "settings": {
+                "editor": "<p style=\"display:inline-block;background:#E6F4EC;color:#0F7A3E;padding:5px 14px;border-radius:999px;font-family:Sora,sans-serif;font-weight:600;font-size:11px;text-transform:uppercase;letter-spacing:.05em;margin:0 0 12px;\">Every winter</p>"
+              },
+              "elements": [],
+              "widgetType": "text-editor"
+            },
+            {
+              "id": "3339f8b",
+              "elType": "widget",
+              "settings": {
+                "title": "Annual Waterfowl Census",
                 "header_size": "h2",
                 "title_color": "#16241D",
                 "typography_typography": "custom",
                 "typography_font_family": "Sora",
                 "typography_font_size": {
                   "unit": "px",
-                  "size": 28,
+                  "size": 26,
                   "sizes": []
                 },
                 "typography_font_size_mobile": {
                   "unit": "px",
-                  "size": 22,
+                  "size": 21,
                   "sizes": []
                 },
                 "typography_font_weight": "700"
@@ -476,19 +561,10 @@
               "widgetType": "heading"
             },
             {
-              "id": "4aef9e8",
+              "id": "7e7e4a2",
               "elType": "widget",
               "settings": {
-                "editor": "<p style=\"display:inline-block;background:#E6F4EC;color:#0F7A3E;padding:5px 14px;border-radius:999px;font-family:Sora,sans-serif;font-weight:600;font-size:12px;margin:8px 0 16px;\">Twice yearly</p>"
-              },
-              "elements": [],
-              "widgetType": "text-editor"
-            },
-            {
-              "id": "967b428",
-              "elType": "widget",
-              "settings": {
-                "editor": "<p>Overnight and multi-day camps for members and students at biodiversity-rich locations, combining birdwatching with broader nature education, campfire talks, and night walks.</p>",
+                "editor": "<ul><li>Census performed every Winter season</li><li>Volunteering opportunity to do the census</li><li>Data submitted to Wetlands International</li></ul>",
                 "typography_typography": "custom",
                 "typography_font_family": "Source Sans 3",
                 "typography_font_size": {
@@ -502,90 +578,28 @@
             }
           ],
           "isInner": false
-        },
-        {
-          "id": "093ec11",
-          "elType": "column",
-          "settings": {
-            "_column_size": 50,
-            "padding": {
-              "unit": "px",
-              "top": "0",
-              "right": "0",
-              "bottom": "0",
-              "left": "20",
-              "isLinked": false
-            }
-          },
-          "elements": [
-            {
-              "id": "96e78a5",
-              "elType": "widget",
-              "settings": {
-                "image": {
-                  "id": "",
-                  "url": ""
-                },
-                "image_alt": "Nature Camps — Deccan Birders"
-              },
-              "elements": [],
-              "widgetType": "image"
-            }
-          ],
-          "isInner": false
         }
       ],
       "isInner": false
     },
     {
-      "id": "c6f12aa",
+      "id": "18c6be1",
       "elType": "section",
       "settings": {
         "background_background": "classic",
         "background_color": "#FFFFFF",
         "padding": {
           "unit": "px",
-          "top": "60",
+          "top": "50",
           "right": "20",
-          "bottom": "60",
+          "bottom": "50",
           "left": "20",
           "isLinked": false
         }
       },
       "elements": [
         {
-          "id": "ec7d610",
-          "elType": "column",
-          "settings": {
-            "_column_size": 50,
-            "padding": {
-              "unit": "px",
-              "top": "0",
-              "right": "20",
-              "bottom": "0",
-              "left": "0",
-              "isLinked": false
-            }
-          },
-          "elements": [
-            {
-              "id": "6765800",
-              "elType": "widget",
-              "settings": {
-                "image": {
-                  "id": "",
-                  "url": ""
-                },
-                "image_alt": "Webinars & Talks — Deccan Birders"
-              },
-              "elements": [],
-              "widgetType": "image"
-            }
-          ],
-          "isInner": false
-        },
-        {
-          "id": "8a7423a",
+          "id": "d33e274",
           "elType": "column",
           "settings": {
             "_column_size": 50,
@@ -593,30 +607,39 @@
             "padding": {
               "unit": "px",
               "top": "0",
-              "right": "0",
+              "right": "30",
               "bottom": "0",
-              "left": "20",
+              "left": "0",
               "isLinked": false
             }
           },
           "elements": [
             {
-              "id": "0fc7909",
+              "id": "18e28d9",
               "elType": "widget",
               "settings": {
-                "title": "Webinars & Talks",
+                "editor": "<p style=\"display:inline-block;background:#E6F4EC;color:#0F7A3E;padding:5px 14px;border-radius:999px;font-family:Sora,sans-serif;font-weight:600;font-size:11px;text-transform:uppercase;letter-spacing:.05em;margin:0 0 12px;\">Through the year</p>"
+              },
+              "elements": [],
+              "widgetType": "text-editor"
+            },
+            {
+              "id": "a2bead4",
+              "elType": "widget",
+              "settings": {
+                "title": "Webinars",
                 "header_size": "h2",
                 "title_color": "#16241D",
                 "typography_typography": "custom",
                 "typography_font_family": "Sora",
                 "typography_font_size": {
                   "unit": "px",
-                  "size": 28,
+                  "size": 26,
                   "sizes": []
                 },
                 "typography_font_size_mobile": {
                   "unit": "px",
-                  "size": 22,
+                  "size": 21,
                   "sizes": []
                 },
                 "typography_font_weight": "700"
@@ -625,19 +648,10 @@
               "widgetType": "heading"
             },
             {
-              "id": "e6ac92a",
+              "id": "6fb88c5",
               "elType": "widget",
               "settings": {
-                "editor": "<p style=\"display:inline-block;background:#E6F4EC;color:#0F7A3E;padding:5px 14px;border-radius:999px;font-family:Sora,sans-serif;font-weight:600;font-size:12px;margin:8px 0 16px;\">Monthly, online</p>"
-              },
-              "elements": [],
-              "widgetType": "text-editor"
-            },
-            {
-              "id": "706eead",
-              "elType": "widget",
-              "settings": {
-                "editor": "<p>Online talks by naturalists, researchers, and photographers on topics ranging from bird identification to conservation science, open to members and the public free of charge.</p>",
+                "editor": "<ul><li>Talks by eminent ornithologists</li><li>Network with the experts</li><li>Become aware of the latest developments</li></ul>",
                 "typography_typography": "custom",
                 "typography_font_family": "Source Sans 3",
                 "typography_font_size": {
@@ -651,21 +665,52 @@
             }
           ],
           "isInner": false
+        },
+        {
+          "id": "b23ee24",
+          "elType": "column",
+          "settings": {
+            "_column_size": 50,
+            "padding": {
+              "unit": "px",
+              "top": "0",
+              "right": "0",
+              "bottom": "0",
+              "left": "30",
+              "isLinked": false
+            }
+          },
+          "elements": [
+            {
+              "id": "b383b6f",
+              "elType": "widget",
+              "settings": {
+                "image": {
+                  "id": "",
+                  "url": ""
+                },
+                "image_alt": "Webinars — Deccan Birders"
+              },
+              "elements": [],
+              "widgetType": "image"
+            }
+          ],
+          "isInner": false
         }
       ],
       "isInner": false
     },
     {
-      "id": "3523c5d",
+      "id": "591bbde",
       "elType": "section",
       "settings": {
         "background_background": "classic",
         "background_color": "#F5F8F6",
         "padding": {
           "unit": "px",
-          "top": "60",
+          "top": "50",
           "right": "20",
-          "bottom": "60",
+          "bottom": "50",
           "left": "20",
           "isLinked": false
         },
@@ -673,15 +718,14 @@
       },
       "elements": [
         {
-          "id": "f4e5105",
+          "id": "961b9ea",
           "elType": "column",
           "settings": {
             "_column_size": 50,
-            "content_position": "center",
             "padding": {
               "unit": "px",
               "top": "0",
-              "right": "20",
+              "right": "30",
               "bottom": "0",
               "left": "0",
               "isLinked": false
@@ -689,22 +733,63 @@
           },
           "elements": [
             {
-              "id": "774b685",
+              "id": "00241a4",
               "elType": "widget",
               "settings": {
-                "title": "Conservation Work",
+                "image": {
+                  "id": "",
+                  "url": ""
+                },
+                "image_alt": "Annual Nature Camps and Trekking — Deccan Birders"
+              },
+              "elements": [],
+              "widgetType": "image"
+            }
+          ],
+          "isInner": false
+        },
+        {
+          "id": "eb2e226",
+          "elType": "column",
+          "settings": {
+            "_column_size": 50,
+            "content_position": "center",
+            "padding": {
+              "unit": "px",
+              "top": "0",
+              "right": "0",
+              "bottom": "0",
+              "left": "30",
+              "isLinked": false
+            }
+          },
+          "elements": [
+            {
+              "id": "8c78bc7",
+              "elType": "widget",
+              "settings": {
+                "editor": "<p style=\"display:inline-block;background:#E6F4EC;color:#0F7A3E;padding:5px 14px;border-radius:999px;font-family:Sora,sans-serif;font-weight:600;font-size:11px;text-transform:uppercase;letter-spacing:.05em;margin:0 0 12px;\">Once a year</p>"
+              },
+              "elements": [],
+              "widgetType": "text-editor"
+            },
+            {
+              "id": "d6d2460",
+              "elType": "widget",
+              "settings": {
+                "title": "Annual Nature Camps and Trekking",
                 "header_size": "h2",
                 "title_color": "#16241D",
                 "typography_typography": "custom",
                 "typography_font_family": "Sora",
                 "typography_font_size": {
                   "unit": "px",
-                  "size": 28,
+                  "size": 26,
                   "sizes": []
                 },
                 "typography_font_size_mobile": {
                   "unit": "px",
-                  "size": 22,
+                  "size": 21,
                   "sizes": []
                 },
                 "typography_font_weight": "700"
@@ -713,19 +798,10 @@
               "widgetType": "heading"
             },
             {
-              "id": "ca0eaec",
+              "id": "763a945",
               "elType": "widget",
               "settings": {
-                "editor": "<p style=\"display:inline-block;background:#E6F4EC;color:#0F7A3E;padding:5px 14px;border-radius:999px;font-family:Sora,sans-serif;font-weight:600;font-size:12px;margin:8px 0 16px;\">Ongoing</p>"
-              },
-              "elements": [],
-              "widgetType": "text-editor"
-            },
-            {
-              "id": "f3c28bf",
-              "elType": "widget",
-              "settings": {
-                "editor": "<p>Beyond birdwatching, Deccan Birders partners with forest departments and local conservation groups on habitat restoration, nest-box installations, and rescue coordination for injured or trapped birds across the region.</p>",
+                "editor": "<ul><li>National and International camps</li><li>Focus on the bird watching</li><li>Exclusive access to sanctuaries wherever possible</li></ul>",
                 "typography_typography": "custom",
                 "typography_font_family": "Source Sans 3",
                 "typography_font_size": {
@@ -736,37 +812,6 @@
               },
               "elements": [],
               "widgetType": "text-editor"
-            }
-          ],
-          "isInner": false
-        },
-        {
-          "id": "fc47dd4",
-          "elType": "column",
-          "settings": {
-            "_column_size": 50,
-            "padding": {
-              "unit": "px",
-              "top": "0",
-              "right": "0",
-              "bottom": "0",
-              "left": "20",
-              "isLinked": false
-            }
-          },
-          "elements": [
-            {
-              "id": "6ef82b5",
-              "elType": "widget",
-              "settings": {
-                "image": {
-                  "id": "",
-                  "url": ""
-                },
-                "image_alt": "Conservation Work — Deccan Birders"
-              },
-              "elements": [],
-              "widgetType": "image"
             }
           ],
           "isInner": false

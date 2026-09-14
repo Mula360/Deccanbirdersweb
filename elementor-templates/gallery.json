@@ -1,58 +1,57 @@
 {
   "content": [
     {
-      "id": "69bcbc5",
+      "id": "1427529",
       "elType": "section",
       "settings": {
         "background_background": "classic",
-        "background_color": "#16241D",
-        "height": "min-height",
-        "custom_height": {
-          "unit": "vh",
-          "size": 35,
-          "sizes": []
-        },
-        "content_position": "middle"
+        "background_color": "#FFFFFF"
       },
       "elements": [
         {
-          "id": "5711a31",
+          "id": "270b796",
           "elType": "column",
           "settings": {
             "_column_size": 100,
-            "content_position": "center",
-            "align": "center",
             "padding": {
               "unit": "px",
               "top": "60",
               "right": "20",
-              "bottom": "60",
+              "bottom": "30",
               "left": "20",
               "isLinked": false
             }
           },
           "elements": [
             {
-              "id": "8e1f54f",
+              "id": "0465a23",
               "elType": "widget",
               "settings": {
-                "title": "Gallery",
+                "editor": "<p style=\"text-transform:uppercase;letter-spacing:.08em;font-size:12px;font-weight:700;font-family:Sora,sans-serif;color:#2B72B8;margin:0 0 8px;\">Gallery</p>"
+              },
+              "elements": [],
+              "widgetType": "text-editor"
+            },
+            {
+              "id": "af79ec9",
+              "elType": "widget",
+              "settings": {
+                "title": "From members' cameras",
                 "header_size": "h1",
-                "align": "center",
-                "title_color": "#FFFFFF",
+                "title_color": "#16241D",
                 "typography_typography": "custom",
                 "typography_font_family": "Sora",
                 "typography_font_size": {
                   "unit": "px",
-                  "size": 48,
+                  "size": 44,
                   "sizes": []
                 },
                 "typography_font_size_mobile": {
                   "unit": "px",
-                  "size": 32,
+                  "size": 30,
                   "sizes": []
                 },
-                "typography_font_weight": "700"
+                "typography_font_weight": "800"
               },
               "elements": [],
               "widgetType": "heading"
@@ -64,7 +63,7 @@
       "isInner": false
     },
     {
-      "id": "c9ea765",
+      "id": "9a391b7",
       "elType": "section",
       "settings": {
         "background_background": "classic",
@@ -72,13 +71,59 @@
       },
       "elements": [
         {
-          "id": "a59238e",
+          "id": "0003973",
           "elType": "column",
           "settings": {
             "_column_size": 100,
             "padding": {
               "unit": "px",
-              "top": "60",
+              "top": "0",
+              "right": "20",
+              "bottom": "30",
+              "left": "20",
+              "isLinked": false
+            },
+            "content_width": "boxed"
+          },
+          "elements": [
+            {
+              "id": "2cfa781",
+              "elType": "widget",
+              "settings": {
+                "editor": "<p>Newest first. Every photograph on this site was taken by a member of Deccan Birders, on a society trip or on their own time.</p>",
+                "typography_typography": "custom",
+                "typography_font_family": "Source Sans 3",
+                "typography_font_size": {
+                  "unit": "px",
+                  "size": 16,
+                  "sizes": []
+                }
+              },
+              "elements": [],
+              "widgetType": "text-editor"
+            }
+          ],
+          "isInner": false
+        }
+      ],
+      "isInner": false
+    },
+    {
+      "id": "aa75899",
+      "elType": "section",
+      "settings": {
+        "background_background": "classic",
+        "background_color": "#FFFFFF"
+      },
+      "elements": [
+        {
+          "id": "3b9394c",
+          "elType": "column",
+          "settings": {
+            "_column_size": 100,
+            "padding": {
+              "unit": "px",
+              "top": "0",
               "right": "20",
               "bottom": "20",
               "left": "20",
@@ -87,7 +132,7 @@
           },
           "elements": [
             {
-              "id": "df9290e",
+              "id": "67a448b",
               "elType": "widget",
               "settings": {
                 "html": "<div class=\"tab-bar\">\n  <button class=\"tab-btn active\" data-tab=\"photos\">Photographs</button>\n  <button class=\"tab-btn\" data-tab=\"videos\">Videos</button>\n</div>"
@@ -102,7 +147,7 @@
       "isInner": false
     },
     {
-      "id": "868f229",
+      "id": "0023979",
       "elType": "section",
       "settings": {
         "background_background": "classic",
@@ -110,7 +155,7 @@
       },
       "elements": [
         {
-          "id": "174e3f7",
+          "id": "dbfe19d",
           "elType": "column",
           "settings": {
             "_column_size": 100,
@@ -126,7 +171,7 @@
           },
           "elements": [
             {
-              "id": "d40f58c",
+              "id": "834292c",
               "elType": "widget",
               "settings": {
                 "shortcode": "[db_photo_gallery]"
@@ -141,7 +186,7 @@
       "isInner": false
     },
     {
-      "id": "9ed526f",
+      "id": "85e0828",
       "elType": "section",
       "settings": {
         "background_background": "classic",
@@ -149,7 +194,7 @@
       },
       "elements": [
         {
-          "id": "ed64e8d",
+          "id": "dd6ad3c",
           "elType": "column",
           "settings": {
             "_column_size": 100,
@@ -165,7 +210,7 @@
           },
           "elements": [
             {
-              "id": "e4f3a26",
+              "id": "79b9a09",
               "elType": "widget",
               "settings": {
                 "html": "<div id=\"videos-grid\"></div>"
@@ -180,7 +225,7 @@
       "isInner": false
     },
     {
-      "id": "af15bc6",
+      "id": "5bf70a5",
       "elType": "section",
       "settings": {
         "background_background": "classic",
@@ -188,14 +233,14 @@
       },
       "elements": [
         {
-          "id": "d9802fc",
+          "id": "e332124",
           "elType": "column",
           "settings": {
             "_column_size": 100
           },
           "elements": [
             {
-              "id": "295204b",
+              "id": "69a654a",
               "elType": "widget",
               "settings": {
                 "html": "<script>\n(function () {\n  var photosPanel = document.getElementById('photos-panel');\n  var videosPanel = document.getElementById('videos-panel');\n  if (videosPanel) videosPanel.hidden = true;\n  document.querySelectorAll('.tab-btn[data-tab]').forEach(function (btn) {\n    btn.addEventListener('click', function () {\n      document.querySelectorAll('.tab-btn').forEach(function (b) { b.classList.toggle('active', b === btn); });\n      if (photosPanel) photosPanel.hidden = btn.dataset.tab !== 'photos';\n      if (videosPanel) videosPanel.hidden = btn.dataset.tab !== 'videos';\n    });\n  });\n})();\n</script>"
@@ -210,7 +255,7 @@
       "isInner": false
     },
     {
-      "id": "ef34f70",
+      "id": "4a90682",
       "elType": "section",
       "settings": {
         "background_background": "classic",
@@ -218,25 +263,61 @@
       },
       "elements": [
         {
-          "id": "203b7fb",
+          "id": "3c7c0fc",
           "elType": "column",
           "settings": {
             "_column_size": 100,
             "padding": {
               "unit": "px",
-              "top": "20",
+              "top": "60",
               "right": "20",
               "bottom": "80",
               "left": "20",
               "isLinked": false
-            }
+            },
+            "content_width": "boxed"
           },
           "elements": [
             {
-              "id": "d78c177",
+              "id": "1a48fc8",
               "elType": "widget",
               "settings": {
-                "editor": "<p><strong>Submit a photo:</strong> email photos@deccanbirders.org with species name, location, and your name for the credit. Rules: one bird per frame, no baiting, no nest photography during the breeding season. Approvals take approximately one week.</p>",
+                "editor": "<p style=\"text-transform:uppercase;letter-spacing:.1em;font-size:11px;font-weight:600;font-family:Sora,sans-serif;color:#2B72B8;margin:0 0 8px;\">Members Only</p>",
+                "align": "left"
+              },
+              "elements": [],
+              "widgetType": "text-editor"
+            },
+            {
+              "id": "6863f05",
+              "elType": "widget",
+              "settings": {
+                "title": "Submit a photograph",
+                "header_size": "h2",
+                "align": "left",
+                "title_color": "#16241D",
+                "typography_typography": "custom",
+                "typography_font_family": "Sora",
+                "typography_font_size": {
+                  "unit": "px",
+                  "size": 32,
+                  "sizes": []
+                },
+                "typography_font_size_mobile": {
+                  "unit": "px",
+                  "size": 24,
+                  "sizes": []
+                },
+                "typography_font_weight": "700"
+              },
+              "elements": [],
+              "widgetType": "heading"
+            },
+            {
+              "id": "bfea9ef",
+              "elType": "widget",
+              "settings": {
+                "editor": "<p>Your entry goes to <a href=\"mailto:photos@deccanbirders.org\">photos@deccanbirders.org</a> for review. Once a committee member approves it, the photograph appears in this gallery credited to you by name.</p><ul><li>Tell us the name you would like the credit to read.</li><li>One bird per frame, no baiting, no nest photography during breeding.</li><li>Approvals usually take a week; you'll hear back either way.</li></ul>",
                 "typography_typography": "custom",
                 "typography_font_family": "Source Sans 3",
                 "typography_font_size": {
@@ -247,6 +328,15 @@
               },
               "elements": [],
               "widgetType": "text-editor"
+            },
+            {
+              "id": "1798f9a",
+              "elType": "widget",
+              "settings": {
+                "html": "<form id=\"db-photo-submit-form\" class=\"submission-form\" novalidate>\n  <div class=\"form-field\">\n    <label for=\"ps-name\">Photographer name</label>\n    <input type=\"text\" id=\"ps-name\" name=\"name\" required>\n  </div>\n  <div class=\"form-field\">\n    <label for=\"ps-email\">Email</label>\n    <input type=\"email\" id=\"ps-email\" name=\"email\" required>\n  </div>\n  <div class=\"form-field\">\n    <label for=\"ps-species\">Species</label>\n    <input type=\"text\" id=\"ps-species\" name=\"species\" required>\n  </div>\n  <div class=\"form-field\">\n    <label for=\"ps-location\">Where and when</label>\n    <input type=\"text\" id=\"ps-location\" name=\"location\" required>\n  </div>\n  <div class=\"form-field\">\n    <label for=\"ps-photo\">Photograph</label>\n    <div class=\"dropzone\">Drop a JPEG here, or browse\n      <input type=\"file\" id=\"ps-photo\" name=\"photo\" accept=\"image/jpeg\" required>\n      <p class=\"form-hint\">Up to 10 MB. Please keep the EXIF data intact.</p>\n    </div>\n  </div>\n  <label class=\"form-checkbox\">\n    <input type=\"checkbox\" name=\"consent\" required>\n    I took this photograph and allow Deccan Birders to publish it with my credit.\n  </label>\n  <button type=\"submit\" class=\"btn btn-primary\">Send for approval</button>\n</form>"
+              },
+              "elements": [],
+              "widgetType": "html"
             }
           ],
           "isInner": false

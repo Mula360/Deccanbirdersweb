@@ -16,19 +16,19 @@
                 "class": "",
                 "id": ""
             },
-            "default_value": "",
+            "default_value": "<p>Stay in the loop with everything you need to know about bird watching.</p>",
             "tabs": "all",
             "toolbar": "basic",
             "media_upload": 0,
             "delay": 0
         },
         {
-            "key": "field_membership_tiers",
-            "label": "Tiers",
-            "name": "tiers",
+            "key": "field_membership_apply_online_url",
+            "label": "Apply Online URL",
+            "name": "apply_online_url",
             "aria-label": "",
-            "type": "repeater",
-            "instructions": "",
+            "type": "url",
+            "instructions": "Link to the online membership application form (e.g. Google Form).",
             "required": 0,
             "conditional_logic": 0,
             "wrapper": {
@@ -36,187 +36,30 @@
                 "class": "",
                 "id": ""
             },
-            "collapsed": "field_membership_tiers_tier_name",
-            "min": 0,
-            "max": 0,
-            "layout": "block",
-            "button_label": "Add tier",
-            "sub_fields": [
-                {
-                    "key": "field_membership_tiers_tier_name",
-                    "label": "Tier Name",
-                    "name": "tier_name",
-                    "aria-label": "",
-                    "type": "text",
-                    "instructions": "",
-                    "required": 0,
-                    "conditional_logic": 0,
-                    "wrapper": {
-                        "width": "",
-                        "class": "",
-                        "id": ""
-                    },
-                    "default_value": "",
-                    "maxlength": "",
-                    "placeholder": "",
-                    "prepend": "",
-                    "append": ""
-                },
-                {
-                    "key": "field_membership_tiers_tier_price",
-                    "label": "Tier Price",
-                    "name": "tier_price",
-                    "aria-label": "",
-                    "type": "text",
-                    "instructions": "",
-                    "required": 0,
-                    "conditional_logic": 0,
-                    "wrapper": {
-                        "width": "",
-                        "class": "",
-                        "id": ""
-                    },
-                    "default_value": "",
-                    "maxlength": "",
-                    "placeholder": "",
-                    "prepend": "",
-                    "append": ""
-                },
-                {
-                    "key": "field_membership_tiers_tier_period",
-                    "label": "Tier Period",
-                    "name": "tier_period",
-                    "aria-label": "",
-                    "type": "text",
-                    "instructions": "",
-                    "required": 0,
-                    "conditional_logic": 0,
-                    "wrapper": {
-                        "width": "",
-                        "class": "",
-                        "id": ""
-                    },
-                    "default_value": "",
-                    "maxlength": "",
-                    "placeholder": "",
-                    "prepend": "",
-                    "append": ""
-                },
-                {
-                    "key": "field_membership_tiers_tier_popular",
-                    "label": "Tier Popular",
-                    "name": "tier_popular",
-                    "aria-label": "",
-                    "type": "true_false",
-                    "instructions": "",
-                    "required": 0,
-                    "conditional_logic": 0,
-                    "wrapper": {
-                        "width": "",
-                        "class": "",
-                        "id": ""
-                    },
-                    "message": "Highlight this tier as the most popular",
-                    "default_value": 0,
-                    "ui": 1,
-                    "ui_on_text": "",
-                    "ui_off_text": ""
-                },
-                {
-                    "key": "field_membership_tiers_tier_features",
-                    "label": "Tier Features",
-                    "name": "tier_features",
-                    "aria-label": "",
-                    "type": "repeater",
-                    "instructions": "",
-                    "required": 0,
-                    "conditional_logic": 0,
-                    "wrapper": {
-                        "width": "",
-                        "class": "",
-                        "id": ""
-                    },
-                    "collapsed": "field_membership_tiers_tier_features_feature_text",
-                    "min": 0,
-                    "max": 0,
-                    "layout": "table",
-                    "button_label": "Add feature",
-                    "sub_fields": [
-                        {
-                            "key": "field_membership_tiers_tier_features_feature_text",
-                            "label": "Feature Text",
-                            "name": "feature_text",
-                            "aria-label": "",
-                            "type": "text",
-                            "instructions": "",
-                            "required": 0,
-                            "conditional_logic": 0,
-                            "wrapper": {
-                                "width": "",
-                                "class": "",
-                                "id": ""
-                            },
-                            "default_value": "",
-                            "maxlength": "",
-                            "placeholder": "",
-                            "prepend": "",
-                            "append": ""
-                        }
-                    ]
-                }
-            ],
-            "default_value": [
-                {
-                    "tier_name": "Student",
-                    "tier_price": "₹200",
-                    "tier_period": "/ year",
-                    "tier_popular": 0,
-                    "tier_features": [
-                        { "feature_text": "Field trip access" },
-                        { "feature_text": "Monthly PITTA newsletter" },
-                        { "feature_text": "Valid student ID required" }
-                    ]
-                },
-                {
-                    "tier_name": "Regular",
-                    "tier_price": "₹500",
-                    "tier_period": "/ year",
-                    "tier_popular": 1,
-                    "tier_features": [
-                        { "feature_text": "Field trip access" },
-                        { "feature_text": "Monthly PITTA newsletter" },
-                        { "feature_text": "Voting rights at AGM" },
-                        { "feature_text": "Loaner binoculars priority" }
-                    ]
-                },
-                {
-                    "tier_name": "Family",
-                    "tier_price": "₹800",
-                    "tier_period": "/ year",
-                    "tier_popular": 0,
-                    "tier_features": [
-                        { "feature_text": "Everything in Regular" },
-                        { "feature_text": "Covers up to 4 family members" },
-                        { "feature_text": "Discounted nature camp fees" }
-                    ]
-                },
-                {
-                    "tier_name": "Life",
-                    "tier_price": "₹5000",
-                    "tier_period": "one-time",
-                    "tier_popular": 0,
-                    "tier_features": [
-                        { "feature_text": "Lifetime membership, no renewals" },
-                        { "feature_text": "All Regular member benefits" },
-                        { "feature_text": "Recognition in the annual report" }
-                    ]
-                }
-            ]
+            "default_value": "",
+            "placeholder": ""
         },
         {
-            "key": "field_membership_membership_steps",
-            "label": "Membership Steps",
-            "name": "membership_steps",
+            "key": "field_membership_apply_pdf_url",
+            "label": "Apply PDF URL",
+            "name": "apply_pdf_url",
+            "aria-label": "",
+            "type": "url",
+            "instructions": "Link to the downloadable membership form (PDF) for members who'd rather fill it offline and email it in.",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "",
+                "class": "",
+                "id": ""
+            },
+            "default_value": "",
+            "placeholder": ""
+        },
+        {
+            "key": "field_membership_benefits",
+            "label": "Membership Benefits",
+            "name": "benefits",
             "aria-label": "",
             "type": "repeater",
             "instructions": "",
@@ -227,36 +70,16 @@
                 "class": "",
                 "id": ""
             },
-            "collapsed": "field_membership_membership_steps_step_title",
+            "collapsed": "field_membership_benefits_benefit_text",
             "min": 0,
-            "max": 3,
+            "max": 0,
             "layout": "table",
-            "button_label": "Add step",
+            "button_label": "Add benefit",
             "sub_fields": [
                 {
-                    "key": "field_membership_membership_steps_step_title",
-                    "label": "Step Title",
-                    "name": "step_title",
-                    "aria-label": "",
-                    "type": "text",
-                    "instructions": "",
-                    "required": 0,
-                    "conditional_logic": 0,
-                    "wrapper": {
-                        "width": "",
-                        "class": "",
-                        "id": ""
-                    },
-                    "default_value": "",
-                    "maxlength": "",
-                    "placeholder": "",
-                    "prepend": "",
-                    "append": ""
-                },
-                {
-                    "key": "field_membership_membership_steps_step_description",
-                    "label": "Step Description",
-                    "name": "step_description",
+                    "key": "field_membership_benefits_benefit_text",
+                    "label": "Benefit Text",
+                    "name": "benefit_text",
                     "aria-label": "",
                     "type": "text",
                     "instructions": "",
@@ -275,9 +98,14 @@
                 }
             ],
             "default_value": [
-                { "step_title": "Fill the form", "step_description": "Complete the online membership application form with your details." },
-                { "step_title": "Pay the fee", "step_description": "Pay the applicable membership fee via UPI or bank transfer." },
-                { "step_title": "Get your welcome kit", "step_description": "Receive a welcome email with your membership card and the latest PITTA issue." }
+                { "benefit_text": "Membership Card" },
+                { "benefit_text": "PITTA, the Society's monthly bulletin" },
+                { "benefit_text": "Regular birdwatching field trips" },
+                { "benefit_text": "Lectures, discussions, talks" },
+                { "benefit_text": "Annual nature camps and trekking" },
+                { "benefit_text": "National conservation projects like Asian Waterfowl Census, Salim Ali Bird Count, BirdLife International World Birdwatch" },
+                { "benefit_text": "Visits to bird sanctuaries and parks" },
+                { "benefit_text": "Nature photography opportunities" }
             ]
         },
         {
@@ -319,5 +147,5 @@
     "active": true,
     "description": "Location rule (Page == a specific page) is a placeholder for the page with slug \"membership\" — ACF has no native slug-matching rule, so once that page exists, open this field group and reselect it in Location so the stored ID matches.",
     "show_in_rest": 0,
-    "modified": 1789257600
+    "modified": 1789344000
 }
