@@ -12,11 +12,6 @@
  *     <button class="tab-btn" data-tab="lookup" role="tab" aria-selected="false">Species Lookup</button>
  *   </div>
  *
- *   <div class="region-toggle">
- *     <button class="region-btn" data-region="IN-TG">Telangana</button>
- *     <button class="region-btn active" data-region="IN-AP">Andhra Pradesh</button>
- *   </div>
- *
  *   <div class="tab-panel" id="sightings-notable" role="tabpanel"></div>
  *   <div class="tab-panel" id="sightings-recent" role="tabpanel" hidden></div>
  *   <div class="tab-panel" id="sightings-hotspots" role="tabpanel" hidden></div>
@@ -40,7 +35,7 @@
 'use strict';
 
 const API      = (window.DB_CONFIG?.api_base || '').replace(/\/$/, '');
-let region     = new URLSearchParams(location.search).get('region') || 'IN-AP';
+const region   = 'IN';
 let activeTab  = 'notable';
 let controller = null;
 
@@ -428,30 +423,6 @@ async function loadTab(tab) {
 }
 
 /* -------------------------------------------------------------------------
- * Region toggle
- * ---------------------------------------------------------------------- */
-
-function initRegionToggle() {
-  document.querySelectorAll('.region-btn').forEach((btn) => {
-    btn.addEventListener('click', () => {
-      region = btn.dataset.region;
-      document.querySelectorAll('.region-btn').forEach((b) => b.classList.toggle('active', b === btn));
-
-      const url = new URL(location.href);
-      url.searchParams.set('region', region);
-      history.pushState({}, '', url);
-
-      // Changing region invalidates any cached lookup index and hotspot data.
-      lookupIndex = null;
-      hotspotSpeciesCache.clear();
-
-      loadTab(activeTab);
-      loadOnThisDay();
-    });
-  });
-}
-
-/* -------------------------------------------------------------------------
  * On This Day
  * ---------------------------------------------------------------------- */
 
@@ -484,7 +455,6 @@ async function initHomeStrip() {
 
 document.addEventListener('DOMContentLoaded', () => {
   initTabSwitching();
-  initRegionToggle();
 
   if (document.getElementById('sightings-notable')) {
     // Full sightings page

@@ -41,9 +41,23 @@ function typeColor(type) {
   return map[type] || '#F1EFE8';
 }
 
+// Calendar event titles come in as "Deccan Birders | 28-SEP-2026 | 0600 | Keesara" —
+// pull just the location out and present it as a readable field trip name.
+function cleanTitle(t) {
+  const m = String(t || '').match(/Deccan Birders\s*\|\s*[\d\-A-Z]+\s*\|\s*\d+\s*\|\s*(.+)/i);
+  return m ? 'Field Trip — ' + m[1].trim() : t;
+}
+
+// The calendar's note field is raw HTML (mail-merge style) — strip tags for
+// the plain-text card preview.
+function stripHtml(h) {
+  return (h || '').replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim();
+}
+
 function renderEventCard(e) {
   const { day, month, dayName } = formatDate(e.date);
-  const note = e.note ? escapeHtml(e.note.length > 120 ? e.note.slice(0, 120) + '…' : e.note) : '';
+  const noteText = stripHtml(e.note).substring(0, 150);
+  const note = noteText ? escapeHtml(noteText.length >= 150 ? noteText + '…' : noteText) : '';
 
   return `
   <div class="event-card">
@@ -54,7 +68,7 @@ function renderEventCard(e) {
     </div>
     <div class="event-info">
       ${e.event_type ? `<span class="event-type-badge" style="background:${typeColor(e.event_type)}">${escapeHtml(e.event_type)}</span>` : ''}
-      <div class="event-title">${escapeHtml(e.title)}</div>
+      <div class="event-title">${escapeHtml(cleanTitle(e.title))}</div>
       ${e.place ? `<div class="event-meta">📍 ${escapeHtml(e.place)}</div>` : ''}
       ${note ? `<div class="event-note">${note}</div>` : ''}
       <div class="event-badges">

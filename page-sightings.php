@@ -22,10 +22,6 @@ while (have_posts()) : the_post();
 
 <section class="section-white" style="padding: 0 20px 40px;">
   <div class="section-boxed">
-    <div class="region-toggle" role="group" aria-label="Region">
-      <button class="region-btn" data-region="IN-TG">Telangana</button>
-      <button class="region-btn active" data-region="IN-AP">Andhra Pradesh</button>
-    </div>
     <p class="sightings-updated-note">Updated every 15 minutes</p>
     <div class="tab-bar" role="tablist">
       <button role="tab" class="tab-btn active" data-tab="notable" aria-selected="true">Notable</button>

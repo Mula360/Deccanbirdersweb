@@ -43,7 +43,14 @@ while (have_posts()) : the_post();
   <?php foreach ($activities as $a): ?>
     <div class="activity-row">
       <div class="activity-media">
-        <img src="" alt="<?php echo esc_attr($a['activity_title']); ?> — Deccan Birders" style="background:var(--surface);">
+        <?php if (!empty($a['activity_image']['url'])): ?>
+          <img src="<?php echo esc_url($a['activity_image']['url']); ?>"
+               alt="<?php echo esc_attr($a['activity_image']['alt'] ?: $a['activity_title'] . ' — Deccan Birders'); ?>">
+        <?php else: ?>
+          <div class="img-placeholder" aria-label="Photo coming soon">
+            <span>Photo coming soon</span>
+          </div>
+        <?php endif; ?>
       </div>
       <div class="activity-text">
         <p style="display:inline-block;background:var(--green-light);color:var(--green-dark);padding:5px 14px;border-radius:999px;font-family:var(--font-head);font-weight:600;font-size:11px;text-transform:uppercase;letter-spacing:.05em;margin:0 0 12px;">

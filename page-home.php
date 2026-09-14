@@ -106,7 +106,7 @@ while (have_posts()) : the_post();
 
 <section class="section-surface" style="padding: 80px 20px 40px;">
   <div class="section-boxed">
-    <span class="eyebrow" style="color:var(--green);">Live From eBird · Telangana</span>
+    <span class="eyebrow" style="color:var(--green);">Live From eBird · India</span>
     <h2>What's being seen right now</h2>
     <div class="sightings-rows" id="home-sightings-rows">
       <div class="sighting-row sighting-skeleton"><span class="sk-block" style="width:130px"></span><span class="sk-block" style="width:80px;margin-left:12px"></span><span class="sk-block" style="width:100px;margin-left:12px"></span></div>

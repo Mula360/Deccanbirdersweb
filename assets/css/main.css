@@ -1295,6 +1295,18 @@ body.lightbox-open { overflow: hidden; }
 .join-band { background: var(--ink); text-align: center; padding: 60px 20px; }
 .join-band p { color: #fff; font-family: var(--font-head); font-weight: 700; font-size: 26px; margin-bottom: 20px; }
 
+.img-placeholder {
+  background: var(--border-light);
+  border-radius: var(--radius-card);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 240px;
+  color: var(--text-muted);
+  font-family: var(--font-body);
+  font-size: 14px;
+}
+
 .two-col-60-40 { display: grid; grid-template-columns: 60% 40%; gap: 30px; }
 .two-col-50-50 { display: grid; grid-template-columns: 1fr 1fr; gap: 30px; }
 
