@@ -65,6 +65,48 @@ add_action('wp_enqueue_scripts', function() {
 add_filter('elementor/frontend/print_google_fonts', '__return_false');
 
 /* -----------------------------------------------------------------------
+ * 3b. Elementor per-post CSS fallback
+ *
+ * On this host, Elementor's own Post_CSS::enqueue() (includes/frontend.php)
+ * is not producing the per-page inline <style id="elementor-post-{ID}-css">
+ * block even though is_singular() is true and the base Elementor CSS/JS
+ * bundles load correctly — confirmed directly against a real browser
+ * session, not just a synthetic request. Root cause not yet isolated
+ * further than that. This prints the same CSS Elementor would normally
+ * output, using its own verified public API (Post_CSS::create()->print_css()),
+ * so widget styling (colors, typography, spacing) actually renders.
+ *
+ * Guarded so it can never fatal or duplicate output:
+ *  - bails immediately unless Elementor is loaded, we're on a real
+ *    singular post/page, and that post is actually built with Elementor
+ *  - wrapped in try/catch since this is a workaround for an unresolved
+ *    upstream issue, not a documented code path
+ * ---------------------------------------------------------------------*/
+add_action('wp_head', function () {
+  if (!did_action('elementor/loaded') || !class_exists('\Elementor\Plugin')) {
+    return;
+  }
+  if (!is_singular()) {
+    return;
+  }
+  $post_id = get_the_ID();
+  if (!$post_id) {
+    return;
+  }
+  try {
+    if (!\Elementor\Plugin::$instance->db->is_built_with_elementor($post_id)) {
+      return;
+    }
+    $css_file = \Elementor\Core\Files\CSS\Post::create($post_id);
+    if ($css_file) {
+      $css_file->print_css();
+    }
+  } catch (\Throwable $e) {
+    // Never let this fallback break page rendering.
+  }
+}, 20);
+
+/* -----------------------------------------------------------------------
  * 4. Custom post types
  * ---------------------------------------------------------------------*/
 add_action('init', function() {
