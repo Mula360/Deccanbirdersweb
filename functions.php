@@ -33,7 +33,13 @@ add_action('after_setup_theme', function() {
  * 2. Enqueue scripts and styles
  * ---------------------------------------------------------------------*/
 add_action('wp_enqueue_scripts', function() {
-  $v = '1.0';
+  // File-based version so edits to CSS/JS always bust browser and
+  // LiteSpeed/proxy caches instead of being served stale under a static tag.
+  $v = wp_get_theme()->get('Version') ?: '1.0';
+  $main_css_path = get_template_directory() . '/assets/css/main.css';
+  if (file_exists($main_css_path)) {
+    $v = filemtime($main_css_path);
+  }
 
   wp_enqueue_style('db-fonts', 'https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700&family=Source+Sans+3:wght@400;600&display=swap', [], null);
   wp_enqueue_style('db-vars', get_template_directory_uri() . '/assets/css/variables.css', [], $v);

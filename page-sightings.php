@@ -45,11 +45,13 @@ while (have_posts()) : the_post();
     <span class="eyebrow" style="color:var(--blue);">Where Can I See It Now?</span>
     <h2>Look up the nearest recent sighting of a species</h2>
     <p>Type a species name. Results are the closest checklists in the last two weeks, with distance from Hyderabad.</p>
-    <div class="autocomplete">
-      <input type="search" id="species-search-input" class="autocomplete-input" placeholder="Type a bird name..." autocomplete="off">
-      <div class="autocomplete-dropdown" id="species-search-dropdown" hidden></div>
+    <div id="sightings-lookup">
+      <div class="autocomplete">
+        <input type="search" id="species-search-input" class="autocomplete-input" placeholder="Type a bird name..." autocomplete="off">
+        <div class="autocomplete-dropdown" id="species-search-dropdown" hidden></div>
+      </div>
+      <div id="species-search-results"></div>
     </div>
-    <div id="species-search-results"></div>
   </div>
 </section>
 
