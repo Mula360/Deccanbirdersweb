@@ -133,6 +133,11 @@ button { font-family: inherit; }
   color: var(--ink);
   margin-right: auto;
 }
+/* Real logo artwork (bird + wordmark in one image). Height-constrained so
+   the 1696x702 source scales to the header without distortion. */
+.logo-img { display: block; height: 42px; width: auto; max-width: 100%; }
+@media (max-width: 640px) { .logo-img { height: 34px; } }
+
 .logo-mark {
   display: inline-flex;
   align-items: center;
@@ -976,7 +981,7 @@ body.lightbox-open { overflow: hidden; }
 .pitta-month-link {
   display: block;
   padding: 8px 12px;
-  background: var(--green-light);
+  background: #E8F1EA; /* exact design token */
   color: var(--green-dark);
   border-radius: 8px;
   font-family: var(--font-head);
@@ -985,7 +990,7 @@ body.lightbox-open { overflow: hidden; }
   text-decoration: none;
   transition: background 150ms, color 150ms;
 }
-.pitta-month-link:hover { background: var(--green); color: #fff; }
+.pitta-month-link:hover { background: var(--green-dark); color: #fff; }
 .pitta-month-empty { display: block; padding: 8px 12px; color: var(--text-muted); font-size: 13.5px; }
 
 /* -------------------------------------------------------------------------
@@ -1177,6 +1182,7 @@ body.lightbox-open { overflow: hidden; }
 .db-contact-form textarea,
 .submission-form textarea { min-height: 140px; resize: vertical; }
 .form-field { margin-bottom: 20px; }
+.label-optional { font-weight: 400; color: var(--text-muted); font-size: 12px; }
 .field-error { display: block; color: #B3261E; font-size: 12px; margin-top: 4px; min-height: 16px; }
 #form-global-error { color: #B3261E; font-size: 14px; min-height: 20px; }
 

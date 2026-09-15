@@ -182,22 +182,33 @@ function db_handle_sighting_report() {
   if (!wp_verify_nonce($_POST['nonce'] ?? '', 'db_contact_nonce')) {
     wp_send_json(['success' => false, 'message' => 'Security check failed.']);
   }
-  $name     = sanitize_text_field($_POST['name'] ?? '');
-  $email    = sanitize_email($_POST['email'] ?? '');
-  $species  = sanitize_text_field($_POST['species'] ?? '');
-  $location = sanitize_text_field($_POST['location'] ?? '');
-  $date     = sanitize_text_field($_POST['date'] ?? '');
-  $notes    = sanitize_textarea_field($_POST['notes'] ?? '');
-  if (!$name || !$email || !$species || !$location) {
-    wp_send_json(['success' => false, 'message' => 'Please fill in all required fields.']);
+  // The design merges "report a sighting" and "volunteer" into one short
+  // form: a single free-text "species and location" field plus a
+  // "what would you like to help with" choice. Email is optional (it isn't
+  // in the design at all) but is accepted so the society can reply.
+  $species_location = sanitize_text_field($_POST['species_location'] ?? '');
+  $help_with        = sanitize_text_field($_POST['help_with'] ?? '');
+  $email            = sanitize_email($_POST['email'] ?? '');
+  if (!$species_location) {
+    wp_send_json(['success' => false, 'message' => 'Please tell us the species and location.']);
   }
   $to      = 'info@deccanbirders.org';
-  $headers = ['Content-Type: text/html; charset=UTF-8', "Reply-To: $name <$email>"];
-  $body    = "<p><strong>From:</strong> $name ($email)</p><p><strong>Species:</strong> $species</p><p><strong>Location:</strong> $location</p>"
-    . ($date ? "<p><strong>Date:</strong> $date</p>" : '')
-    . ($notes ? "<p><strong>Notes:</strong> $notes</p>" : '');
-  wp_mail($to, "Sighting report: $species at $location", $body, $headers);
-  wp_mail($email, 'We received your sighting report — Deccan Birders', "<p>Hi $name,</p><p>Thank you for reporting your sighting of $species at $location. We appreciate your contribution to our records.</p><p>— Deccan Birders</p>", $headers);
+  $headers = ['Content-Type: text/html; charset=UTF-8'];
+  if ($email) $headers[] = "Reply-To: $email";
+  $body = '<p><strong>Species and location:</strong> ' . esc_html($species_location) . '</p>'
+    . ($help_with ? '<p><strong>Would like to help with:</strong> ' . esc_html($help_with) . '</p>' : '')
+    . ($email ? '<p><strong>Email:</strong> ' . esc_html($email) . '</p>' : '<p><em>No contact email supplied.</em></p>');
+  wp_mail($to, 'Sighting / volunteer: ' . $species_location, $body, $headers);
+  if ($email) {
+    wp_mail(
+      $email,
+      'We received your submission — Deccan Birders',
+      '<p>Thank you — we have your note about <strong>' . esc_html($species_location) . '</strong>'
+        . ($help_with && $help_with !== 'Reporting a sighting only' ? ', and your offer to help with ' . esc_html($help_with) : '')
+        . '.</p><p>— Deccan Birders</p>',
+      $headers
+    );
+  }
   wp_send_json(['success' => true]);
 }
 

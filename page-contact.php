@@ -2,10 +2,10 @@
 /**
  * Template for the Contact page — rendered directly in PHP (no Elementor).
  *
- * Matches the design: "Send us a message" form, phone/WhatsApp block,
- * "Seen something unusual?" sighting report, and "Submit a photograph".
- * (The volunteer form was removed — it isn't part of the design. Its AJAX
- * handler stays registered in functions.php so it can be reinstated.)
+ * Matches the design: "Send us a message" form, phone/WhatsApp block, the
+ * combined "Volunteer · Report a sighting" section, and "Submit a photograph".
+ * The design folds volunteering into the sighting form via the "I'd like to
+ * help with" select rather than having a separate volunteer form.
  */
 get_header();
 while (have_posts()) : the_post();
@@ -62,37 +62,29 @@ while (have_posts()) : the_post();
 
 <section class="section-surface" style="padding: 60px 20px 80px;">
   <div class="section-boxed">
-    <span class="eyebrow" style="color:var(--green);">Report a Sighting</span>
+    <span class="eyebrow" style="color:var(--green);">Volunteer · Report a sighting</span>
     <h2>Seen something unusual?</h2>
-    <p>Tell us what you saw, where and when.</p>
+    <p>Tell us what you saw, where and when. You can also put your hand up for the winter waterfowl census or a school outreach session.</p>
     <form id="db-sighting-report-form" class="submission-form" novalidate>
       <div class="form-field">
-        <label for="sr-name">Name</label>
-        <input type="text" id="sr-name" name="name" required>
-        <span class="field-error" id="sr-error-name"></span>
+        <label for="sr-species-location">Species and location</label>
+        <input type="text" id="sr-species-location" name="species_location" placeholder="e.g. Indian Skimmer, Manjeera" required>
+        <span class="field-error" id="sr-error-species-location"></span>
       </div>
       <div class="form-field">
-        <label for="sr-email">Email</label>
-        <input type="email" id="sr-email" name="email" required>
+        <label for="sr-help-with">I'd like to help with</label>
+        <select id="sr-help-with" name="help_with">
+          <option>Reporting a sighting only</option>
+          <option>Annual waterfowl census</option>
+          <option>Field trip coordination</option>
+          <option>School and college outreach</option>
+          <option>PITTA newsletter</option>
+        </select>
+      </div>
+      <div class="form-field">
+        <label for="sr-email">Email <span class="label-optional">(optional — so we can follow up)</span></label>
+        <input type="email" id="sr-email" name="email">
         <span class="field-error" id="sr-error-email"></span>
-      </div>
-      <div class="form-field">
-        <label for="sr-species">Species</label>
-        <input type="text" id="sr-species" name="species" required>
-        <span class="field-error" id="sr-error-species"></span>
-      </div>
-      <div class="form-field">
-        <label for="sr-location">Location</label>
-        <input type="text" id="sr-location" name="location" required>
-        <span class="field-error" id="sr-error-location"></span>
-      </div>
-      <div class="form-field">
-        <label for="sr-date">Date</label>
-        <input type="text" id="sr-date" name="date" placeholder="e.g. 14 September 2026">
-      </div>
-      <div class="form-field">
-        <label for="sr-notes">Notes</label>
-        <textarea id="sr-notes" name="notes" rows="3"></textarea>
       </div>
       <p class="field-error" id="sr-error-global"></p>
       <button type="submit" class="btn btn-secondary">Submit</button>

@@ -162,16 +162,21 @@
       const globalError = form.querySelector('#sr-error-global');
       if (globalError) globalError.textContent = '';
 
-      // Client-side validation
+      // Client-side validation. The design's combined volunteer / report-a-
+      // sighting form has one required field; email is optional.
       let valid = true;
-      ['name', 'email', 'species', 'location'].forEach((field) => {
-        const input = form.querySelector(`[name=${field}]`);
-        if (input && !input.value.trim()) {
-          const errorEl = form.querySelector(`#sr-error-${field}`);
-          if (errorEl) errorEl.textContent = 'This field is required.';
-          valid = false;
-        }
-      });
+      const speciesLocation = form.querySelector('[name=species_location]');
+      if (speciesLocation && !speciesLocation.value.trim()) {
+        const errorEl = form.querySelector('#sr-error-species-location');
+        if (errorEl) errorEl.textContent = 'This field is required.';
+        valid = false;
+      }
+      const emailInput = form.querySelector('[name=email]');
+      if (emailInput && emailInput.value.trim() && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailInput.value.trim())) {
+        const errorEl = form.querySelector('#sr-error-email');
+        if (errorEl) errorEl.textContent = 'Please enter a valid email address.';
+        valid = false;
+      }
 
       if (!valid) {
         btn.disabled = false;
