@@ -753,18 +753,23 @@ body.nav-open { overflow: hidden; }
 }
 .submission-form input:focus,
 .submission-form select:focus,
-.submission-form textarea:focus { outline: none; border-color: var(--blue); }
+.submission-form textarea:focus,
+.stacked-form input:focus,
+.stacked-form select:focus,
+.stacked-form textarea:focus { outline: none; border-color: var(--blue); }
 .submission-form .form-hint { font-size: 12px; color: var(--text-muted); margin-top: 4px; }
 .submission-form .form-checkbox { display: flex; align-items: flex-start; gap: 8px; font-size: 13px; color: var(--text-muted); }
 .submission-form .form-checkbox input { width: auto; margin-top: 3px; }
 .dropzone {
-  border: 2px dashed var(--border);
-  border-radius: var(--radius-sm);
-  padding: 24px;
+  border: 1.5px dashed #B9C8DC;
+  border-radius: 12px;
+  padding: 26px 20px;
   text-align: center;
+  background: #F5F8F6; /* design token for this element specifically */
   color: var(--text-muted);
   font-size: 14px;
 }
+.dropzone input[type="file"] { margin-top: 12px; }
 
 /* -------------------------------------------------------------------------
    Fact / humour cards ([db_bird_fact], [db_birding_joke])
@@ -1163,7 +1168,11 @@ body.lightbox-open { overflow: hidden; }
 .db-contact-form textarea,
 .submission-form input,
 .submission-form select,
-.submission-form textarea {
+.submission-form textarea,
+.stacked-form input[type="text"],
+.stacked-form input[type="email"],
+.stacked-form select,
+.stacked-form textarea {
   width: 100%;
   font-family: var(--font-body);
   font-size: 15px;
@@ -1181,7 +1190,82 @@ body.lightbox-open { overflow: hidden; }
 .submission-form select:focus,
 .submission-form textarea:focus { outline: none; border-color: var(--blue); }
 .db-contact-form textarea,
-.submission-form textarea { min-height: 140px; resize: vertical; }
+.submission-form textarea,
+.stacked-form textarea { min-height: 140px; resize: vertical; }
+/* -------------------------------------------------------------------------
+   Contact page — card grid, stacked fields, photo-submit card
+   ---------------------------------------------------------------------- */
+.contact-grid {
+  padding: clamp(36px, 5vw, 56px) 20px clamp(60px, 8vw, 96px);
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 20px;
+  align-items: start;
+}
+.contact-col { display: grid; gap: 20px; }
+
+.contact-card {
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  padding: clamp(26px, 3.2vw, 38px);
+}
+/* Tinted variant (the volunteer / report-a-sighting card) has no border. */
+.contact-card--tint { background: var(--blue-light); border: none; }
+
+.card-heading {
+  font-family: var(--font-head);
+  font-size: clamp(20px, 2.4vw, 24px);
+  font-weight: 700;
+  letter-spacing: -0.025em;
+  margin-bottom: 18px;
+}
+.card-intro { margin-bottom: 18px; }
+
+.contact-details { display: grid; gap: 14px; font-size: 16.5px; line-height: 1.5; }
+
+/* Label-wraps-input field pattern used across the contact forms. */
+.stacked-form { display: grid; gap: 14px; align-content: start; }
+.stacked-form--tight { gap: 12px; }
+.stacked-field { display: grid; gap: 7px; }
+.stacked-label {
+  font-family: var(--font-head);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #4E6B5C;
+}
+.field-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 14px; }
+
+.photo-submit-card {
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  padding: clamp(26px, 3.4vw, 40px);
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: clamp(28px, 4vw, 48px);
+}
+.submit-notes { display: grid; gap: 10px; margin-top: 16px; }
+.submit-notes li {
+  display: flex;
+  gap: 11px;
+  align-items: flex-start;
+  font-size: 15px;
+  line-height: 1.5;
+  color: var(--text-muted);
+}
+.submit-notes li::before {
+  content: '';
+  margin-top: 7px;
+  width: 6px;
+  height: 6px;
+  flex-shrink: 0;
+  border-radius: 99px;
+  background: var(--yellow);
+}
+
 .form-field { margin-bottom: 20px; }
 .field-error { display: block; color: #B3261E; font-size: 12px; margin-top: 4px; min-height: 16px; }
 #form-global-error { color: #B3261E; font-size: 14px; min-height: 20px; }
