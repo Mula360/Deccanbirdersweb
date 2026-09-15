@@ -1009,41 +1009,110 @@ body.lightbox-open { overflow: hidden; }
 }
 .btn-outline-dark:hover { background: var(--ink); color: #fff; border-color: var(--ink); }
 
+/* Membership page body: option cards sit below the hero, benefits block
+   below those, matching the design's two container paddings. */
+.membership-body {
+  max-width: var(--max-w);
+  margin: 0 auto;
+  padding: clamp(44px, 6vw, 72px) 20px clamp(60px, 8vw, 96px);
+}
+.membership-body .membership-benefits { margin-top: clamp(44px, 6vw, 80px); }
+
 .apply-options {
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 24px;
-  margin-bottom: 48px;
+  grid-template-columns: repeat(auto-fit, minmax(290px, 1fr));
+  gap: 20px;
 }
 .apply-option {
-  border: 1px solid var(--border);
-  border-radius: var(--radius-card);
-  padding: 32px 28px;
   background: #fff;
-}
-.apply-option h3 { font-family: var(--font-head); font-weight: 700; font-size: 20px; color: var(--ink); margin: 8px 0 12px; }
-.apply-option p { color: var(--text-body); font-size: 15px; margin-bottom: 20px; }
-
-.membership-benefits-heading { font-family: var(--font-head); font-weight: 700; font-size: 24px; color: var(--ink); margin-bottom: 20px; text-align: center; }
-.benefit-list {
-  max-width: 640px;
-  margin: 0 auto;
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  padding: clamp(28px, 3.4vw, 40px);
   display: flex;
   flex-direction: column;
-  gap: 14px;
+}
+/* "Option one" is a filled blue card in the design, not a bordered white one. */
+.apply-option--primary { background: var(--blue); border-color: var(--blue); color: #fff; }
+
+.apply-option-label {
+  font-family: var(--font-head);
+  font-size: 11.5px;
+  font-weight: 600;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  color: #4E6B5C;
+}
+.apply-option--primary .apply-option-label { color: rgba(255, 255, 255, 0.75); }
+
+.apply-option-title {
+  margin: 12px 0 0;
+  font-family: var(--font-head);
+  font-size: clamp(24px, 3vw, 30px);
+  line-height: 1.15;
+  letter-spacing: -0.025em;
+  font-weight: 700;
+}
+.apply-option--primary .apply-option-title { color: #fff; }
+
+.apply-option-text { margin: 12px 0 26px; font-size: 17px; line-height: 1.55; color: var(--text-body); }
+.apply-option--primary .apply-option-text { color: rgba(255, 255, 255, 0.88); }
+
+/* Buttons sit at the bottom of each card regardless of text length. */
+.apply-option-btn {
+  margin-top: auto;
+  align-self: flex-start;
+  padding: 14px 26px;
+  border-radius: var(--radius-btn);
+  font-family: var(--font-head);
+  font-size: 15.5px;
+  font-weight: 600;
+  text-decoration: none;
+  transition: background 150ms, color 150ms;
+}
+.apply-option-btn--onblue { background: #fff; color: #1F5A93; }
+.apply-option-btn--onblue:hover { background: var(--yellow); color: var(--ink); }
+.apply-option-btn--dark { background: var(--ink); color: #fff; }
+.apply-option-btn--dark:hover { background: var(--green-dark); color: #fff; }
+
+.membership-benefits-heading {
+  margin: 0 0 28px;
+  font-family: var(--font-head);
+  font-size: clamp(26px, 3.4vw, 38px);
+  letter-spacing: -0.03em;
+  font-weight: 700;
+  color: var(--ink);
+  text-align: left;
+}
+/* 2px gaps over a grey backing read as hairline dividers between cells. */
+.benefit-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 2px;
+  background: var(--border);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-card);
+  overflow: hidden;
+  max-width: none;
+  margin: 0;
 }
 .benefit-list li {
-  font-size: 16px;
-  color: var(--text-body);
-  padding-left: 30px;
-  position: relative;
+  background: #fff;
+  padding: 24px 26px;
+  display: flex;
+  gap: 14px;
+  align-items: flex-start;
+  font-size: 17px;
+  line-height: 1.5;
+  color: #2B3A33;
 }
 .benefit-list li::before {
-  content: '✓';
-  position: absolute;
-  left: 0;
-  color: var(--green);
-  font-weight: 700;
+  content: '';
+  margin-top: 7px;
+  width: 8px;
+  height: 8px;
+  flex-shrink: 0;
+  border-radius: 99px;
+  background: var(--yellow);
 }
 
 /* -------------------------------------------------------------------------
@@ -1488,8 +1557,18 @@ body.lightbox-open { overflow: hidden; }
   margin: 0 auto;
   padding: clamp(72px, 11vw, 140px) 20px clamp(48px, 7vw, 80px);
 }
-.hero-photo h1 { color: #fff; max-width: 20ch; }
-.hero-photo p { color: rgba(255, 255, 255, 0.86); max-width: 48ch; font-size: clamp(17px, 2.2vw, 20px); margin-top: 20px; }
+.hero-photo h1 {
+  color: #fff;
+  max-width: 20ch;
+  margin: 14px 0 0;
+  font-family: var(--font-head);
+  font-size: clamp(34px, 6vw, 64px);
+  line-height: 1.04;
+  letter-spacing: -0.035em;
+  font-weight: 700;
+}
+.hero-photo .eyebrow { font-size: 12.5px; margin-bottom: 0; }
+.hero-photo p { color: rgba(255, 255, 255, 0.86); max-width: 48ch; font-size: clamp(17px, 2.2vw, 20px); line-height: 1.55; margin-top: 20px; }
 
 /* Home variant: taller, content anchored to the bottom of the photo. */
 .hero-photo--home { min-height: min(78vh, 660px); display: flex; align-items: flex-end; }

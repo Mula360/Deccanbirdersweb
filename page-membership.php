@@ -23,10 +23,8 @@ while (have_posts()) : the_post();
   </div>
 </section>
 
-<section class="section-white" style="padding: 0 20px 80px;">
-  <div class="section-boxed">
-    <?php echo do_shortcode('[db_membership_tiers]'); ?>
-  </div>
+<section class="membership-body">
+  <?php echo do_shortcode('[db_membership_tiers]'); ?>
 </section>
 
 <?php endwhile;
