@@ -191,6 +191,9 @@ function renderRecent(data) {
 // Hotspots: 5 rows, each expandable to show that hotspot's species list.
 const hotspotSpeciesCache = new Map();
 
+// eBird's /ref/hotspot endpoint returns numSpeciesAllTime but no checklist
+// count, so h.checklists is absent — render that stat only when the API
+// actually supplies a number.
 function renderHotspots(data) {
   const el = document.getElementById('sightings-hotspots');
   if (!el || data === null) return;
@@ -208,10 +211,11 @@ function renderHotspots(data) {
             <span class="hotspot-stat-num hotspot-stat-species">${escapeHtml(String(h.species))}</span>
             <span class="hotspot-stat-label">species</span>
           </span>
+          ${Number.isFinite(Number(h.checklists)) ? `
           <span class="hotspot-stat">
             <span class="hotspot-stat-num hotspot-stat-checklists">${escapeHtml(String(h.checklists))}</span>
             <span class="hotspot-stat-label">checklists</span>
-          </span>
+          </span>` : ''}
           <span class="hotspot-arrow" aria-hidden="true">+</span>
         </span>
       </button>
