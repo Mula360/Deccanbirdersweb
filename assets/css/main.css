@@ -1872,8 +1872,6 @@ body.lightbox-open { overflow: hidden; }
 .hero-light { background: transparent; padding: clamp(40px, 6vw, 68px) 20px 0; }
 .hero-light-inner { max-width: var(--max-w); margin: 0 auto; }
 .hero-light .eyebrow { font-size: 12.5px; margin-bottom: 0; }
-.hero-light--aims h1 { font-size: clamp(32px, 5.4vw, 58px); }
-.hero-standfirst--committee { max-width: 54ch; }
 .hero-standfirst { margin: 20px 0 0; max-width: 56ch; font-size: clamp(17px, 2.1vw, 20px); line-height: 1.55; color: var(--text-body); }
 .hero-light h1 {
   margin: 14px 0 0;
@@ -1883,6 +1881,9 @@ body.lightbox-open { overflow: hidden; }
   letter-spacing: -0.035em;
   font-weight: 700;
 }
+/* Modifiers must follow the base rules — equal specificity, so source order decides. */
+.hero-light--aims h1 { font-size: clamp(32px, 5.4vw, 58px); }
+.hero-standfirst--committee { max-width: 54ch; }
 
 .section-white { background: #fff; }
 .section-surface { background: var(--surface); }
