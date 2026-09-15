@@ -335,6 +335,7 @@ body.nav-open { overflow: hidden; }
 .event-title { font-family: var(--font-head); font-weight: 700; font-size: 16px; color: var(--ink); margin-bottom: 4px; }
 .event-meta { font-size: 13px; color: var(--text-muted); margin-bottom: 4px; }
 .event-note { font-size: 13px; color: var(--text-muted); font-style: italic; }
+.event-note-full { font-size: 14px; color: var(--text-body); font-style: normal; line-height: 1.6; margin-top: 8px; }
 
 /* -------------------------------------------------------------------------
    Video card
@@ -374,7 +375,10 @@ body.nav-open { overflow: hidden; }
   border-bottom: 2px solid var(--border);
   margin-bottom: 32px;
   overflow-x: auto;
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* old Edge/IE */
 }
+.tab-bar::-webkit-scrollbar { display: none; } /* Chrome/Safari — stay scrollable on narrow screens, just don't show the bar */
 .tab-btn {
   font-family: var(--font-head);
   font-weight: 600;
@@ -899,47 +903,56 @@ body.lightbox-open { overflow: hidden; }
   gap: 10px;
 }
 .pitta-year-heading::-webkit-details-marker { display: none; }
+.pitta-year-number { font-size: clamp(20px, 3vw, 24px); font-weight: 700; letter-spacing: -0.03em; }
 .pitta-year-heading::after {
   content: '+';
   margin-left: auto;
   font-size: 20px;
-  color: var(--text-muted);
+  color: var(--blue);
   transition: transform 150ms;
 }
 .pitta-year[open] .pitta-year-heading::after { transform: rotate(45deg); }
-.pitta-count { font-family: var(--font-body); font-weight: 400; font-size: 13px; color: var(--text-muted); }
+.pitta-count {
+  font-family: var(--font-head);
+  font-weight: 600;
+  font-size: 13.5px;
+  color: var(--text-muted);
+  padding: 4px 10px;
+  background: var(--blue-light);
+  border-radius: 999px;
+}
 
 .pitta-month-grid {
-  padding: 4px 20px 20px;
+  border-top: 1px solid var(--border);
+  padding: 18px 20px 20px;
   display: grid;
-  grid-template-columns: repeat(6, 1fr);
-  gap: 8px;
+  grid-template-columns: repeat(auto-fill, minmax(104px, 1fr));
+  gap: 10px;
 }
-.pitta-month-cell {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 4px;
-  padding: 12px 6px;
-  border-radius: var(--radius-sm);
-  background: var(--surface);
-  text-decoration: none;
-  text-align: center;
-}
+.pitta-month-col { display: grid; gap: 6px; }
 .pitta-month-label {
   font-family: var(--font-head);
-  font-weight: 700;
-  font-size: 12px;
-  letter-spacing: 0.04em;
+  font-weight: 600;
+  font-size: 11.5px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
   color: var(--text-muted);
 }
-.pitta-month-action { font-size: 12px; color: var(--border); }
-.pitta-month-cell.has-issue { background: var(--blue-light); cursor: pointer; transition: background 150ms; }
-.pitta-month-cell.has-issue .pitta-month-label { color: var(--blue-dark); }
-.pitta-month-cell.has-issue .pitta-month-action { color: var(--blue); font-weight: 600; }
-.pitta-month-cell.has-issue:hover { background: var(--blue); }
-.pitta-month-cell.has-issue:hover .pitta-month-label,
-.pitta-month-cell.has-issue:hover .pitta-month-action { color: #fff; }
+.pitta-month-links { display: flex; flex-wrap: wrap; gap: 6px; }
+.pitta-month-link {
+  display: block;
+  padding: 8px 12px;
+  background: var(--green-light);
+  color: var(--green-dark);
+  border-radius: 8px;
+  font-family: var(--font-head);
+  font-size: 13.5px;
+  font-weight: 600;
+  text-decoration: none;
+  transition: background 150ms, color 150ms;
+}
+.pitta-month-link:hover { background: var(--green); color: #fff; }
+.pitta-month-empty { display: block; padding: 8px 12px; color: var(--text-muted); font-size: 13.5px; }
 
 /* -------------------------------------------------------------------------
    Membership application options + benefits ([db_membership_tiers])
@@ -1241,12 +1254,19 @@ body.lightbox-open { overflow: hidden; }
    ---------------------------------------------------------------------- */
 .library-columns {
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 32px;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 20px;
 }
-.library-col h3 { font-family: var(--font-head); font-weight: 700; font-size: 15px; color: var(--ink); margin-bottom: 12px; }
-.library-col ul { display: flex; flex-direction: column; gap: 8px; }
-.library-col li { font-size: 14px; }
+.library-col {
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-card);
+  padding: 28px;
+}
+.library-col h3 { font-family: var(--font-head); font-weight: 600; font-size: 20px; letter-spacing: -0.02em; color: var(--ink); margin-bottom: 16px; }
+.library-col ul { display: flex; flex-direction: column; gap: 12px; }
+.library-col li { font-size: 16.5px; line-height: 1.5; color: var(--text-body); list-style: none; }
+.library-col li a { display: block; padding-bottom: 12px; border-bottom: 1px solid var(--border-light); }
 .library-col a { color: var(--blue); }
 
 /* -------------------------------------------------------------------------

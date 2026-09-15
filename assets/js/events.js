@@ -51,15 +51,31 @@ function cleanTitle(t) {
 }
 
 // The calendar's note field is raw HTML (mail-merge style) — strip tags for
-// the plain-text card preview.
-function stripHtml(h) {
-  return (h || '').replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim();
+// display. When keepBreaks is set, paragraph/line breaks are preserved as
+// \n (for the full write-up on the Events page); otherwise everything
+// collapses to one line (for the short card preview).
+function stripHtml(h, keepBreaks) {
+  let s = h || '';
+  if (keepBreaks) {
+    s = s.replace(/<\/(p|div|li)>/gi, '\n').replace(/<br\s*\/?>/gi, '\n');
+  }
+  s = s.replace(/<[^>]*>/g, ' ').replace(/[ \t]+/g, ' ');
+  s = keepBreaks ? s.replace(/ *\n */g, '\n').replace(/\n{3,}/g, '\n\n').trim() : s.replace(/\s+/g, ' ').trim();
+  return s;
 }
 
-function renderEventCard(e) {
+// full=true renders the complete write-up (Events page); full=false (default)
+// truncates to a short preview (homepage strip).
+function renderEventCard(e, full = false) {
   const { day, month, dayName } = formatDate(e.date);
-  const noteText = stripHtml(e.note).substring(0, 150);
-  const note = noteText ? escapeHtml(noteText.length >= 150 ? noteText + '…' : noteText) : '';
+  let note;
+  if (full) {
+    const text = stripHtml(e.note, true);
+    note = text ? escapeHtml(text).replace(/\n/g, '<br>') : '';
+  } else {
+    const text = stripHtml(e.note).substring(0, 150);
+    note = text ? escapeHtml(text.length >= 150 ? text + '…' : text) : '';
+  }
 
   return `
   <div class="event-card">
@@ -72,7 +88,7 @@ function renderEventCard(e) {
       ${e.event_type ? `<span class="event-type-badge" style="background:${typeColor(e.event_type)}">${escapeHtml(e.event_type)}</span>` : ''}
       <div class="event-title">${escapeHtml(cleanTitle(e.title))}</div>
       ${e.place ? `<div class="event-meta">📍 ${escapeHtml(e.place)}</div>` : ''}
-      ${note ? `<div class="event-note">${note}</div>` : ''}
+      ${note ? `<div class="event-note${full ? ' event-note-full' : ''}">${note}</div>` : ''}
       <div class="event-badges">
         ${e.loanerBins ? '<span class="loaner-badge">Loaner bins available</span>' : ''}
         ${e.fee ? `<span class="fee-badge">₹${escapeHtml(e.fee)}</span>` : ''}
@@ -94,7 +110,7 @@ async function initHomeEvents() {
     if (json.error) throw new Error(json.message || 'Request failed');
     const data = json.data || [];
     if (!data.length) { grid.innerHTML = '<p>No upcoming trips. Check back soon.</p>'; return; }
-    grid.innerHTML = data.slice(0, 3).map(renderEventCard).join('');
+    grid.innerHTML = data.slice(0, 3).map((e) => renderEventCard(e)).join('');
   } catch (e) {
     grid.innerHTML = '<p>Could not load events.</p>';
   }
@@ -145,7 +161,7 @@ async function fetchMergedPastEvents() {
   return { merged, bothFailed: wpFailed && calendarFailed };
 }
 
-function renderPastEventCard(item) {
+function renderPastEventCard(item, full = false) {
   if (item.source === 'wp') {
     const e = item.post;
     return `
@@ -161,7 +177,7 @@ function renderPastEventCard(item) {
     </div>`;
   }
   // Calendar-only record: no write-up yet, so render with the plain event card.
-  return renderEventCard(item.event);
+  return renderEventCard(item.event, full);
 }
 
 /* -------------------------------------------------------------------------
@@ -179,7 +195,7 @@ async function initHomePastEvents() {
     return;
   }
 
-  grid.innerHTML = merged.slice(0, 3).map(renderPastEventCard).join('');
+  grid.innerHTML = merged.slice(0, 3).map((item) => renderPastEventCard(item)).join('');
 }
 
 /* -------------------------------------------------------------------------
@@ -198,7 +214,7 @@ async function initEventsPage() {
     if (!data.length) {
       upcoming.innerHTML = '<div class="events-empty"><p>No upcoming trips scheduled. We plan trips every month — check back soon.</p></div>';
     } else {
-      upcoming.innerHTML = `<div class="events-list">${data.map(renderEventCard).join('')}</div>`;
+      upcoming.innerHTML = `<div class="events-list">${data.map((e) => renderEventCard(e, true)).join('')}</div>`;
     }
   } catch (e) {
     upcoming.innerHTML = '<p>Could not load events.</p>';
@@ -214,7 +230,7 @@ async function initEventsPage() {
     return;
   }
 
-  past.innerHTML = merged.map(renderPastEventCard).join('');
+  past.innerHTML = merged.map((item) => renderPastEventCard(item, true)).join('');
 }
 
 /* -------------------------------------------------------------------------

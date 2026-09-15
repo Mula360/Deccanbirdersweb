@@ -293,7 +293,10 @@ function db_proxy_fetch($path, WP_REST_Request $request, array $allowed_params, 
   if ($cached !== false) return $cached;
 
   $url = db_api_base() . $path . (($query) ? ('?' . http_build_query($query)) : '');
-  $res = wp_remote_get($url, ['timeout' => 12]);
+  // Country-wide "recent" pulls (used as the base for the notable/IUCN
+  // filter, see below) can return a large payload, so allow a bit more
+  // time than a typical small proxied request.
+  $res = wp_remote_get($url, ['timeout' => 20]);
 
   if (is_wp_error($res)) {
     return ['error' => true, 'message' => $res->get_error_message()];
@@ -308,6 +311,87 @@ function db_proxy_fetch($path, WP_REST_Request $request, array $allowed_params, 
     set_transient($cache_key, $body, $ttl);
   }
   return $body;
+}
+
+/**
+ * Best-effort IUCN Red List status for species that turn up in eBird
+ * checklists across India, keyed by eBird's common name. Not exhaustive —
+ * covers species reasonably likely to be seen on Deccan Birders' trips
+ * plus nationally significant threatened species. Review/expand against
+ * the current IUCN Red List (iucnredlist.org) periodically; eBird's API
+ * does not provide conservation status itself, so this has to be
+ * maintained by hand.
+ */
+function db_iucn_watchlist() {
+  return [
+    // Critically Endangered
+    'White-rumped Vulture'    => 'CR',
+    'Indian Vulture'          => 'CR',
+    'Red-headed Vulture'      => 'CR',
+    'Slender-billed Vulture'  => 'CR',
+    'Great Indian Bustard'    => 'CR',
+    'Sociable Lapwing'        => 'CR',
+    'Spoon-billed Sandpiper'  => 'CR',
+    'White-bellied Heron'     => 'CR',
+    "Jerdon's Courser"        => 'CR',
+    // Endangered
+    'Egyptian Vulture'        => 'EN',
+    'Steppe Eagle'            => 'EN',
+    "Pallas's Fish-Eagle"     => 'EN',
+    'Black-bellied Tern'      => 'EN',
+    'Indian Skimmer'          => 'EN',
+    'Greater Adjutant'        => 'EN',
+    'Lesser Florican'         => 'EN',
+    'Yellow-breasted Bunting' => 'EN',
+    'Nordmann\'s Greenshank'  => 'EN',
+    'Black-necked Crane'      => 'EN',
+    // Vulnerable
+    'Sarus Crane'             => 'VU',
+    'Lesser Adjutant'         => 'VU',
+    'Woolly-necked Stork'     => 'VU',
+    'Common Pochard'          => 'VU',
+    'Marbled Duck'            => 'VU',
+    'Andaman Teal'            => 'VU',
+    'Nilgiri Wood-Pigeon'     => 'VU',
+    // Near Threatened
+    'Painted Stork'           => 'NT',
+    'Black-headed Ibis'       => 'NT',
+    'Oriental Darter'         => 'NT',
+    'River Tern'              => 'NT',
+    'Black-necked Stork'      => 'NT',
+    'Eurasian Curlew'         => 'NT',
+    'Ferruginous Duck'        => 'NT',
+    'Lesser Fish-Eagle'       => 'NT',
+    'Grey-headed Fish-Eagle'  => 'NT',
+    'Black-tailed Godwit'     => 'NT',
+    'Eurasian Oystercatcher'  => 'NT',
+    'Alexandrine Parakeet'    => 'NT',
+  ];
+}
+
+/**
+ * Filters a list of sighting records (mapRecord() shape from the API) down
+ * to species on the IUCN watchlist, tags each with its status, and sorts
+ * most-threatened first.
+ */
+function db_filter_notable_by_iucn(array $records) {
+  $watchlist = db_iucn_watchlist();
+  $rank = ['CR' => 0, 'EN' => 1, 'VU' => 2, 'NT' => 3];
+
+  $notable = [];
+  foreach ($records as $r) {
+    $species = $r['species'] ?? '';
+    if (!isset($watchlist[$species])) continue;
+    $r['iucnStatus'] = $watchlist[$species];
+    $r['rare'] = true;
+    $notable[] = $r;
+  }
+
+  usort($notable, function($a, $b) use ($rank) {
+    return ($rank[$a['iucnStatus']] ?? 9) <=> ($rank[$b['iucnStatus']] ?? 9);
+  });
+
+  return $notable;
 }
 
 add_action('rest_api_init', function() {
@@ -326,6 +410,21 @@ add_action('rest_api_init', function() {
     'callback'            => function(WP_REST_Request $request) {
       $tab = $request->get_param('tab');
       $ttl = in_array($tab, ['hotspots', 'hotspot_species', 'onthisday'], true) ? DAY_IN_SECONDS : 15 * MINUTE_IN_SECONDS;
+
+      // "Notable" here means IUCN Near Threatened or worse — a different
+      // definition than eBird's own "notable" (locally rare/reviewed),
+      // which would miss a species that's globally threatened but common
+      // in this specific region (e.g. Painted Stork). So instead of
+      // proxying eBird's /recent/notable, pull the full /recent feed and
+      // filter it against our own conservation-status watchlist.
+      if ($tab === 'notable') {
+        $recent_request = new WP_REST_Request('GET', $request->get_route());
+        $recent_request->set_query_params(array_merge($request->get_query_params(), ['tab' => 'recent']));
+        $recent = db_proxy_fetch('/api/sightings', $recent_request, ['region', 'tab'], $ttl);
+        if (!empty($recent['error'])) return rest_ensure_response($recent);
+        return rest_ensure_response(['data' => db_filter_notable_by_iucn($recent['data'] ?? [])]);
+      }
+
       return rest_ensure_response(db_proxy_fetch('/api/sightings', $request, ['region', 'tab', 'm', 'd', 'locId', 'speciesCode'], $ttl));
     },
   ]);
