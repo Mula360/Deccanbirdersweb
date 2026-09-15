@@ -394,13 +394,29 @@ function db_filter_notable_by_iucn(array $records) {
   return $notable;
 }
 
+/**
+ * The host's .htaccess has a blanket "ExpiresDefault access plus 1 week"
+ * mod_expires rule that applies to every response without its own
+ * Cache-Control, including these dynamic JSON endpoints — a browser that
+ * hit /wp-json/db/v1/sightings once would keep serving that exact response
+ * from its disk cache for 7 days, completely ignoring our server-side
+ * transient TTLs (and any subsequent bug fix) until the cache expired.
+ * Explicitly setting a real Cache-Control header here overrides that.
+ */
+function db_rest_no_cache(WP_REST_Response $response) {
+  $response->header('Cache-Control', 'no-cache, no-store, must-revalidate');
+  $response->header('Pragma', 'no-cache');
+  $response->header('Expires', '0');
+  return $response;
+}
+
 add_action('rest_api_init', function() {
   register_rest_route('db/v1', '/events', [
     'methods'             => 'GET',
     'permission_callback' => '__return_true',
     'callback'            => function(WP_REST_Request $request) {
       $ttl = $request->get_param('scope') === 'past' ? 6 * HOUR_IN_SECONDS : HOUR_IN_SECONDS;
-      return rest_ensure_response(db_proxy_fetch('/api/events', $request, ['scope'], $ttl));
+      return db_rest_no_cache(rest_ensure_response(db_proxy_fetch('/api/events', $request, ['scope'], $ttl)));
     },
   ]);
 
@@ -421,11 +437,11 @@ add_action('rest_api_init', function() {
         $recent_request = new WP_REST_Request('GET', $request->get_route());
         $recent_request->set_query_params(array_merge($request->get_query_params(), ['tab' => 'recent']));
         $recent = db_proxy_fetch('/api/sightings', $recent_request, ['region', 'tab'], $ttl);
-        if (!empty($recent['error'])) return rest_ensure_response($recent);
-        return rest_ensure_response(['data' => db_filter_notable_by_iucn($recent['data'] ?? [])]);
+        if (!empty($recent['error'])) return db_rest_no_cache(rest_ensure_response($recent));
+        return db_rest_no_cache(rest_ensure_response(['data' => db_filter_notable_by_iucn($recent['data'] ?? [])]));
       }
 
-      return rest_ensure_response(db_proxy_fetch('/api/sightings', $request, ['region', 'tab', 'm', 'd', 'locId', 'speciesCode'], $ttl));
+      return db_rest_no_cache(rest_ensure_response(db_proxy_fetch('/api/sightings', $request, ['region', 'tab', 'm', 'd', 'locId', 'speciesCode'], $ttl)));
     },
   ]);
 
@@ -433,7 +449,7 @@ add_action('rest_api_init', function() {
     'methods'             => 'GET',
     'permission_callback' => '__return_true',
     'callback'            => function(WP_REST_Request $request) {
-      return rest_ensure_response(db_proxy_fetch('/api/videos', $request, [], 6 * HOUR_IN_SECONDS));
+      return db_rest_no_cache(rest_ensure_response(db_proxy_fetch('/api/videos', $request, [], 6 * HOUR_IN_SECONDS)));
     },
   ]);
 });
