@@ -537,91 +537,124 @@ body.nav-open { overflow: hidden; }
 /* -------------------------------------------------------------------------
    Region toggle (sightings page)
    ---------------------------------------------------------------------- */
-.region-toggle { display: flex; gap: 8px; margin-bottom: 24px; flex-wrap: wrap; }
-.region-btn {
-  font-family: var(--font-head);
-  font-weight: 600;
-  font-size: 13px;
-  padding: 8px 18px;
-  border-radius: var(--radius-btn);
-  border: 2px solid var(--border);
-  background: white;
-  color: var(--text-muted);
-  cursor: pointer;
-  transition: all 150ms;
+/* Scope row: static India pill + the refresh note. */
+.sightings-scope {
+  max-width: var(--max-w);
+  margin: 0 auto;
+  padding: 32px 20px 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  align-items: center;
+  justify-content: space-between;
 }
-.region-btn.active { background: var(--blue); color: white; border-color: var(--blue); }
-.region-btn:hover:not(.active) { border-color: var(--blue); color: var(--blue); }
+.region-pills { display: flex; gap: 4px; padding: 4px; background: var(--blue-light); border-radius: 999px; }
+.region-pill {
+  padding: 11px 22px;
+  border-radius: 999px;
+  font-family: var(--font-head);
+  font-size: 14.5px;
+  font-weight: 600;
+  color: var(--text-muted);
+}
+.region-pill.is-active { background: var(--ink); color: #fff; }
+.sightings-updated { font-size: 14px; color: var(--text-muted); }
 
-/* -------------------------------------------------------------------------
-   Sighting cards (notable / recent / lookup results on the sightings page)
-   ---------------------------------------------------------------------- */
+.sightings-tabs-wrap { max-width: var(--max-w); margin: 0 auto; padding: 28px 20px 0; }
+.sightings-panels { max-width: var(--max-w); margin: 0 auto; padding: 28px 20px 0; }
+
+/* Notable — 3-4 across, bordered card with a yellow top rule. */
 .sighting-cards {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(290px, 1fr));
   gap: 16px;
-  margin-bottom: 24px;
 }
 .sighting-card {
   background: #fff;
   border: 1px solid var(--border);
-  border-radius: var(--radius-card);
-  padding: 20px;
+  border-top: 3px solid var(--yellow);
+  border-radius: 16px;
+  padding: 26px;
 }
-.sighting-card-top {
-  display: flex;
-  align-items: baseline;
-  gap: 8px;
-  flex-wrap: wrap;
-  margin-bottom: 8px;
-}
-.sighting-card-top .species { font-family: var(--font-head); font-weight: 700; color: var(--ink); font-size: 15px; }
-.sighting-card-top .scientific { color: var(--text-muted); font-style: italic; font-size: 13px; }
-.rare-star { color: var(--blue); font-size: 13px; }
-.sighting-card-mid {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  flex-wrap: wrap;
-  font-size: 13px;
-  color: var(--text-muted);
-  margin-bottom: 12px;
-}
-.count-badge {
+.sighting-species {
   font-family: var(--font-head);
-  font-weight: 700;
-  font-size: 12px;
-  padding: 2px 9px;
-  border-radius: var(--radius-btn);
-  background: var(--green-light);
-  color: var(--green-dark);
+  font-size: 21px;
+  font-weight: 600;
+  letter-spacing: -0.025em;
+  line-height: 1.2;
+  color: var(--ink);
 }
-.sighting-card-bottom { display: flex; }
-.records-count { color: var(--text-muted); font-size: 13px; margin-bottom: 16px; }
+.sighting-sci { margin-top: 5px; font-size: 15px; font-style: italic; color: var(--text-muted); }
+.sighting-lines { margin-top: 18px; display: grid; gap: 7px; font-size: 15.5px; color: var(--text-body); }
+.sighting-when { color: var(--text-muted); }
+.sighting-chips { margin-top: 18px; display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+
+.chip {
+  padding: 4px 11px;
+  border-radius: 999px;
+  font-family: var(--font-head);
+  font-size: 13px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+.chip-green { background: #E8F1EA; color: var(--green-dark); }
+.chip-blue  { background: var(--blue-light); color: #1F5A93; }
+
+/* All recent — rows inside one bordered card. */
+.recent-list { background: #fff; border: 1px solid var(--border); border-radius: 16px; overflow: hidden; }
+.recent-row {
+  padding: 20px 24px;
+  border-bottom: 1px solid var(--border-light);
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  align-items: baseline;
+  justify-content: space-between;
+}
+.recent-row:last-child { border-bottom: 0; }
+.recent-row-main { display: flex; flex-wrap: wrap; gap: 14px; align-items: baseline; }
+.recent-species { font-family: var(--font-head); font-size: 18px; font-weight: 600; letter-spacing: -0.02em; color: var(--ink); }
+.recent-loc { font-size: 15.5px; color: var(--text-muted); }
+.recent-row-meta { display: flex; gap: 14px; align-items: center; }
+.recent-when { font-size: 14px; color: var(--text-muted); }
+
+.records-count { color: var(--text-muted); font-size: 14px; margin-top: 18px; text-align: center; }
 
 /* -------------------------------------------------------------------------
    Hotspot expand panel (species list revealed on click)
    ---------------------------------------------------------------------- */
-.hotspot-row.expanded { border-color: var(--green); }
-.hotspot-row.expanded .hotspot-arrow { transform: rotate(180deg); }
+.hotspot-row.expanded .hotspot-arrow { transform: rotate(45deg); }
 .hotspot-species-panel {
-  padding: 14px 16px 18px 64px;
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-top: none;
-  border-radius: 0 0 var(--radius-sm) var(--radius-sm);
-  margin-top: -10px;
-  margin-bottom: 10px;
+  border-top: 1px solid var(--border-light);
+  background: #F5F8F6;
+  padding: 22px 24px 26px;
 }
-.hotspot-loading { color: var(--text-muted); font-size: 13px; }
-.hotspot-species-list { display: flex; flex-wrap: wrap; gap: 6px; }
+.hotspot-panel-label {
+  font-family: var(--font-head);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  color: #4E6B5C;
+  margin-bottom: 16px;
+}
+.hotspot-loading { color: var(--text-muted); font-size: 14px; }
+.hotspot-species-list { display: flex; flex-wrap: wrap; gap: 8px; }
 .species-pill {
-  font-size: 11px;
-  font-family: var(--font-body);
-  padding: 3px 10px;
-  border-radius: var(--radius-btn);
+  padding: 7px 13px;
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  font-size: 14.5px;
+  color: #2B3A33;
+}
+.species-pill--more {
   background: var(--blue-light);
-  color: var(--blue-dark);
+  border-color: var(--blue-light);
+  font-family: var(--font-head);
+  font-size: 14px;
+  font-weight: 600;
+  color: #1F5A93;
 }
 
 /* -------------------------------------------------------------------------
@@ -682,45 +715,54 @@ body.nav-open { overflow: hidden; }
 /* -------------------------------------------------------------------------
    Hotspot rows (top hotspots list)
    ---------------------------------------------------------------------- */
-.hotspot-list { display: flex; flex-direction: column; gap: 2px; }
+.hotspot-list { background: #fff; border: 1px solid var(--border); border-radius: 16px; overflow: hidden; }
+.hotspot-item { border-bottom: 1px solid var(--border-light); }
+.hotspot-item:last-child { border-bottom: 0; }
 .hotspot-row {
+  width: 100%;
+  background: transparent;
+  border: 0;
+  cursor: pointer;
+  text-align: left;
+  padding: 22px 24px;
   display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
   align-items: center;
-  gap: 16px;
-  padding: 16px;
-  background: white;
-  border: 1px solid var(--border);
-  border-radius: var(--radius-sm);
-  text-decoration: none;
-  transition: border-color 150ms, transform 150ms;
+  justify-content: space-between;
+  transition: background 150ms;
 }
-.hotspot-row:hover { border-color: var(--green); transform: translateX(2px); }
-.hotspot-row + .hotspot-row { margin-top: 10px; }
-
+.hotspot-row:hover { background: var(--surface); }
+.hotspot-left { display: flex; gap: 16px; align-items: center; min-width: 0; }
 .hotspot-rank {
-  width: 32px;
-  height: 32px;
+  width: 30px;
+  height: 30px;
   flex-shrink: 0;
-  border-radius: 50%;
-  background: var(--green-light);
-  color: var(--green-dark);
-  font-family: var(--font-head);
-  font-weight: 700;
-  font-size: 14px;
+  border-radius: 99px;
+  background: var(--blue-light);
   display: flex;
   align-items: center;
   justify-content: center;
+  font-family: var(--font-head);
+  font-size: 13.5px;
+  font-weight: 700;
+  color: #4E6B5C;
 }
-.hotspot-info { flex: 1; min-width: 0; }
-.hotspot-name { font-family: var(--font-head); font-weight: 700; font-size: 15px; color: var(--ink); }
-.hotspot-stats { font-size: 13px; color: var(--text-muted); }
-.hotspot-arrow { color: var(--text-muted); flex-shrink: 0; }
+.hotspot-name { font-family: var(--font-head); font-size: 18px; font-weight: 600; letter-spacing: -0.02em; color: var(--ink); }
+.hotspot-right { display: flex; gap: 26px; align-items: center; }
+.hotspot-stat { text-align: left; }
+.hotspot-stat-num { display: block; font-family: var(--font-head); font-size: 19px; font-weight: 700; letter-spacing: -0.03em; }
+.hotspot-stat-species { color: var(--blue); }
+.hotspot-stat-checklists { color: var(--green); }
+.hotspot-stat-label { display: block; font-size: 13px; color: var(--text-muted); }
+.hotspot-arrow { font-family: var(--font-head); font-size: 22px; color: var(--blue); transition: transform 180ms ease; }
 
 /* -------------------------------------------------------------------------
    Autocomplete dropdown (species lookup on sightings page)
    ---------------------------------------------------------------------- */
 .autocomplete { position: relative; }
 .autocomplete-input {
+  background: #F5F8F6;
   width: 100%;
   font-family: var(--font-body);
   font-size: 15px;
@@ -1599,9 +1641,37 @@ body.lightbox-open { overflow: hidden; }
   gap: 16px;
 }
 
-.otd-heading { font-family: var(--font-head); font-weight: 700; font-size: 24px; color: var(--ink); margin-bottom: 20px; }
+/* Species lookup card. */
+.lookup-wrap { max-width: var(--max-w); margin: 0 auto; padding: clamp(48px, 7vw, 84px) 20px 0; }
+.lookup-card {
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: clamp(28px, 4vw, 44px);
+}
+.lookup-title {
+  margin: 0;
+  max-width: 26ch;
+  font-family: var(--font-head);
+  font-size: clamp(24px, 3.2vw, 34px);
+  line-height: 1.1;
+  letter-spacing: -0.03em;
+  font-weight: 700;
+}
+.lookup-intro { margin: 12px 0 24px; max-width: 52ch; font-size: 16.5px; line-height: 1.55; color: var(--text-body); }
+.lookup-card .autocomplete { max-width: 520px; }
 
-.sightings-updated-note { color: var(--text-muted); font-size: 13px; margin: 8px 0 20px; }
+.otd-section { max-width: var(--max-w); margin: 0 auto; padding: clamp(48px, 7vw, 84px) 20px clamp(60px, 8vw, 96px); }
+.otd-heading {
+  margin: 0 0 20px;
+  font-family: var(--font-head);
+  font-size: clamp(24px, 3.2vw, 34px);
+  line-height: 1.1;
+  letter-spacing: -0.03em;
+  font-weight: 700;
+  color: var(--ink);
+}
+
 
 /* -------------------------------------------------------------------------
    Archives — Library documents section

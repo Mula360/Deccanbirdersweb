@@ -3,29 +3,10 @@
  * Vanilla ES6, no dependencies. Talks to the deccan-birders-api Vercel
  * endpoint (DB_CONFIG.api_base) at /api/sightings.
  *
- * Expected markup (page-sightings.php or wherever [db_sightings] lives):
- *
- *   <div class="tab-bar" role="tablist">
- *     <button class="tab-btn active" data-tab="notable" role="tab" aria-selected="true">Notable</button>
- *     <button class="tab-btn" data-tab="recent" role="tab" aria-selected="false">Recent</button>
- *     <button class="tab-btn" data-tab="hotspots" role="tab" aria-selected="false">Hotspots</button>
- *     <button class="tab-btn" data-tab="lookup" role="tab" aria-selected="false">Species Lookup</button>
- *   </div>
- *
- *   <div class="tab-panel" id="sightings-notable" role="tabpanel"></div>
- *   <div class="tab-panel" id="sightings-recent" role="tabpanel" hidden></div>
- *   <div class="tab-panel" id="sightings-hotspots" role="tabpanel" hidden></div>
- *   <div class="tab-panel" id="sightings-lookup" role="tabpanel" hidden>
- *     <div class="autocomplete">
- *       <input type="text" id="species-search-input" class="autocomplete-input"
- *              placeholder="Search a species..." autocomplete="off">
- *       <div class="autocomplete-dropdown" id="species-search-dropdown" hidden></div>
- *     </div>
- *     <div id="species-search-results"></div>
- *   </div>
- *
- *   <h2>On this day</h2>
- *   <div id="sightings-otd"></div>
+ * Expected markup (page-sightings.php): a .gallery-tabs bar with
+ * data-tab="notable|recent|hotspots", the matching #sightings-* panels,
+ * the #sightings-lookup card (with #species-search-input / -dropdown /
+ * -results), and #sightings-otd. Scope is all of India.
  *
  *   <!-- Homepage strip -->
  *   <div id="home-sightings-rows"></div>
@@ -73,27 +54,40 @@ function escapeHtml(str) {
 }
 
 function renderSightingRow(r) {
+  // Homepage strip — compact single line.
   return `<div class="sighting-row">
     <span class="species">${escapeHtml(r.species)} <em class="scientific">${escapeHtml(r.scientific)}</em></span>
     <span class="locality">${escapeHtml(r.locality)}</span>
     <span class="when">${timeAgo(r.when)}</span>
-    <span class="status-badge ${r.status === 'Confirmed' ? 'confirmed' : 'under-review'}">${escapeHtml(r.status)}</span>
   </div>`;
 }
 
+// Notable tab — bordered card with a yellow top rule.
 function renderSightingCard(r) {
-  return `<div class="sighting-card"${r.rare ? ' style="border-left:4px solid var(--blue)"' : ''}>
-    <div class="sighting-card-top">
-      <span class="species">${escapeHtml(r.species)}${r.rare ? ' <span class="rare-star" title="Rare">★</span>' : ''}</span>
-      <em class="scientific">${escapeHtml(r.scientific)}</em>
+  return `<div class="sighting-card">
+    <div class="sighting-species">${escapeHtml(r.species)}</div>
+    <div class="sighting-sci">${escapeHtml(r.scientific)}</div>
+    <div class="sighting-lines">
+      <div>${escapeHtml(r.locality)}</div>
+      <div class="sighting-when">${timeAgo(r.when)}</div>
     </div>
-    <div class="sighting-card-mid">
-      <span class="count-badge">${escapeHtml(r.count)}</span>
-      <span class="locality">${escapeHtml(r.locality)}</span>
-      <span class="when">${timeAgo(r.when)}</span>
+    <div class="sighting-chips">
+      <span class="chip chip-green">${escapeHtml(String(r.count))} birds</span>
+      <span class="chip chip-blue">${escapeHtml(r.status)}</span>
     </div>
-    <div class="sighting-card-bottom">
-      <span class="status-badge ${r.status === 'Confirmed' ? 'confirmed' : 'under-review'}">${escapeHtml(r.status)}</span>
+  </div>`;
+}
+
+// All-recent tab — one row per record inside a single bordered card.
+function renderRecentRow(r) {
+  return `<div class="recent-row">
+    <div class="recent-row-main">
+      <span class="recent-species">${escapeHtml(r.species)}</span>
+      <span class="recent-loc">${escapeHtml(r.locality)}</span>
+    </div>
+    <div class="recent-row-meta">
+      <span class="chip chip-green">${escapeHtml(String(r.count))}</span>
+      <span class="recent-when">${timeAgo(r.when)}</span>
     </div>
   </div>`;
 }
@@ -143,55 +137,55 @@ async function fetchTab(tab, extra = {}, standalone = false) {
  * Tab renderers
  * ---------------------------------------------------------------------- */
 
+/* -------------------------------------------------------------------------
+ * Shared pagination. The design lays Notable out as a 3-4 across card grid,
+ * so a "page" is 10 rows of that grid — 30 records. The same page size is
+ * used for the recent list so both tabs behave consistently.
+ * ---------------------------------------------------------------------- */
+
+const PAGE_SIZE = 30;
+
+function paginateInto(el, items, renderItem, wrapClass) {
+  let page = 1;
+  const pages = Math.max(1, Math.ceil(items.length / PAGE_SIZE));
+
+  function paint() {
+    const start = (page - 1) * PAGE_SIZE;
+    const slice = items.slice(start, start + PAGE_SIZE);
+
+    const nav = pages > 1 ? `
+      <nav class="events-pager" aria-label="Sightings pages">
+        <button type="button" class="events-pager-btn" data-step="-1"${page === 1 ? ' disabled' : ''}>← Previous</button>
+        <span class="events-pager-status">Page ${page} of ${pages} · ${items.length} records</span>
+        <button type="button" class="events-pager-btn" data-step="1"${page === pages ? ' disabled' : ''}>Next →</button>
+      </nav>` : `<p class="records-count">${items.length} record${items.length === 1 ? '' : 's'}</p>`;
+
+    el.innerHTML = `<div class="${wrapClass}">${slice.map(renderItem).join('')}</div>${nav}`;
+
+    el.querySelectorAll('.events-pager-btn').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        page = Math.min(pages, Math.max(1, page + Number(btn.dataset.step)));
+        paint();
+        el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      });
+    });
+  }
+
+  paint();
+}
+
 function renderNotable(data) {
   const el = document.getElementById('sightings-notable');
   if (!el || data === null) return;
   if (!data.length) { el.innerHTML = emptyState('No notable sightings reported recently.'); return; }
-  el.innerHTML = data.map(renderSightingCard).join('');
+  paginateInto(el, data, renderSightingCard, 'sighting-cards');
 }
-
-// Recent tab: the API returns the full 14-day window in one response
-// (no server-side offset support), so pagination is client-side over the
-// already-fetched array.
-let recentAll  = [];
-let recentShown = 0;
-const RECENT_PAGE_SIZE = 20;
 
 function renderRecent(data) {
   const el = document.getElementById('sightings-recent');
-  if (!el) return;
-  if (data === null) return;
-
-  recentAll   = data;
-  recentShown = Math.min(RECENT_PAGE_SIZE, recentAll.length);
-  paintRecent();
-}
-
-function paintRecent() {
-  const el = document.getElementById('sightings-recent');
-  if (!el) return;
-
-  if (!recentAll.length) {
-    el.innerHTML = emptyState('No recent sightings reported in the last 14 days.');
-    return;
-  }
-
-  const shown = recentAll.slice(0, recentShown);
-  const hasMore = recentShown < recentAll.length;
-
-  el.innerHTML = `
-    <p class="records-count">Showing ${shown.length} of ${recentAll.length} records</p>
-    <div class="sighting-cards">${shown.map(renderSightingCard).join('')}</div>
-    ${hasMore ? '<button type="button" class="btn btn-ghost" id="recent-load-more">Load more</button>' : ''}
-  `;
-
-  const loadMoreBtn = document.getElementById('recent-load-more');
-  if (loadMoreBtn) {
-    loadMoreBtn.addEventListener('click', () => {
-      recentShown = Math.min(recentShown + RECENT_PAGE_SIZE, recentAll.length);
-      paintRecent();
-    });
-  }
+  if (!el || data === null) return;
+  if (!data.length) { el.innerHTML = emptyState('No recent sightings reported in the last 14 days.'); return; }
+  paginateInto(el, data, renderRecentRow, 'recent-list');
 }
 
 // Hotspots: 5 rows, each expandable to show that hotspot's species list.
@@ -200,25 +194,32 @@ const hotspotSpeciesCache = new Map();
 function renderHotspots(data) {
   const el = document.getElementById('sightings-hotspots');
   if (!el || data === null) return;
-  if (!data.length) { el.innerHTML = emptyState('No hotspot data available for this region.'); return; }
+  if (!data.length) { el.innerHTML = emptyState('No hotspot data available.'); return; }
 
-  el.innerHTML = data.map((h, i) => `
-    <div class="hotspot-row" data-loc-id="${escapeHtml(h.locId)}" tabindex="0" role="button" aria-expanded="false">
-      <span class="hotspot-rank">${i + 1}</span>
-      <span class="hotspot-info">
-        <span class="hotspot-name">${escapeHtml(h.name)}</span>
-        <span class="hotspot-stats"><strong class="hotspot-species-count">${escapeHtml(h.species)}</strong> species · ${escapeHtml(h.checklists)} checklists</span>
-      </span>
-      <span class="hotspot-arrow" aria-hidden="true">▾</span>
-    </div>
-    <div class="hotspot-species-panel" hidden></div>
-  `).join('');
+  el.innerHTML = `<div class="hotspot-list">${data.map((h, i) => `
+    <div class="hotspot-item">
+      <button class="hotspot-row" type="button" data-loc-id="${escapeHtml(h.locId)}" aria-expanded="false">
+        <span class="hotspot-left">
+          <span class="hotspot-rank">${i + 1}</span>
+          <span class="hotspot-name">${escapeHtml(h.name)}</span>
+        </span>
+        <span class="hotspot-right">
+          <span class="hotspot-stat">
+            <span class="hotspot-stat-num hotspot-stat-species">${escapeHtml(String(h.species))}</span>
+            <span class="hotspot-stat-label">species</span>
+          </span>
+          <span class="hotspot-stat">
+            <span class="hotspot-stat-num hotspot-stat-checklists">${escapeHtml(String(h.checklists))}</span>
+            <span class="hotspot-stat-label">checklists</span>
+          </span>
+          <span class="hotspot-arrow" aria-hidden="true">+</span>
+        </span>
+      </button>
+      <div class="hotspot-species-panel" hidden></div>
+    </div>`).join('')}</div>`;
 
   el.querySelectorAll('.hotspot-row').forEach((row) => {
     row.addEventListener('click', () => toggleHotspot(row));
-    row.addEventListener('keydown', (e) => {
-      if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggleHotspot(row); }
-    });
   });
 }
 
@@ -245,8 +246,13 @@ async function toggleHotspot(row) {
 
   if (species === null) return; // aborted — leave whatever is showing
 
+  const SHOWN = 24;
   const html = species.length
-    ? `<div class="hotspot-species-list">${species.map((code) => `<span class="species-pill">${escapeHtml(code)}</span>`).join('')}</div>`
+    ? `<div class="hotspot-panel-label">Recorded here</div>
+       <div class="hotspot-species-list">
+         ${species.slice(0, SHOWN).map((code) => `<span class="species-pill">${escapeHtml(code)}</span>`).join('')}
+         ${species.length > SHOWN ? `<span class="species-pill species-pill--more">+${species.length - SHOWN} more on the full list</span>` : ''}
+       </div>`
     : '<p class="db-empty">No species list available for this hotspot.</p>';
 
   hotspotSpeciesCache.set(locId, html);
@@ -379,14 +385,14 @@ function renderSpeciesLookup() {
 function renderOnThisDay(data) {
   const el = document.getElementById('sightings-otd');
   if (!el || data === null) return;
-  if (!data.length) { el.innerHTML = emptyState("No historic records found for today's date in this region."); return; }
+  if (!data.length) { el.innerHTML = emptyState("No historic records found for today's date."); return; }
 
   el.innerHTML = data.map((r) => {
     const yearMatch = String(r.when).match(/\d{4}/);
     const year = yearMatch ? yearMatch[0] : '';
     return `<div class="sighting-row">
       <span class="species">${escapeHtml(r.species)}</span>
-      <span class="count-badge">${escapeHtml(r.count)}</span>
+      <span class="chip chip-green">${escapeHtml(String(r.count))}</span>
       <span class="locality">${escapeHtml(r.locality)}</span>
       <span class="when">${escapeHtml(year)}</span>
     </div>`;
@@ -398,14 +404,15 @@ function renderOnThisDay(data) {
  * ---------------------------------------------------------------------- */
 
 function initTabSwitching() {
-  document.querySelectorAll('.tab-btn').forEach((btn) => {
+  document.querySelectorAll('.gallery-tab[data-tab]').forEach((btn) => {
     btn.addEventListener('click', async () => {
       const tab = btn.dataset.tab;
       activeTab = tab;
 
-      document.querySelectorAll('.tab-btn').forEach((b) => {
-        b.classList.toggle('active', b === btn);
-        b.setAttribute('aria-selected', b === btn);
+      document.querySelectorAll('.gallery-tab').forEach((b) => {
+        const on = b === btn;
+        b.classList.toggle('is-active', on);
+        b.setAttribute('aria-selected', on ? 'true' : 'false');
       });
       document.querySelectorAll('.tab-panel').forEach((p) => {
         const isActive = p.id === `sightings-${tab}`;
