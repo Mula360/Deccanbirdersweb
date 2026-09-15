@@ -28,7 +28,7 @@ while (have_posts()) : the_post();
 
 <section class="section-boxed contact-grid">
   <div class="contact-card">
-    <h2 class="card-heading">Send us a message</h2>
+    <h2 class="card-heading card-heading--lg">Send us a message</h2>
     <p class="card-intro">Questions about membership, trips or a bird you can't identify.</p>
     <form id="db-contact-form" class="stacked-form" novalidate>
       <label class="stacked-field">
@@ -53,7 +53,7 @@ while (have_posts()) : the_post();
 
   <div class="contact-col">
     <div class="contact-card">
-      <h2 class="card-heading">Phone and WhatsApp</h2>
+      <h2 class="card-heading card-heading--spaced">Phone and WhatsApp</h2>
       <div class="contact-details">
         <div>
           <span class="contact-info-label">Enquiries</span>
@@ -75,7 +75,7 @@ while (have_posts()) : the_post();
     <div class="contact-card contact-card--tint">
       <span class="eyebrow" style="color:var(--green);">Volunteer · Report a sighting</span>
       <h2 class="card-heading">Seen something unusual?</h2>
-      <p class="card-intro">Tell us what you saw, where and when. You can also put your hand up for the winter waterfowl census or a school outreach session.</p>
+      <p class="card-intro card-intro--tight">Tell us what you saw, where and when. You can also put your hand up for the winter waterfowl census or a school outreach session.</p>
       <form id="db-sighting-report-form" class="stacked-form stacked-form--tight" novalidate>
         <label class="stacked-field">
           <span class="stacked-label">Species and location</span>
@@ -103,8 +103,8 @@ while (have_posts()) : the_post();
   <div class="photo-submit-card">
     <div>
       <span class="eyebrow" style="color:var(--blue);">Members only</span>
-      <h2 class="card-heading">Submit a photograph</h2>
-      <p class="card-intro">Your entry goes to <a href="mailto:photos@deccanbirders.org"><strong>photos@deccanbirders.org</strong></a> for review. Once a committee member approves it, the photograph appears in the gallery credited to you by name.</p>
+      <h2 class="card-heading card-heading--xl">Submit a photograph</h2>
+      <p class="card-intro card-intro--flush">Your entry goes to <a href="mailto:photos@deccanbirders.org"><strong>photos@deccanbirders.org</strong></a> for review. Once a committee member approves it, the photograph appears in the gallery credited to you by name.</p>
       <ul class="submit-notes">
         <li>Tell us the name you would like the credit to read.</li>
         <li>One bird per frame, no baiting, no nest photography during breeding.</li>
