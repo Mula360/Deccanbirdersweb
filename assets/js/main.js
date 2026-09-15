@@ -162,19 +162,15 @@
       const globalError = form.querySelector('#sr-error-global');
       if (globalError) globalError.textContent = '';
 
-      // Client-side validation. The design's combined volunteer / report-a-
-      // sighting form has one required field; email is optional.
+      // Client-side validation. Per the design this form has exactly two
+      // controls — "Species and location" (required) and the "I'd like to
+      // help with" select (always has a value) — so there is nothing else
+      // to check.
       let valid = true;
       const speciesLocation = form.querySelector('[name=species_location]');
       if (speciesLocation && !speciesLocation.value.trim()) {
         const errorEl = form.querySelector('#sr-error-species-location');
         if (errorEl) errorEl.textContent = 'This field is required.';
-        valid = false;
-      }
-      const emailInput = form.querySelector('[name=email]');
-      if (emailInput && emailInput.value.trim() && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailInput.value.trim())) {
-        const errorEl = form.querySelector('#sr-error-email');
-        if (errorEl) errorEl.textContent = 'Please enter a valid email address.';
         valid = false;
       }
 

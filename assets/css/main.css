@@ -1183,7 +1183,6 @@ body.lightbox-open { overflow: hidden; }
 .db-contact-form textarea,
 .submission-form textarea { min-height: 140px; resize: vertical; }
 .form-field { margin-bottom: 20px; }
-.label-optional { font-weight: 400; color: var(--text-muted); font-size: 12px; }
 .field-error { display: block; color: #B3261E; font-size: 12px; margin-top: 4px; min-height: 16px; }
 #form-global-error { color: #B3261E; font-size: 14px; min-height: 20px; }
 

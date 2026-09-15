@@ -81,11 +81,6 @@ while (have_posts()) : the_post();
           <option>PITTA newsletter</option>
         </select>
       </div>
-      <div class="form-field">
-        <label for="sr-email">Email <span class="label-optional">(optional — so we can follow up)</span></label>
-        <input type="email" id="sr-email" name="email">
-        <span class="field-error" id="sr-error-email"></span>
-      </div>
       <p class="field-error" id="sr-error-global"></p>
       <button type="submit" class="btn btn-secondary">Submit</button>
     </form>
