@@ -17,7 +17,6 @@ while (have_posts()) : the_post();
   if (!$stats) {
     $stats = [
       ['stat_number' => '1980', 'stat_label' => 'Founded, as the Birdwatchers Society of Andhra Pradesh'],
-      ['stat_number' => '500+', 'stat_label' => 'Members across the Deccan and beyond'],
       ['stat_number' => '12',   'stat_label' => 'Issues of PITTA published every year'],
       ['stat_number' => '45',   'stat_label' => 'Years of field records and waterfowl counts'],
     ];
