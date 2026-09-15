@@ -39,10 +39,14 @@ async function initVideos() {
 
     grid.innerHTML = `<div class="videos-grid-inner">${data.map((v) => `
       <div class="video-card" data-video-id="${escapeHtml(v.videoId)}" role="button" tabindex="0" aria-label="Watch ${escapeHtml(v.title)} on YouTube">
-        <img class="video-thumb" src="${escapeHtml(v.thumbnail)}" alt="${escapeHtml(v.title)}" loading="lazy">
+        <div class="video-thumb-wrap">
+          <img class="video-thumb" src="${escapeHtml(v.thumbnail)}" alt="${escapeHtml(v.title)}" loading="lazy">
+          <div class="video-thumb-scrim" aria-hidden="true"></div>
+          <div class="video-play" aria-hidden="true"><span></span></div>
+        </div>
         <div class="video-info">
           <div class="video-title">${escapeHtml(v.title)}</div>
-          <div class="video-meta"><span>${escapeHtml(v.duration)}</span><span>${escapeHtml(v.views)} views</span></div>
+          <div class="video-meta">${escapeHtml(v.duration)} · ${escapeHtml(v.views)} views</div>
         </div>
       </div>`).join('')}</div>`;
 

@@ -1,7 +1,11 @@
 <?php
 /**
- * [db_photo_gallery] — filterable, lightbox-enabled grid of Gallery photos
- * (db_gallery_photo CPT).
+ * [db_photo_gallery] — masonry of Gallery photos (db_gallery_photo CPT).
+ *
+ * Design: CSS-columns masonry of bordered white cards, each a figure with
+ * the species as the title, the location beneath it, and the photographer
+ * credit on its own rule-separated line. Clicking a card opens a lightbox
+ * (an addition to the design, but it stays out of the way until used).
  */
 
 $photos = get_posts(['post_type' => 'db_gallery_photo', 'posts_per_page' => -1, 'post_status' => 'publish']);
@@ -10,33 +14,26 @@ if (!$photos) {
   return;
 }
 ?>
-<div class="gallery-filters">
-  <button class="filter-btn active" data-cat="all">All</button>
-  <?php foreach (['Raptors', 'Waders', 'Passerines', 'Waterbirds', 'Mammals', 'Landscapes'] as $cat): ?>
-    <button class="filter-btn" data-cat="<?php echo esc_attr(strtolower($cat)); ?>">
-      <?php echo esc_html($cat); ?>
-    </button>
-  <?php endforeach; ?>
-</div>
-
 <div class="photo-masonry" id="photos-grid">
   <?php foreach ($photos as $photo):
     $img      = get_field('photo', $photo->ID);
     $species  = get_field('species_name', $photo->ID);
     $location = get_field('photo_location', $photo->ID);
     $credit   = get_field('photographer', $photo->ID);
-    $cat      = strtolower(get_field('category', $photo->ID) ?? '');
     if (!$img) continue;
+    $src = $img['sizes']['large'] ?? $img['url'];
   ?>
-  <div class="photo-card" data-cat="<?php echo esc_attr($cat); ?>">
-    <img src="<?php echo esc_url($img['sizes']['large'] ?? $img['url']); ?>"
-         alt="<?php echo esc_attr($species . ' photographed at ' . $location); ?>"
+  <figure class="photo-card" tabindex="0" role="button"
+          aria-label="<?php echo esc_attr(trim($species . ($location ? ' — ' . $location : ''))); ?>">
+    <img src="<?php echo esc_url($src); ?>"
+         alt="<?php echo esc_attr(trim($species . ($location ? ' photographed at ' . $location : ''))); ?>"
          loading="lazy" width="<?php echo (int) $img['width']; ?>" height="<?php echo (int) $img['height']; ?>">
-    <div class="photo-overlay">
-      <span class="photo-species"><?php echo esc_html($species); ?></span>
-      <span class="photo-credit">© <?php echo esc_html($credit); ?></span>
-    </div>
-  </div>
+    <figcaption>
+      <?php if ($species): ?><span class="photo-species"><?php echo esc_html($species); ?></span><?php endif; ?>
+      <?php if ($location): ?><span class="photo-place"><?php echo esc_html($location); ?></span><?php endif; ?>
+      <?php if ($credit): ?><span class="photo-credit"><?php echo esc_html($credit); ?></span><?php endif; ?>
+    </figcaption>
+  </figure>
   <?php endforeach; ?>
 </div>
 
@@ -52,42 +49,21 @@ if (!$photos) {
 (function () {
   'use strict';
 
-  var grid    = document.getElementById("photos-grid");
+  var grid     = document.getElementById('photos-grid');
   var lightbox = document.getElementById('db-lightbox');
   if (!grid || !lightbox) return;
 
-  var filterBtns = document.querySelectorAll('.filter-btn');
-  var cards       = Array.prototype.slice.call(grid.querySelectorAll('.photo-card'));
-  var visibleCards = cards.slice();
+  var cards = Array.prototype.slice.call(grid.querySelectorAll('.photo-card'));
+  if (!cards.length) return;
   var currentIndex = -1;
 
   var lbImg     = lightbox.querySelector('.lightbox-img');
   var lbCaption = lightbox.querySelector('.lightbox-caption');
-  var lbClose   = lightbox.querySelector('.lightbox-close');
-  var lbPrev    = lightbox.querySelector('.lightbox-prev');
-  var lbNext    = lightbox.querySelector('.lightbox-next');
 
-  // Filtering
-  filterBtns.forEach(function (btn) {
-    btn.addEventListener('click', function () {
-      filterBtns.forEach(function (b) { b.classList.remove('active'); });
-      btn.classList.add('active');
-
-      var cat = btn.dataset.cat;
-      visibleCards = cards.filter(function (card) {
-        var match = cat === 'all' || card.dataset.cat === cat;
-        card.style.display = match ? '' : 'none';
-        return match;
-      });
-    });
-  });
-
-  // Lightbox
   function openLightbox(index) {
-    if (!visibleCards.length) return;
-    currentIndex = (index + visibleCards.length) % visibleCards.length;
-    var card = visibleCards[currentIndex];
-    var img  = card.querySelector('img');
+    currentIndex = (index + cards.length) % cards.length;
+    var card    = cards[currentIndex];
+    var img     = card.querySelector('img');
     var species = card.querySelector('.photo-species');
     var credit  = card.querySelector('.photo-credit');
 
@@ -105,31 +81,23 @@ if (!$photos) {
     lbImg.src = '';
   }
 
-  function showNext(delta) {
-    openLightbox(currentIndex + delta);
-  }
-
   cards.forEach(function (card, i) {
-    card.addEventListener('click', function () { openLightbox(visibleCards.indexOf(card)); });
-    card.tabIndex = 0;
+    card.addEventListener('click', function () { openLightbox(i); });
     card.addEventListener('keydown', function (e) {
-      if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openLightbox(visibleCards.indexOf(card)); }
+      if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openLightbox(i); }
     });
   });
 
-  lbClose.addEventListener('click', closeLightbox);
-  lbPrev.addEventListener('click', function () { showNext(-1); });
-  lbNext.addEventListener('click', function () { showNext(1); });
-
-  lightbox.addEventListener('click', function (e) {
-    if (e.target === lightbox) closeLightbox();
-  });
+  lightbox.querySelector('.lightbox-close').addEventListener('click', closeLightbox);
+  lightbox.querySelector('.lightbox-prev').addEventListener('click', function () { openLightbox(currentIndex - 1); });
+  lightbox.querySelector('.lightbox-next').addEventListener('click', function () { openLightbox(currentIndex + 1); });
+  lightbox.addEventListener('click', function (e) { if (e.target === lightbox) closeLightbox(); });
 
   document.addEventListener('keydown', function (e) {
     if (lightbox.hidden) return;
     if (e.key === 'Escape') closeLightbox();
-    if (e.key === 'ArrowLeft') showNext(-1);
-    if (e.key === 'ArrowRight') showNext(1);
+    if (e.key === 'ArrowLeft') openLightbox(currentIndex - 1);
+    if (e.key === 'ArrowRight') openLightbox(currentIndex + 1);
   });
 })();
 </script>

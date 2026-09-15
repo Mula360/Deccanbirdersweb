@@ -381,30 +381,54 @@ body.nav-open { overflow: hidden; }
    Video card
    ---------------------------------------------------------------------- */
 .video-card {
-  background: white;
+  display: block;
+  background: #fff;
   border: 1px solid var(--border);
-  border-radius: var(--radius-card);
+  border-radius: 16px;
   overflow: hidden;
   cursor: pointer;
   transition: box-shadow 150ms;
-  text-decoration: none;
-  display: block;
 }
 .video-card:hover { box-shadow: 0 4px 16px rgba(22, 36, 29, 0.1); }
-.video-thumb { width: 100%; aspect-ratio: 16 / 9; object-fit: cover; }
-.video-info { padding: 14px; }
+.video-thumb-wrap { position: relative; }
+.video-thumb { width: 100%; aspect-ratio: 16 / 9; object-fit: cover; display: block; }
+.video-thumb-scrim {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to top, rgba(10, 20, 15, 0.5), rgba(10, 20, 15, 0));
+}
+.video-play {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 62px;
+  height: 44px;
+  border-radius: 10px;
+  background: var(--ink);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+/* Play triangle drawn with borders, as in the design. */
+.video-play span {
+  width: 0;
+  height: 0;
+  border-left: 15px solid #fff;
+  border-top: 9px solid transparent;
+  border-bottom: 9px solid transparent;
+  margin-left: 3px;
+}
+.video-info { padding: 18px 20px 20px; }
 .video-title {
   font-family: var(--font-head);
+  font-size: 17px;
   font-weight: 600;
-  font-size: 14px;
+  letter-spacing: -0.02em;
+  line-height: 1.3;
   color: var(--ink);
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-  margin-bottom: 8px;
 }
-.video-meta { display: flex; justify-content: space-between; font-size: 12px; color: var(--text-muted); }
+.video-meta { margin-top: 8px; font-size: 14.5px; color: var(--text-muted); }
 
 /* -------------------------------------------------------------------------
    Tab bar (sightings, events, gallery)
@@ -592,8 +616,8 @@ body.nav-open { overflow: hidden; }
    ---------------------------------------------------------------------- */
 .videos-grid-inner, .video-skeleton-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-  gap: 20px;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 18px;
 }
 .video-skeleton {
   background: white;
@@ -824,57 +848,96 @@ body.nav-open { overflow: hidden; }
 /* -------------------------------------------------------------------------
    Photo gallery — filters, masonry grid, lightbox ([db_photo_gallery])
    ---------------------------------------------------------------------- */
-.gallery-filters {
-  display: flex;
-  gap: 8px;
-  flex-wrap: wrap;
-  margin-bottom: 28px;
-}
-.filter-btn {
+/* Gallery tab bar: 2px rounded indicator inside each button. */
+.gallery-tabs-wrap { max-width: var(--max-w); margin: 0 auto; padding: clamp(36px, 5vw, 52px) 20px 0; }
+.gallery-tabs { display: flex; gap: 28px; border-bottom: 1px solid var(--border); }
+.gallery-tab {
+  background: transparent;
+  border: 0;
+  cursor: pointer;
+  padding: 0 0 14px;
   font-family: var(--font-head);
+  font-size: 17px;
   font-weight: 600;
-  font-size: 13px;
-  padding: 8px 18px;
-  border-radius: var(--radius-btn);
-  border: 2px solid var(--border);
-  background: white;
+  letter-spacing: -0.015em;
   color: var(--text-muted);
-  cursor: pointer;
-  transition: all 150ms;
+  transition: color 150ms;
 }
-.filter-btn.active { background: var(--green); color: white; border-color: var(--green); }
-.filter-btn:hover:not(.active) { border-color: var(--green); color: var(--green); }
-
-.photo-masonry {
-  columns: 4 220px;
-  column-gap: 16px;
-}
-.photo-card {
-  break-inside: avoid;
-  margin: 0 0 16px;
-  border-radius: var(--radius-sm);
-  overflow: hidden;
-  position: relative;
-  cursor: pointer;
-}
-.photo-card img { width: 100%; display: block; }
-.photo-overlay {
-  position: absolute;
-  left: 0; right: 0; bottom: 0;
-  padding: 12px 14px;
-  background: linear-gradient(transparent, rgba(22, 36, 29, 0.8));
-  color: #fff;
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-end;
-  gap: 8px;
+.gallery-tab.is-active { color: var(--ink); }
+.gallery-tab:hover { color: var(--ink); }
+.gallery-tab-bar {
+  display: block;
+  margin-top: 12px;
+  height: 2px;
+  border-radius: 2px;
+  background: var(--blue);
   opacity: 0;
   transition: opacity 150ms;
 }
-.photo-card:hover .photo-overlay,
-.photo-card:focus-visible .photo-overlay { opacity: 1; }
-.photo-species { font-family: var(--font-head); font-weight: 700; font-size: 13px; }
-.photo-credit { font-size: 11px; opacity: 0.85; white-space: nowrap; }
+.gallery-tab.is-active .gallery-tab-bar { opacity: 1; }
+
+.gallery-panel { max-width: var(--max-w); margin: 0 auto; padding: clamp(32px, 4vw, 48px) 20px clamp(60px, 8vw, 96px); }
+
+/* Videos: intro row then the card grid. */
+.videos-intro {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  align-items: baseline;
+  justify-content: space-between;
+  margin-bottom: 26px;
+}
+.videos-intro p { margin: 0; max-width: 52ch; font-size: 17px; line-height: 1.55; color: var(--text-body); }
+.videos-yt-btn {
+  flex-shrink: 0;
+  padding: 13px 24px;
+  background: var(--ink);
+  color: #fff;
+  border-radius: var(--radius-btn);
+  font-family: var(--font-head);
+  font-size: 15px;
+  font-weight: 600;
+  text-decoration: none;
+  transition: background 150ms;
+}
+.videos-yt-btn:hover { background: var(--green-dark); color: #fff; }
+
+/* Photo masonry — CSS columns so cards keep their natural aspect. */
+.photo-masonry { columns: auto 280px; column-gap: 16px; }
+.photo-card {
+  margin: 0 0 16px;
+  break-inside: avoid;
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  overflow: hidden;
+  cursor: pointer;
+}
+.photo-card img { width: 100%; height: auto; display: block; }
+.photo-card figcaption { padding: 16px 18px 18px; }
+.photo-species {
+  display: block;
+  font-family: var(--font-head);
+  font-size: 16.5px;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  line-height: 1.25;
+  color: var(--ink);
+}
+.photo-place { display: block; margin-top: 6px; font-size: 14.5px; color: var(--text-muted); }
+.photo-credit {
+  display: block;
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid var(--border-light);
+  font-family: var(--font-head);
+  font-size: 12.5px;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  color: #1F5A93;
+}
+
+.photo-submit-wrap { max-width: var(--max-w); margin: 0 auto; padding: 0 20px clamp(60px, 8vw, 96px); }
 
 .lightbox {
   position: fixed;
@@ -1560,6 +1623,7 @@ body.lightbox-open { overflow: hidden; }
 .hero-light { background: transparent; padding: clamp(40px, 6vw, 68px) 20px 0; }
 .hero-light-inner { max-width: var(--max-w); margin: 0 auto; }
 .hero-light .eyebrow { font-size: 12.5px; margin-bottom: 0; }
+.hero-standfirst { margin: 20px 0 0; max-width: 56ch; font-size: clamp(17px, 2.1vw, 20px); line-height: 1.55; color: var(--text-body); }
 .hero-light h1 {
   margin: 14px 0 0;
   font-family: var(--font-head);
@@ -1700,7 +1764,6 @@ body.lightbox-open { overflow: hidden; }
   .activity-row { grid-template-columns: 1fr; gap: 24px; padding: 32px 0; }
   .activity-row:nth-child(even) .activity-media,
   .activity-row:nth-child(even) .activity-text { order: initial; }
-  .photo-masonry { columns: 3 180px; }
 }
 
 /* 640px — grid/layout stacking */
@@ -1712,7 +1775,6 @@ body.lightbox-open { overflow: hidden; }
     grid-template-columns: 1fr 1fr;
   }
   .apply-options { grid-template-columns: 1fr; }
-  .photo-masonry { columns: 2 140px; }
   .hotspot-row { flex-wrap: wrap; }
   .sighting-row .locality { flex-basis: 100%; }
   .event-card { flex-direction: column; }
