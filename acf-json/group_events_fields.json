@@ -271,6 +271,26 @@
             "append": ""
         },
         {
+            "key": "field_events_pick_of_the_day",
+            "label": "Pick of the Day",
+            "name": "pick_of_the_day",
+            "aria-label": "",
+            "type": "text",
+            "instructions": "The standout bird of the trip, e.g. \"Indian Skimmer (3, first site record)\". Shown on the past-event card.",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "",
+                "class": "",
+                "id": ""
+            },
+            "default_value": "",
+            "maxlength": "",
+            "placeholder": "e.g. Indian Skimmer — 3 birds",
+            "prepend": "",
+            "append": ""
+        },
+        {
             "key": "field_events_highlights",
             "label": "Highlights",
             "name": "highlights",

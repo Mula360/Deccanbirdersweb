@@ -57,12 +57,12 @@ while (have_posts()) : the_post();
     <h2>Come out with us</h2>
     <p>Trips run most weekends. Turn up, borrow a pair of binoculars, and put your name on the checklist.</p>
     <div class="events-grid" id="home-events-grid">
-      <div class="event-card"><div class="date-block"><span class="sk-block" style="width:36px"></span></div>
-        <div class="event-info"><span class="sk-block" style="width:70%;margin-bottom:8px"></span><span class="sk-block" style="width:50%"></span></div></div>
-      <div class="event-card"><div class="date-block"><span class="sk-block" style="width:36px"></span></div>
-        <div class="event-info"><span class="sk-block" style="width:70%;margin-bottom:8px"></span><span class="sk-block" style="width:50%"></span></div></div>
-      <div class="event-card"><div class="date-block"><span class="sk-block" style="width:36px"></span></div>
-        <div class="event-info"><span class="sk-block" style="width:70%;margin-bottom:8px"></span><span class="sk-block" style="width:50%"></span></div></div>
+      <div class="event-card"><div class="event-date-block"><span class="sk-block" style="width:36px"></span></div>
+        <div class="event-body"><span class="sk-block" style="width:70%;margin-bottom:8px"></span><span class="sk-block" style="width:50%"></span></div></div>
+      <div class="event-card"><div class="event-date-block"><span class="sk-block" style="width:36px"></span></div>
+        <div class="event-body"><span class="sk-block" style="width:70%;margin-bottom:8px"></span><span class="sk-block" style="width:50%"></span></div></div>
+      <div class="event-card"><div class="event-date-block"><span class="sk-block" style="width:36px"></span></div>
+        <div class="event-body"><span class="sk-block" style="width:70%;margin-bottom:8px"></span><span class="sk-block" style="width:50%"></span></div></div>
     </div>
     <a href="/events" class="btn btn-ghost">Full calendar →</a>
   </div>
@@ -72,12 +72,12 @@ while (have_posts()) : the_post();
   <div class="section-boxed">
     <h3 style="font-family:var(--font-head);font-size:22px;">Where we've been</h3>
     <div class="past-events-grid" id="home-past-events-grid">
-      <div class="event-card past-event-card"><div class="past-event-species"><span class="sk-block" style="width:24px"></span></div>
-        <div class="event-info"><span class="sk-block" style="width:70%;margin-bottom:8px"></span><span class="sk-block" style="width:50%"></span></div></div>
-      <div class="event-card past-event-card"><div class="past-event-species"><span class="sk-block" style="width:24px"></span></div>
-        <div class="event-info"><span class="sk-block" style="width:70%;margin-bottom:8px"></span><span class="sk-block" style="width:50%"></span></div></div>
-      <div class="event-card past-event-card"><div class="past-event-species"><span class="sk-block" style="width:24px"></span></div>
-        <div class="event-info"><span class="sk-block" style="width:70%;margin-bottom:8px"></span><span class="sk-block" style="width:50%"></span></div></div>
+      <div class="event-card"><div class="event-date-block"><span class="sk-block" style="width:24px"></span></div>
+        <div class="event-body"><span class="sk-block" style="width:70%;margin-bottom:8px"></span><span class="sk-block" style="width:50%"></span></div></div>
+      <div class="event-card"><div class="event-date-block"><span class="sk-block" style="width:24px"></span></div>
+        <div class="event-body"><span class="sk-block" style="width:70%;margin-bottom:8px"></span><span class="sk-block" style="width:50%"></span></div></div>
+      <div class="event-card"><div class="event-date-block"><span class="sk-block" style="width:24px"></span></div>
+        <div class="event-body"><span class="sk-block" style="width:70%;margin-bottom:8px"></span><span class="sk-block" style="width:50%"></span></div></div>
     </div>
     <a href="/events" class="btn btn-ghost">All past events →</a>
   </div>

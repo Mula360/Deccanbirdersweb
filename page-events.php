@@ -1,7 +1,11 @@
 <?php
 /**
  * Template for the Events page — rendered directly in PHP (no Elementor).
- * Upcoming/Past tabs populated client-side by events.js.
+ *
+ * The design file has no Events page, so this follows the design system's
+ * own event card (the home page's "Come out with us" strip) and the
+ * Gallery tab bar. Both tabs are paginated at 10 per page and each card
+ * opens to an expanded view in place; events.js does the rendering.
  */
 get_header();
 while (have_posts()) : the_post();
@@ -11,25 +15,25 @@ while (have_posts()) : the_post();
   <div class="hero-light-inner">
     <span class="eyebrow" style="color:var(--blue);">Events</span>
     <h1>Bird walks and events</h1>
+    <p class="hero-standfirst">Walks run most weekends and are open to everyone, members or not. Past outings keep their checklist totals so you can see what a site produces at a given time of year.</p>
   </div>
 </section>
 
-<section class="section-white" style="padding: 0 20px 30px;">
-  <div class="section-boxed">
-    <p>Walks run most weekends and are open to everyone, members or not. Past outings keep their checklist totals so you can see what a site produces at a given time of year.</p>
+<div class="gallery-tabs-wrap">
+  <div class="gallery-tabs" role="tablist">
+    <button class="gallery-tab is-active" data-tab="upcoming" role="tab" aria-selected="true" aria-controls="events-upcoming">
+      Upcoming<span class="gallery-tab-bar" aria-hidden="true"></span>
+    </button>
+    <button class="gallery-tab" data-tab="past" role="tab" aria-selected="false" aria-controls="events-past">
+      Past events<span class="gallery-tab-bar" aria-hidden="true"></span>
+    </button>
   </div>
-</section>
+</div>
 
-<section class="section-white" style="padding: 20px 20px 80px;">
-  <div class="section-boxed">
-    <div class="tab-bar">
-      <button class="tab-btn active" data-tab="upcoming">Upcoming</button>
-      <button class="tab-btn" data-tab="past">Past events</button>
-    </div>
-    <div class="events-tab-panel" id="events-upcoming"></div>
-    <div class="events-tab-panel" id="events-past" hidden></div>
-  </div>
-</section>
+<div class="gallery-panel">
+  <div class="events-tab-panel" id="events-upcoming" role="tabpanel"></div>
+  <div class="events-tab-panel" id="events-past" role="tabpanel" hidden></div>
+</div>
 
 <?php get_template_part('template-parts/join-band'); ?>
 

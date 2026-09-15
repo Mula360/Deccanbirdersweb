@@ -347,35 +347,107 @@ body.nav-open { overflow: hidden; }
 /* -------------------------------------------------------------------------
    Event card (home strip and events page)
    ---------------------------------------------------------------------- */
+/* Event card — design-system pattern from the home "Come out with us"
+   strip: bordered white card, tinted date chip, minimal summary, and an
+   optional details panel that opens in place. */
 .event-card {
-  display: flex;
-  gap: 16px;
-  background: white;
+  background: #fff;
   border: 1px solid var(--border);
-  border-radius: var(--radius-card);
-  padding: 20px;
+  border-radius: 16px;
+  padding: 24px;
+  display: flex;
+  gap: 18px;
+  align-items: flex-start;
   transition: border-color 150ms;
 }
-.event-card:hover { border-color: var(--blue); }
+.event-card.is-expandable:hover { border-color: var(--blue); }
 
-.date-block {
-  width: 60px;
+.event-date-block {
   flex-shrink: 0;
-  background: var(--blue-light);
-  border-radius: 10px;
-  padding: 10px 8px;
+  width: 60px;
   text-align: center;
+  background: var(--blue-light);
+  border-radius: 12px;
+  padding: 10px 0;
 }
-.date-block .day { display: block; font-family: var(--font-head); font-weight: 700; font-size: 24px; color: var(--ink); line-height: 1; }
-.date-block .month { display: block; font-family: var(--font-head); font-weight: 600; font-size: 11px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; margin-top: 2px; }
-.date-block .dayname { display: block; font-size: 10px; color: var(--text-muted); margin-top: 2px; }
+.event-day {
+  display: block;
+  font-family: var(--font-head);
+  font-size: 24px;
+  font-weight: 700;
+  letter-spacing: -0.04em;
+  line-height: 1;
+  color: var(--ink);
+}
+.event-month {
+  display: block;
+  margin-top: 3px;
+  font-family: var(--font-head);
+  font-size: 11.5px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #4E6B5C;
+}
 
-.event-info { flex: 1; }
-.event-type-badge { display: inline-block; font-size: 11px; font-weight: 600; padding: 2px 8px; border-radius: var(--radius-btn); margin-bottom: 6px; background: var(--green-light); color: var(--green-dark); }
-.event-title { font-family: var(--font-head); font-weight: 700; font-size: 16px; color: var(--ink); margin-bottom: 4px; }
-.event-meta { font-size: 13px; color: var(--text-muted); margin-bottom: 4px; }
-.event-note { font-size: 13px; color: var(--text-muted); font-style: italic; }
-.event-note-full { font-size: 14px; color: var(--text-body); font-style: normal; line-height: 1.6; margin-top: 8px; }
+.event-body { flex: 1; min-width: 0; }
+.event-title {
+  font-family: var(--font-head);
+  font-size: 17.5px;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  line-height: 1.25;
+  color: var(--ink);
+}
+.event-meta { margin-top: 8px; font-size: 15px; line-height: 1.5; color: var(--text-muted); }
+
+/* Compact stats on past events (species / turnout). */
+.event-chips { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+.event-chip {
+  font-size: 13.5px;
+  color: var(--text-muted);
+  padding: 4px 10px;
+  background: var(--surface);
+  border-radius: 999px;
+}
+.event-chip strong { font-family: var(--font-head); font-weight: 700; color: var(--ink); }
+
+.event-toggle {
+  margin-top: 14px;
+  padding: 0;
+  background: none;
+  border: 0;
+  cursor: pointer;
+  font-family: var(--font-head);
+  font-size: 14.5px;
+  font-weight: 600;
+  color: var(--green-dark);
+  border-bottom: 2px solid var(--yellow);
+  padding-bottom: 2px;
+}
+.event-toggle-less { display: none; }
+.event-card.is-open .event-toggle-more { display: none; }
+.event-card.is-open .event-toggle-less { display: inline; }
+
+.event-details {
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px solid var(--border-light);
+  display: grid;
+  gap: 10px;
+}
+.event-detail { display: flex; flex-wrap: wrap; gap: 8px; font-size: 15px; line-height: 1.5; color: var(--text-body); }
+.event-detail-label {
+  flex-shrink: 0;
+  min-width: 130px;
+  font-family: var(--font-head);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #4E6B5C;
+}
+.event-detail-notes { font-size: 15px; line-height: 1.6; color: var(--text-body); white-space: pre-line; }
 
 /* -------------------------------------------------------------------------
    Video card
@@ -561,55 +633,34 @@ body.nav-open { overflow: hidden; }
 .strip-error { color: var(--text-muted); padding: 12px 0; }
 
 /* -------------------------------------------------------------------------
-   Events page — badges, list, past-event cards
+   Events page — list and pagination
    ---------------------------------------------------------------------- */
-.event-badges { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 10px; }
-.loaner-badge, .fee-badge {
-  font-size: 11px;
-  font-weight: 600;
-  padding: 2px 9px;
-  border-radius: var(--radius-btn);
-}
-.loaner-badge { background: var(--blue-light); color: var(--blue-dark); }
-.fee-badge { background: var(--yellow); color: var(--ink); }
-
 .events-empty { color: var(--text-muted); padding: 40px 0; text-align: center; }
-.events-list { display: flex; flex-direction: column; gap: 16px; }
+.events-list { display: grid; gap: 14px; }
 
-.past-event-card { align-items: flex-start; }
-.past-event-species {
-  width: 60px;
-  flex-shrink: 0;
-  background: var(--green-light);
-  color: var(--green-dark);
-  border-radius: 10px;
-  padding: 12px 8px;
-  text-align: center;
-  font-family: var(--font-head);
-  font-weight: 700;
-  font-size: 22px;
-  line-height: 1;
+/* Pager — 10 events per page on each tab. */
+.events-pager {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 18px;
+  margin-top: 28px;
 }
-.past-event-species span {
-  display: block;
+.events-pager-btn {
+  padding: 10px 20px;
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-btn);
+  cursor: pointer;
   font-family: var(--font-head);
+  font-size: 14.5px;
   font-weight: 600;
-  font-size: 10px;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  margin-top: 4px;
+  color: var(--ink);
+  transition: background 150ms, border-color 150ms, color 150ms;
 }
-.event-highlights { font-size: 13px; color: var(--text-body); margin-top: 6px; }
-.pitta-link {
-  display: inline-block;
-  font-family: var(--font-head);
-  font-weight: 600;
-  font-size: 13px;
-  color: var(--blue);
-  text-decoration: none;
-  margin-top: 8px;
-}
-.pitta-link:hover { text-decoration: underline; }
+.events-pager-btn:hover:not(:disabled) { background: var(--ink); border-color: var(--ink); color: #fff; }
+.events-pager-btn:disabled { opacity: 0.45; cursor: not-allowed; }
+.events-pager-status { font-size: 14.5px; color: var(--text-muted); }
 
 /* -------------------------------------------------------------------------
    Video gallery grid + skeleton loader
@@ -1778,7 +1829,7 @@ body.lightbox-open { overflow: hidden; }
   .hotspot-row { flex-wrap: wrap; }
   .sighting-row .locality { flex-basis: 100%; }
   .event-card { flex-direction: column; }
-  .date-block { width: 100%; }
+  .event-date-block { width: 100%; }
   .milestone-item {
     grid-template-columns: 64px 20px 1fr;
     gap: 12px;
