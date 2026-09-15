@@ -149,10 +149,22 @@
                 }
             ],
             "default_value": [
-                { "stat_number": "1980", "stat_label": "Founded, as the Birdwatchers Society of Andhra Pradesh" },
-                { "stat_number": "500+", "stat_label": "Members across the Deccan and beyond" },
-                { "stat_number": "12", "stat_label": "Issues of PITTA published every year" },
-                { "stat_number": "45", "stat_label": "Years of field records and waterfowl counts" }
+                {
+                    "stat_number": "1980",
+                    "stat_label": "Founded, as the Birdwatchers Society of Andhra Pradesh"
+                },
+                {
+                    "stat_number": "500+",
+                    "stat_label": "Members across the Deccan and beyond"
+                },
+                {
+                    "stat_number": "12",
+                    "stat_label": "Issues of PITTA published every year"
+                },
+                {
+                    "stat_number": "45",
+                    "stat_label": "Years of field records and waterfowl counts"
+                }
             ]
         },
         {
@@ -217,15 +229,42 @@
                 }
             ],
             "default_value": [
-                { "bird_name": "Indian Peafowl", "fact_text": "India's national bird — the male's iridescent train is a set of elongated upper tail coverts, not the bird's true tail feathers." },
-                { "bird_name": "Painted Stork", "fact_text": "Gets its pink flush from carotenoid pigments in the crustaceans it eats, the same mechanism that colours a flamingo." },
-                { "bird_name": "Sarus Crane", "fact_text": "The world's tallest flying bird, standing up to 1.8 metres, and one that mates for life." },
-                { "bird_name": "Indian Roller", "fact_text": "Named for the dramatic aerobatic rolls it performs during courtship display; it is Telangana's state bird." },
-                { "bird_name": "Purple Sunbird", "fact_text": "One of the smallest birds in the region — breeding males lose their iridescent plumage outside the breeding season." },
-                { "bird_name": "Black-necked Stork", "fact_text": "India's only stork with a resident breeding population; pairs form long-term bonds and rarely migrate." },
-                { "bird_name": "Amur Falcon", "fact_text": "Undertakes one of the longest migrations of any raptor, passing through Northeast India en route from Siberia to southern Africa." },
-                { "bird_name": "Great Indian Bustard", "fact_text": "One of the heaviest flying birds in the world, now critically endangered with fewer than 150 individuals left in the wild." },
-                { "bird_name": "Owl", "fact_text": "Owls are asymmetric on purpose. In several species one ear sits higher than the other, letting the bird triangulate a rustle in complete darkness to within a degree or two." }
+                {
+                    "bird_name": "Indian Peafowl",
+                    "fact_text": "India's national bird — the male's iridescent train is a set of elongated upper tail coverts, not the bird's true tail feathers."
+                },
+                {
+                    "bird_name": "Painted Stork",
+                    "fact_text": "Gets its pink flush from carotenoid pigments in the crustaceans it eats, the same mechanism that colours a flamingo."
+                },
+                {
+                    "bird_name": "Sarus Crane",
+                    "fact_text": "The world's tallest flying bird, standing up to 1.8 metres, and one that mates for life."
+                },
+                {
+                    "bird_name": "Indian Roller",
+                    "fact_text": "Named for the dramatic aerobatic rolls it performs during courtship display; it is Telangana's state bird."
+                },
+                {
+                    "bird_name": "Purple Sunbird",
+                    "fact_text": "One of the smallest birds in the region — breeding males lose their iridescent plumage outside the breeding season."
+                },
+                {
+                    "bird_name": "Black-necked Stork",
+                    "fact_text": "India's only stork with a resident breeding population; pairs form long-term bonds and rarely migrate."
+                },
+                {
+                    "bird_name": "Amur Falcon",
+                    "fact_text": "Undertakes one of the longest migrations of any raptor, passing through Northeast India en route from Siberia to southern Africa."
+                },
+                {
+                    "bird_name": "Great Indian Bustard",
+                    "fact_text": "One of the heaviest flying birds in the world, now critically endangered with fewer than 150 individuals left in the wild."
+                },
+                {
+                    "bird_name": "Owl",
+                    "fact_text": "Owls are asymmetric on purpose. In several species one ear sits higher than the other, letting the bird triangulate a rustle in complete darkness to within a degree or two."
+                }
             ]
         },
         {
@@ -270,16 +309,109 @@
                 }
             ],
             "default_value": [
-                { "joke_text": "Why did the birder bring a ladder to the field trip? To get a better vantage on all the little tweets." },
-                { "joke_text": "Why don't birders ever get lost? They always follow the flyway." },
-                { "joke_text": "How do you know a birder had a bad day? They got a lifer and forgot to bring the binoculars." },
-                { "joke_text": "What did one owl say to the other after a long night of birding? 'Whooo's counting?'" },
-                { "joke_text": "Why did the sunbird refuse to share its nectar? It was feeling a little tweet-ish." },
-                { "joke_text": "What's a birder's favourite kind of music? Anything with a good warble." },
-                { "joke_text": "Why do birders make terrible secret keepers? They always spill the sighting." },
-                { "joke_text": "Why was the eBird checklist such an honest witness? It couldn't fudge a species it hadn't actually seen." },
-                { "joke_text": "Why don't cranes use social media? They prefer a long-distance call." }
+                {
+                    "joke_text": "Why did the birder bring a ladder to the field trip? To get a better vantage on all the little tweets."
+                },
+                {
+                    "joke_text": "Why don't birders ever get lost? They always follow the flyway."
+                },
+                {
+                    "joke_text": "How do you know a birder had a bad day? They got a lifer and forgot to bring the binoculars."
+                },
+                {
+                    "joke_text": "What did one owl say to the other after a long night of birding? 'Whooo's counting?'"
+                },
+                {
+                    "joke_text": "Why did the sunbird refuse to share its nectar? It was feeling a little tweet-ish."
+                },
+                {
+                    "joke_text": "What's a birder's favourite kind of music? Anything with a good warble."
+                },
+                {
+                    "joke_text": "Why do birders make terrible secret keepers? They always spill the sighting."
+                },
+                {
+                    "joke_text": "Why was the eBird checklist such an honest witness? It couldn't fudge a species it hadn't actually seen."
+                },
+                {
+                    "joke_text": "Why don't cranes use social media? They prefer a long-distance call."
+                }
             ]
+        },
+        {
+            "key": "field_home_pitta_collage_1",
+            "label": "PITTA Collage 1",
+            "name": "pitta_collage_1",
+            "aria-label": "",
+            "type": "image",
+            "instructions": "Part of the three-image collage beside the PITTA panel on the home page.",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "",
+                "class": "",
+                "id": ""
+            },
+            "return_format": "array",
+            "preview_size": "medium",
+            "library": "all",
+            "min_width": "",
+            "min_height": "",
+            "min_size": "",
+            "max_width": "",
+            "max_height": "",
+            "max_size": "",
+            "mime_types": ""
+        },
+        {
+            "key": "field_home_pitta_collage_2",
+            "label": "PITTA Collage 2",
+            "name": "pitta_collage_2",
+            "aria-label": "",
+            "type": "image",
+            "instructions": "Part of the three-image collage beside the PITTA panel on the home page.",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "",
+                "class": "",
+                "id": ""
+            },
+            "return_format": "array",
+            "preview_size": "medium",
+            "library": "all",
+            "min_width": "",
+            "min_height": "",
+            "min_size": "",
+            "max_width": "",
+            "max_height": "",
+            "max_size": "",
+            "mime_types": ""
+        },
+        {
+            "key": "field_home_pitta_collage_3",
+            "label": "PITTA Collage 3",
+            "name": "pitta_collage_3",
+            "aria-label": "",
+            "type": "image",
+            "instructions": "Part of the three-image collage beside the PITTA panel on the home page.",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "",
+                "class": "",
+                "id": ""
+            },
+            "return_format": "array",
+            "preview_size": "medium",
+            "library": "all",
+            "min_width": "",
+            "min_height": "",
+            "min_size": "",
+            "max_width": "",
+            "max_height": "",
+            "max_size": "",
+            "mime_types": ""
         }
     ],
     "location": [

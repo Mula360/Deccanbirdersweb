@@ -927,14 +927,19 @@ body.nav-open { overflow: hidden; }
 /* -------------------------------------------------------------------------
    Fact / humour cards ([db_bird_fact], [db_birding_joke])
    ---------------------------------------------------------------------- */
-.fact-card, .humour-card {
-  background: #fff;
-  box-shadow: 0 2px 10px rgba(22, 36, 29, 0.06);
-  padding: 24px 28px;
+/* Content inside the coloured "This week at the hide" cards. */
+.hide-setup {
+  font-family: var(--font-head);
+  font-size: clamp(20px, 2.5vw, 26px);
+  line-height: 1.25;
+  letter-spacing: -0.02em;
+  font-weight: 600;
 }
-.fact-bird { font-family: var(--font-head); font-weight: 700; font-size: 18px; color: var(--ink); margin: 6px 0 8px; }
-.fact-text { color: var(--text-body); font-size: 15px; }
-.humour-card p { color: var(--text-body); font-size: 15px; margin-top: 6px; }
+.hide-punch { line-height: 1.5; }
+.hide-card--humour .hide-setup { color: #2E2200; }
+.hide-card--humour .hide-punch { font-size: clamp(17px, 2.1vw, 20px); color: #4A3800; }
+.hide-card--fact .hide-setup { color: #fff; }
+.hide-card--fact .hide-punch { font-size: clamp(16px, 2vw, 18px); color: #fff; }
 
 /* -------------------------------------------------------------------------
    Committee grid ([db_committee_grid])
@@ -1735,37 +1740,7 @@ body.lightbox-open { overflow: hidden; }
 /* -------------------------------------------------------------------------
    Home page extras: activity preview grid, PITTA teaser, past-events grid
    ---------------------------------------------------------------------- */
-.activity-preview-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 16px;
-}
-.activity-preview-card {
-  background: #fff;
-  border: 1px solid var(--border);
-  border-radius: var(--radius-sm);
-  padding: 18px 16px;
-}
-.activity-preview-cadence {
-  display: block;
-  font-family: var(--font-head);
-  font-weight: 700;
-  font-size: 10px;
-  letter-spacing: 0.06em;
-  color: var(--text-muted);
-  margin-bottom: 6px;
-}
-.activity-preview-title { display: block; font-family: var(--font-head); font-weight: 700; font-size: 15px; color: var(--ink); }
 
-.pitta-teaser-list { display: flex; flex-direction: column; gap: 8px; margin: 16px 0 24px; }
-.pitta-teaser-list li { padding-left: 22px; position: relative; font-size: 15px; color: var(--text-body); }
-.pitta-teaser-list li::before { content: '•'; position: absolute; left: 0; color: var(--blue); font-weight: 700; }
-
-.past-events-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-  gap: 16px;
-}
 
 /* Species lookup card. */
 .lookup-wrap { max-width: var(--max-w); margin: 0 auto; padding: clamp(48px, 7vw, 84px) 20px 0; }
@@ -1889,15 +1864,26 @@ body.lightbox-open { overflow: hidden; }
 .section-surface { background: var(--surface); }
 .section-boxed { max-width: var(--max-w); margin: 0 auto; padding: 0 20px; }
 
-.stats-bar {
+/* Stats band — green figures, left aligned, hairline dividers. */
+.stats-band { background: #fff; border-bottom: 1px solid var(--border); }
+.stats-band-inner {
+  max-width: var(--max-w);
+  margin: 0 auto;
+  padding: 0 20px;
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  background: #fff;
-  border-bottom: 1px solid var(--border);
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
 }
-.stats-bar .stat-col { text-align: center; padding: 32px 12px; }
-.stats-bar .stat-number { font-family: var(--font-head); font-weight: 700; font-size: 40px; color: var(--ink); }
-.stats-bar .stat-label { color: var(--text-muted); font-size: 14px; margin-top: 6px; }
+.stats-band .stat-col { padding: 34px 24px 34px 0; border-right: 1px solid var(--border-light); }
+.stats-band .stat-col:last-child { border-right: 0; }
+.stats-band .stat-number {
+  font-family: var(--font-head);
+  font-size: clamp(32px, 4.4vw, 46px);
+  font-weight: 700;
+  letter-spacing: -0.04em;
+  line-height: 1;
+  color: var(--green);
+}
+.stats-band .stat-label { margin-top: 8px; font-size: 15px; line-height: 1.4; color: var(--text-muted); max-width: 22ch; }
 
 /* Membership call-to-action band: light blue, text left, button right. */
 .join-band { background: var(--blue-light); border-top: 1px solid var(--border); }
@@ -2030,7 +2016,216 @@ body.lightbox-open { overflow: hidden; }
     gap: 12px;
   }
   .milestone-item::before { left: 86px; }
-  .activity-preview-grid { grid-template-columns: 1fr 1fr; }
   .stats-bar { grid-template-columns: repeat(2, 1fr); }
   .two-col-60-40, .two-col-50-50 { grid-template-columns: 1fr; }
 }
+
+
+/* -------------------------------------------------------------------------
+   Home page sections
+   ---------------------------------------------------------------------- */
+.home-section { max-width: var(--max-w); margin: 0 auto; padding: clamp(56px, 8vw, 96px) 20px 0; }
+.home-section--gallery { padding-bottom: clamp(20px, 3vw, 40px); }
+
+.section-head {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+  align-items: flex-end;
+  justify-content: space-between;
+  margin-bottom: 30px;
+}
+.section-head--baseline { align-items: baseline; gap: 14px; margin-bottom: 26px; }
+.eyebrow--lede { margin-bottom: 14px; }
+.section-h2 {
+  margin: 0;
+  font-family: var(--font-head);
+  font-size: clamp(28px, 4vw, 44px);
+  line-height: 1.06;
+  letter-spacing: -0.03em;
+  font-weight: 700;
+  color: var(--ink);
+}
+.section-h2--lg { font-size: clamp(30px, 4.4vw, 50px); text-wrap: balance; }
+.section-lede { margin: 14px 0 0; max-width: 46ch; font-size: 17.5px; line-height: 1.55; color: var(--text-body); }
+.week-label {
+  font-family: var(--font-head);
+  font-size: 13.5px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  color: var(--text-muted);
+}
+
+/* Green link with the yellow rule beneath — the design's standard "more" link. */
+.text-link {
+  font-family: var(--font-head);
+  font-size: 15.5px;
+  font-weight: 600;
+  color: var(--green-dark);
+  text-decoration: none;
+  border-bottom: 2px solid var(--yellow);
+  padding-bottom: 3px;
+  white-space: nowrap;
+}
+.text-link--block { display: inline-block; margin-top: 22px; }
+
+.events-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 14px; }
+
+/* Activities: text column beside a grid of small cards. */
+.home-split {
+  max-width: var(--max-w);
+  margin: 0 auto;
+  padding: clamp(60px, 9vw, 110px) 20px;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: clamp(32px, 5vw, 72px);
+  align-items: start;
+}
+.split-lede { margin: 22px 0 0; font-size: 18px; line-height: 1.62; color: var(--text-body); max-width: 44ch; }
+.home-split .text-link--block { margin-top: 26px; }
+.activity-brief-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 14px; }
+.activity-brief { background: #fff; border: 1px solid var(--border); border-radius: 14px; padding: 22px; }
+.activity-brief-cadence {
+  display: block;
+  font-family: var(--font-head);
+  font-size: 11.5px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #4E6B5C;
+}
+.activity-brief-title {
+  display: block;
+  margin-top: 10px;
+  font-family: var(--font-head);
+  font-size: 18px;
+  font-weight: 600;
+  letter-spacing: -0.015em;
+  line-height: 1.25;
+  color: var(--ink);
+}
+
+/* Dark PITTA panel with its image collage. */
+.pitta-band { background: var(--ink); color: #fff; }
+.pitta-band-inner {
+  max-width: var(--max-w);
+  margin: 0 auto;
+  padding: clamp(56px, 8vw, 96px) 20px;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(290px, 1fr));
+  gap: clamp(32px, 5vw, 64px);
+  align-items: center;
+}
+.pitta-band-title {
+  margin: 0;
+  font-family: var(--font-head);
+  font-size: clamp(28px, 4vw, 44px);
+  line-height: 1.08;
+  letter-spacing: -0.03em;
+  font-weight: 700;
+  color: #fff;
+}
+.pitta-points { margin: 26px 0 0; display: grid; gap: 12px; }
+.pitta-points li {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  font-size: 17px;
+  line-height: 1.5;
+  color: rgba(255, 255, 255, 0.82);
+}
+.pitta-points li::before {
+  content: '';
+  margin-top: 8px;
+  width: 6px;
+  height: 6px;
+  flex-shrink: 0;
+  border-radius: 99px;
+  background: var(--blue);
+}
+.pitta-band-btn {
+  display: inline-block;
+  margin-top: 30px;
+  padding: 14px 26px;
+  background: #fff;
+  color: var(--ink);
+  border-radius: var(--radius-btn);
+  font-family: var(--font-head);
+  font-size: 15.5px;
+  font-weight: 600;
+  text-decoration: none;
+  transition: background 150ms;
+}
+.pitta-band-btn:hover { background: var(--yellow); color: var(--ink); }
+.pitta-collage { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.pitta-collage img { width: 100%; height: 100%; min-height: 110px; object-fit: cover; border-radius: 12px; }
+.pitta-collage img:first-child { grid-row: span 2; min-height: 150px; }
+
+/* eBird strip — hairline-divided cells. */
+.home-sightings {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2px;
+  background: var(--border);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  overflow: hidden;
+}
+.home-sighting-cell { flex: 1 1 230px; background: #fff; padding: 24px; }
+.home-sighting-species {
+  font-family: var(--font-head);
+  font-size: 17.5px;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  line-height: 1.25;
+  color: var(--ink);
+}
+.home-sighting-loc { margin-top: 10px; font-size: 15px; color: var(--text-muted); }
+.home-sighting-meta { margin-top: 12px; display: flex; gap: 8px; align-items: center; }
+.home-sighting-when { font-size: 13.5px; color: var(--text-muted); }
+.region-pill--sm { padding: 9px 18px; font-size: 14px; }
+
+/* "This week at the hide" — three coloured cards. */
+.hide-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 16px; }
+.hide-card {
+  border-radius: 18px;
+  padding: clamp(28px, 3.6vw, 42px);
+  display: flex;
+  flex-direction: column;
+}
+.hide-card--humour { background: var(--yellow); }
+.hide-card--fact { background: var(--green-dark); }
+.hide-card--otd { background: var(--ink); }
+.hide-card-label {
+  display: block;
+  font-family: var(--font-head);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  margin-bottom: 20px;
+}
+.hide-card--humour .hide-card-label { color: #2E2200; }
+.hide-card--fact .hide-card-label { color: #fff; }
+.hide-card--otd .hide-card-label { color: var(--yellow); }
+.hide-card-spacer { flex: 1; min-height: 14px; }
+.hide-card-link { font-family: var(--font-head); font-size: 14.5px; font-weight: 600; color: var(--yellow); text-decoration: none; }
+
+/* On-this-day rows inside the dark card. */
+.home-otd-row { display: flex; gap: 16px; align-items: baseline; }
+.home-otd-row + .home-otd-row { margin-top: 14px; }
+.home-otd-year {
+  font-family: var(--font-head);
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: var(--yellow);
+  min-width: 42px;
+  flex-shrink: 0;
+}
+.home-otd-species { display: block; font-family: var(--font-head); font-size: 16px; font-weight: 600; letter-spacing: -0.015em; color: #fff; line-height: 1.25; }
+.home-otd-loc { display: block; margin-top: 3px; font-size: 14px; color: rgba(255, 255, 255, 0.7); }
+
+.gallery-strip { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px; }
+.gallery-strip img { width: 100%; height: clamp(160px, 20vw, 230px); object-fit: cover; border-radius: 12px; }
+.gallery-strip .img-placeholder { height: clamp(160px, 20vw, 230px); min-height: 0; border-radius: 12px; }

@@ -53,12 +53,15 @@ function escapeHtml(str) {
   return div.innerHTML;
 }
 
+// Homepage strip — hairline-divided cells, per the design.
 function renderSightingRow(r) {
-  // Homepage strip — compact single line.
-  return `<div class="sighting-row">
-    <span class="species">${escapeHtml(r.species)} <em class="scientific">${escapeHtml(r.scientific)}</em></span>
-    <span class="locality">${escapeHtml(r.locality)}</span>
-    <span class="when">${timeAgo(r.when)}</span>
+  return `<div class="home-sighting-cell">
+    <div class="home-sighting-species">${escapeHtml(r.species)}</div>
+    <div class="home-sighting-loc">${escapeHtml(r.locality)}</div>
+    <div class="home-sighting-meta">
+      <span class="chip chip-green">${escapeHtml(String(r.count))}</span>
+      <span class="home-sighting-when">${timeAgo(r.when)}</span>
+    </div>
   </div>`;
 }
 
@@ -386,6 +389,23 @@ function renderSpeciesLookup() {
   });
 }
 
+// Compact rows for the dark "On this day" card on the home page.
+function renderHomeOnThisDay(data) {
+  const el = document.getElementById('home-otd');
+  if (!el || data === null) return;
+  if (!data.length) { el.innerHTML = '<p class="home-otd-loc">No historic records for today.</p>'; return; }
+  el.innerHTML = data.slice(0, 4).map((r) => {
+    const m = String(r.when).match(/\d{4}/);
+    return `<div class="home-otd-row">
+      <span class="home-otd-year">${escapeHtml(m ? m[0] : '')}</span>
+      <span>
+        <span class="home-otd-species">${escapeHtml(r.species)}</span>
+        <span class="home-otd-loc">${escapeHtml(r.locality)}</span>
+      </span>
+    </div>`;
+  }).join('');
+}
+
 function renderOnThisDay(data) {
   const el = document.getElementById('sightings-otd');
   if (!el || data === null) return;
@@ -459,6 +479,7 @@ async function loadOnThisDay() {
   showSkeleton('sightings-otd', 3);
   const data = await fetchTab('onthisday', { m, d }, true);
   renderOnThisDay(data);
+  renderHomeOnThisDay(data);
 }
 
 /* -------------------------------------------------------------------------
@@ -489,6 +510,9 @@ document.addEventListener('DOMContentLoaded', () => {
   }
   if (document.getElementById('home-sightings-rows')) {
     initHomeStrip();
+  }
+  if (document.getElementById('home-otd')) {
+    loadOnThisDay();
   }
 });
 
