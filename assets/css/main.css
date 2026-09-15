@@ -674,11 +674,13 @@ body.nav-open { overflow: hidden; }
    Events page — list and pagination
    ---------------------------------------------------------------------- */
 .events-empty { color: var(--text-muted); padding: 40px 0; text-align: center; }
-/* Design puts these cards in a grid (auto-fit minmax(260px,1fr), 14px gap);
-   320px here so the expanded detail panel has room to breathe. */
+/* Design puts these cards in a grid (minmax(260px,1fr), 14px gap); 320px
+   here so the expanded detail panel has room. auto-fill rather than
+   auto-fit: with a single event auto-fit collapses the empty tracks and
+   stretches that one card across the full container. */
 .events-list {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
   gap: 14px;
   align-items: start;
 }
