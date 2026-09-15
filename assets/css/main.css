@@ -1290,7 +1290,16 @@ body.lightbox-open { overflow: hidden; }
   padding-bottom: 48px;
 }
 
-.footer-logo { display: flex; align-items: center; gap: 10px; margin-bottom: 16px; }
+.footer-logo { display: inline-flex; align-items: center; gap: 10px; margin-bottom: 16px; }
+/* White chip behind the artwork — the logo's dark elements would otherwise
+   vanish against the dark footer. Matches the design. */
+.footer-logo-img {
+  height: 52px;
+  width: auto;
+  background: #fff;
+  padding: 8px 12px;
+  border-radius: 10px;
+}
 .footer-logo .logo-name { color: #fff; font-size: 16px; }
 .footer-tagline { font-size: 14px; opacity: 0.75; line-height: 1.7; margin-bottom: 20px; max-width: 320px; }
 

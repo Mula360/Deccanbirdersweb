@@ -3,8 +3,20 @@
 
     <div class="footer-col footer-about">
       <a href="<?php echo esc_url(home_url('/')); ?>" class="footer-logo" aria-label="Deccan Birders home">
-        <span class="logo-mark logo-mark--sm" aria-hidden="true">DB</span>
-        <span class="logo-name">Deccan Birders</span>
+        <?php
+        // Same artwork as the header. The design sets it on a white rounded
+        // chip because the logo has dark elements that would disappear
+        // against the dark footer.
+        $f_logo_id  = get_theme_mod('custom_logo');
+        $f_logo_src = $f_logo_id ? wp_get_attachment_image_src($f_logo_id, 'full') : null;
+        if ($f_logo_src):
+        ?>
+          <img class="footer-logo-img" src="<?php echo esc_url($f_logo_src[0]); ?>" alt="Deccan Birders"
+               width="<?php echo (int) $f_logo_src[1]; ?>" height="<?php echo (int) $f_logo_src[2]; ?>">
+        <?php else: ?>
+          <span class="logo-mark logo-mark--sm" aria-hidden="true">DB</span>
+          <span class="logo-name">Deccan Birders</span>
+        <?php endif; ?>
       </a>
       <p class="footer-tagline"><?php echo esc_html(get_field('footer_tagline','option') ?: 'Since 1980, documenting the birds of the Deccan Plateau through field trips, citizen science, and the monthly PITTA bulletin.'); ?></p>
       <div class="footer-social">
