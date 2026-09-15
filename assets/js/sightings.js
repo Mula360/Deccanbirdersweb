@@ -103,17 +103,30 @@ function emptyState(msg) {
 }
 
 /* -------------------------------------------------------------------------
- * Core fetch — shared AbortController cancels the previous in-flight
- * request; an aborted call resolves to null so callers can no-op instead
- * of overwriting the UI with an empty state.
+ * Core fetch. By default (standalone=false) this shares one AbortController
+ * with the main tab-switching area (notable/recent/hotspots), so clicking a
+ * new tab cancels a still-in-flight fetch for the tab you just left — that's
+ * the only place cancel-the-previous-one is actually wanted. Every other
+ * caller (on-this-day, the species-lookup index, a hotspot's species list,
+ * the homepage strip) passes standalone=true so it gets its own controller
+ * and can't cancel — or be cancelled by — an unrelated fetch. These used to
+ * all share the one controller, which meant loadOnThisDay() running right
+ * after loadTab('notable') on page load would immediately abort the
+ * Notable tab's request before it could ever resolve.
  * ---------------------------------------------------------------------- */
 
-async function fetchTab(tab, extra = {}) {
-  if (controller) controller.abort();
-  controller = new AbortController();
+async function fetchTab(tab, extra = {}, standalone = false) {
+  let signal;
+  if (standalone) {
+    signal = new AbortController().signal;
+  } else {
+    if (controller) controller.abort();
+    controller = new AbortController();
+    signal = controller.signal;
+  }
   const params = new URLSearchParams({ region, tab, ...extra });
   try {
-    const res  = await fetch(`${API}/sightings?${params}`, { signal: controller.signal });
+    const res  = await fetch(`${API}/sightings?${params}`, { signal });
     const json = await res.json();
     if (json.error) {
       console.error('Sightings API error:', json.message);
@@ -228,7 +241,7 @@ async function toggleHotspot(row) {
   }
 
   panel.innerHTML = '<span class="hotspot-loading">Loading species…</span>';
-  const species = await fetchTab('hotspot_species', { locId });
+  const species = await fetchTab('hotspot_species', { locId }, true);
 
   if (species === null) return; // aborted — leave whatever is showing
 
@@ -248,7 +261,7 @@ let lookupInitialized = false;
 
 async function ensureLookupIndex() {
   if (lookupIndex) return lookupIndex;
-  const [notable, recent] = await Promise.all([fetchTab('notable'), fetchTab('recent')]);
+  const [notable, recent] = await Promise.all([fetchTab('notable', {}, true), fetchTab('recent', {}, true)]);
   const all = [...(notable || []), ...(recent || [])];
 
   lookupIndex = new Map();
@@ -433,7 +446,7 @@ async function loadOnThisDay() {
   const m = String(now.getMonth() + 1).padStart(2, '0');
   const d = String(now.getDate()).padStart(2, '0');
   showSkeleton('sightings-otd', 3);
-  const data = await fetchTab('onthisday', { m, d });
+  const data = await fetchTab('onthisday', { m, d }, true);
   renderOnThisDay(data);
 }
 
@@ -444,7 +457,7 @@ async function loadOnThisDay() {
 async function initHomeStrip() {
   const strip = document.getElementById('home-sightings-rows');
   if (!strip) return;
-  const data = await fetchTab('recent');
+  const data = await fetchTab('recent', {}, true);
   if (!data) { strip.innerHTML = '<p class="strip-error">Could not load sightings.</p>'; return; }
   strip.innerHTML = data.slice(0, 4).map(renderSightingRow).join('');
   // Auto-refresh every 15 minutes
