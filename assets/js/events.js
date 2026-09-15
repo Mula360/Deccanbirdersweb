@@ -38,6 +38,26 @@ function formatDate(dateStr) {
   };
 }
 
+// Calendar event titles come in as "Deccan Birders | 28-SEP-2026 | 0600 | Keesara" —
+// pull just the location out and present it as a readable field trip name.
+function cleanTitle(t) {
+  const m = String(t || '').match(/Deccan Birders\s*\|\s*[\d\-A-Z]+\s*\|\s*\d+\s*\|\s*(.+)/i);
+  return m ? 'Field Trip — ' + m[1].trim() : t;
+}
+
+// The calendar's note field is raw HTML (mail-merge style). keepBreaks
+// preserves paragraph breaks as \n for the expanded view; otherwise
+// everything collapses to a single line.
+function stripHtml(h, keepBreaks) {
+  let s = h || '';
+  if (keepBreaks) {
+    s = s.replace(/<\/(p|div|li)>/gi, '\n').replace(/<br\s*\/?>/gi, '\n');
+  }
+  s = s.replace(/<[^>]*>/g, ' ').replace(/[ \t]+/g, ' ');
+  s = keepBreaks ? s.replace(/ *\n */g, '\n').replace(/\n{3,}/g, '\n\n').trim() : s.replace(/\s+/g, ' ').trim();
+  return s;
+}
+
 /* -------------------------------------------------------------------------
  * Homepage strip
  * ---------------------------------------------------------------------- */
