@@ -197,9 +197,9 @@ function renderCard(kind, data, index) {
         <button type="button" class="event-toggle" aria-expanded="false" aria-controls="panel-${id}">
           <span class="event-toggle-more">More details</span>
           <span class="event-toggle-less">Hide details</span>
-        </button>
-        <div class="event-details" id="panel-${id}" hidden>${details}</div>` : ''}
+        </button>` : ''}
     </div>
+    ${hasDetails ? `<div class="event-details" id="panel-${id}" hidden>${details}</div>` : ''}
   </article>`;
 }
 

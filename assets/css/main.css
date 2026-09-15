@@ -356,6 +356,7 @@ body.nav-open { overflow: hidden; }
   border-radius: 16px;
   padding: 24px;
   display: flex;
+  flex-wrap: wrap;
   gap: 18px;
   align-items: flex-start;
   transition: border-color 150ms;
@@ -400,6 +401,7 @@ body.nav-open { overflow: hidden; }
   color: var(--ink);
 }
 .event-meta { margin-top: 8px; font-size: 15px; line-height: 1.5; color: var(--text-muted); }
+.event-meta + .event-meta { margin-top: 2px; }
 
 /* Compact stats on past events (species / turnout). */
 .event-chips { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
@@ -432,7 +434,8 @@ body.nav-open { overflow: hidden; }
 /* `display:grid` would otherwise beat the UA's [hidden]{display:none}. */
 .event-details[hidden] { display: none; }
 .event-details {
-  margin-top: 16px;
+  flex-basis: 100%;
+  margin-top: 2px;
   padding-top: 16px;
   border-top: 1px solid var(--border-light);
   display: grid;
@@ -441,7 +444,7 @@ body.nav-open { overflow: hidden; }
 .event-detail { display: flex; flex-wrap: wrap; gap: 8px; font-size: 15px; line-height: 1.5; color: var(--text-body); }
 .event-detail-label {
   flex-shrink: 0;
-  min-width: 130px;
+  min-width: 110px;
   font-family: var(--font-head);
   font-size: 12px;
   font-weight: 600;
@@ -671,7 +674,14 @@ body.nav-open { overflow: hidden; }
    Events page — list and pagination
    ---------------------------------------------------------------------- */
 .events-empty { color: var(--text-muted); padding: 40px 0; text-align: center; }
-.events-list { display: grid; gap: 14px; }
+/* Design puts these cards in a grid (auto-fit minmax(260px,1fr), 14px gap);
+   320px here so the expanded detail panel has room to breathe. */
+.events-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 14px;
+  align-items: start;
+}
 
 /* Pager — 10 events per page on each tab. */
 .events-pager {
