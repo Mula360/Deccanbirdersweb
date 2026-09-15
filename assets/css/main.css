@@ -135,8 +135,9 @@ button { font-family: inherit; }
 }
 /* Real logo artwork (bird + wordmark in one image). Height-constrained so
    the 1696x702 source scales to the header without distortion. */
-.logo-img { display: block; height: 42px; width: auto; max-width: 100%; }
-@media (max-width: 640px) { .logo-img { height: 34px; } }
+/* deccanbirders.org itself renders this artwork at 134x55; match that. */
+.logo-img { display: block; height: 55px; width: auto; max-width: 100%; }
+@media (max-width: 640px) { .logo-img { height: 42px; } }
 
 .logo-mark {
   display: inline-flex;
