@@ -1195,7 +1195,11 @@ body.lightbox-open { overflow: hidden; }
 /* -------------------------------------------------------------------------
    Contact page — card grid, stacked fields, photo-submit card
    ---------------------------------------------------------------------- */
+/* Self-contained (not combined with .section-boxed, whose later
+   `padding: 0 20px` would override the vertical padding below). */
 .contact-grid {
+  max-width: var(--max-w);
+  margin: 0 auto;
   padding: clamp(36px, 5vw, 56px) 20px clamp(60px, 8vw, 96px);
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));

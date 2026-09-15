@@ -26,7 +26,7 @@ while (have_posts()) : the_post();
   </div>
 </section>
 
-<section class="section-boxed contact-grid">
+<section class="contact-grid">
   <div class="contact-card">
     <h2 class="card-heading card-heading--lg">Send us a message</h2>
     <p class="card-intro">Questions about membership, trips or a bird you can't identify.</p>
