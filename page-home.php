@@ -21,10 +21,19 @@ while (have_posts()) : the_post();
   }
 ?>
 
-<section class="hero-dark">
-  <div class="hero-dark-inner">
-    <p class="eyebrow" style="color:var(--yellow);"><span style="display:inline-block;background:var(--yellow);color:var(--ink);padding:7px 18px;border-radius:999px;font-weight:600;font-size:13px;"><?php echo esc_html($hero_badge); ?></span></p>
-    <h1 style="font-family:var(--font-head);font-size:clamp(32px,5vw,56px);font-weight:700;margin:20px 0 16px;"><?php echo esc_html($hero_title); ?></h1>
+<?php
+  // Full-bleed photo hero (design): photograph behind a dark gradient scrim.
+  $hero_bg = get_field('hero_bg_image', $id);
+  $hero_bg_url = is_array($hero_bg) ? ($hero_bg['url'] ?? '') : (string) $hero_bg;
+?>
+<section class="hero-photo hero-photo--home">
+  <?php if ($hero_bg_url): ?>
+    <img class="hero-photo-bg" src="<?php echo esc_url($hero_bg_url); ?>" alt="" aria-hidden="true">
+  <?php endif; ?>
+  <div class="hero-photo-scrim hero-photo-scrim--home"></div>
+  <div class="hero-photo-inner">
+    <span class="hero-badge"><span class="hero-badge-dot" aria-hidden="true"></span><?php echo esc_html($hero_badge); ?></span>
+    <h1><?php echo esc_html($hero_title); ?></h1>
     <p><?php echo esc_html($hero_subtitle); ?></p>
     <div class="hero-buttons">
       <a href="/sightings" class="btn btn-primary">Explore sightings</a>

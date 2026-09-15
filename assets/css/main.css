@@ -162,6 +162,37 @@ button { font-family: inherit; }
   align-items: center;
   gap: 28px;
 }
+
+/* Dropdown submenus (e.g. Executive Committee under About). */
+.nav-list li { position: relative; }
+.nav-list .sub-menu {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  min-width: 220px;
+  padding: 8px 0;
+  margin-top: 6px;
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  box-shadow: 0 8px 24px rgba(22, 36, 29, 0.12);
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(-4px);
+  transition: opacity 150ms, transform 150ms, visibility 150ms;
+  z-index: 60;
+}
+.nav-list li:hover > .sub-menu,
+.nav-list li:focus-within > .sub-menu {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}
+.nav-list .sub-menu a { display: block; padding: 9px 18px; white-space: nowrap; }
+.nav-list .sub-menu a:hover { background: var(--surface); }
 .nav-list a {
   font-family: var(--font-head);
   font-weight: 600;
@@ -233,6 +264,9 @@ body.nav-open .mobile-nav { transform: translateX(0); }
   flex-direction: column;
   gap: 4px;
 }
+/* Mobile drawer: submenus stay expanded, just indented. */
+.mobile-nav-list .sub-menu { display: flex; flex-direction: column; gap: 4px; padding-left: 16px; }
+.mobile-nav-list .sub-menu a { font-size: 15px; color: var(--text-muted); }
 .mobile-nav-list a {
   display: block;
   font-family: var(--font-head);
@@ -1327,6 +1361,32 @@ body.lightbox-open { overflow: hidden; }
 }
 .hero-photo h1 { color: #fff; max-width: 20ch; }
 .hero-photo p { color: rgba(255, 255, 255, 0.86); max-width: 48ch; font-size: clamp(17px, 2.2vw, 20px); margin-top: 20px; }
+
+/* Home variant: taller, content anchored to the bottom of the photo. */
+.hero-photo--home { min-height: min(78vh, 660px); display: flex; align-items: flex-end; }
+.hero-photo--home .hero-photo-bg { opacity: 0.62; }
+.hero-photo-scrim--home {
+  background: linear-gradient(to top, rgba(10, 20, 15, 0.92) 0%, rgba(10, 20, 15, 0.55) 45%, rgba(10, 20, 15, 0.25) 100%);
+}
+.hero-photo--home .hero-photo-inner { padding: 80px 20px 56px; }
+.hero-photo--home h1 { font-family: var(--font-head); font-size: clamp(32px, 5vw, 56px); font-weight: 700; margin: 20px 0 16px; }
+
+.hero-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  padding: 7px 14px;
+  border-radius: 999px;
+  background: rgba(242, 183, 5, 0.16);
+  border: 1px solid rgba(242, 183, 5, 0.5);
+  color: var(--yellow);
+  font-family: var(--font-head);
+  font-size: 12.5px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+.hero-badge-dot { width: 7px; height: 7px; border-radius: 99px; background: var(--yellow); }
 
 .img-placeholder {
   background: var(--border-light);

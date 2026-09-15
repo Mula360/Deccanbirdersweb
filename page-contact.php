@@ -1,10 +1,18 @@
 <?php
 /**
  * Template for the Contact page — rendered directly in PHP (no Elementor).
+ *
+ * Matches the design: "Send us a message" form, phone/WhatsApp block,
+ * "Seen something unusual?" sighting report, and "Submit a photograph".
+ * (The volunteer form was removed — it isn't part of the design. Its AJAX
+ * handler stays registered in functions.php so it can be reinstated.)
  */
 get_header();
 while (have_posts()) : the_post();
   $phone = get_field('contact_phone', 'option') ?: '+91 97388 40070';
+  // wa.me needs digits only, no +, spaces or dashes.
+  $wa_raw = get_field('contact_whatsapp', 'option');
+  $wa = preg_replace('/\D+/', '', $wa_raw ?: $phone);
 ?>
 
 <section class="hero-light">
@@ -40,9 +48,12 @@ while (have_posts()) : the_post();
   </div>
   <div>
     <div class="contact-info-block">
-      <h3>Phone and WhatsApp</h3>
+      <h2 style="font-size:20px;margin-bottom:12px;">Phone and WhatsApp</h2>
       <span class="contact-info-label">Enquiries</span>
-      <p><?php echo esc_html($phone); ?></p>
+      <p><a href="tel:<?php echo esc_attr(preg_replace('/\s+/', '', $phone)); ?>"><?php echo esc_html($phone); ?></a></p>
+      <?php if ($wa): ?>
+        <p><a href="https://wa.me/<?php echo esc_attr($wa); ?>" target="_blank" rel="noopener" class="btn btn-secondary">Message us on WhatsApp</a></p>
+      <?php endif; ?>
       <span class="contact-info-label">Email</span>
       <p><a href="mailto:info@deccanbirders.org">info@deccanbirders.org</a></p>
     </div>
@@ -84,35 +95,6 @@ while (have_posts()) : the_post();
         <textarea id="sr-notes" name="notes" rows="3"></textarea>
       </div>
       <p class="field-error" id="sr-error-global"></p>
-      <button type="submit" class="btn btn-secondary">Submit</button>
-    </form>
-  </div>
-</section>
-
-<section class="section-surface" style="padding: 0 20px 80px;">
-  <div class="section-boxed">
-    <span class="eyebrow" style="color:var(--green);">Volunteer</span>
-    <h2>Put your hand up</h2>
-    <p>Help with the winter waterfowl census, field trip coordination, school outreach, or the PITTA newsletter.</p>
-    <form id="db-volunteer-form" class="submission-form" novalidate>
-      <div class="form-field">
-        <label for="vf-name">Name</label>
-        <input type="text" id="vf-name" name="name" required>
-        <span class="field-error" id="vf-error-name"></span>
-      </div>
-      <div class="form-field">
-        <label for="vf-email">Email</label>
-        <input type="email" id="vf-email" name="email" required>
-        <span class="field-error" id="vf-error-email"></span>
-      </div>
-      <div class="form-field">
-        <label>I'd like to help with</label>
-        <label class="form-checkbox"><input type="checkbox" name="help_with[]" value="Annual waterfowl census"> Annual waterfowl census</label>
-        <label class="form-checkbox"><input type="checkbox" name="help_with[]" value="Field trip coordination"> Field trip coordination</label>
-        <label class="form-checkbox"><input type="checkbox" name="help_with[]" value="School and college outreach"> School and college outreach</label>
-        <label class="form-checkbox"><input type="checkbox" name="help_with[]" value="PITTA newsletter"> PITTA newsletter</label>
-      </div>
-      <p class="field-error" id="vf-error-global"></p>
       <button type="submit" class="btn btn-secondary">Submit</button>
     </form>
   </div>
