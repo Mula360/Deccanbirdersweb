@@ -912,6 +912,23 @@ body.lightbox-open { overflow: hidden; }
 /* -------------------------------------------------------------------------
    PITTA accordion ([db_pitta_accordion])
    ---------------------------------------------------------------------- */
+/* PITTA section container (design: clamp(40px,5vw,64px) top,
+   clamp(60px,8vw,96px) bottom). */
+.pitta-section {
+  max-width: var(--max-w);
+  margin: 0 auto;
+  padding: clamp(40px, 5vw, 64px) 20px clamp(60px, 8vw, 96px);
+}
+.pitta-section-title {
+  margin: 0;
+  font-family: var(--font-head);
+  font-size: clamp(26px, 3.4vw, 38px);
+  letter-spacing: -0.03em;
+  font-weight: 700;
+  color: var(--ink);
+}
+.pitta-section-intro { margin: 12px 0 26px; font-size: 17px; color: var(--text-muted); max-width: 50ch; }
+
 .pitta-search-wrap { margin-bottom: 24px; }
 #pitta-search {
   width: 100%;
@@ -931,12 +948,13 @@ body.lightbox-open { overflow: hidden; }
 
 .pitta-year {
   border: 1px solid var(--border);
-  border-radius: var(--radius-sm);
+  border-radius: 14px;
   background: #fff;
   overflow: hidden;
 }
 .pitta-year-heading {
-  padding: 16px 20px;
+  padding: 20px 24px;
+  gap: 16px;
   cursor: pointer;
   font-family: var(--font-head);
   font-weight: 700;
@@ -948,11 +966,11 @@ body.lightbox-open { overflow: hidden; }
   gap: 10px;
 }
 .pitta-year-heading::-webkit-details-marker { display: none; }
-.pitta-year-number { font-size: clamp(20px, 3vw, 24px); font-weight: 700; letter-spacing: -0.03em; }
+.pitta-year-number { font-size: clamp(22px, 3vw, 28px); font-weight: 700; letter-spacing: -0.03em; color: var(--ink); }
 .pitta-year-heading::after {
   content: '+';
   margin-left: auto;
-  font-size: 20px;
+  font-size: 22px;
   color: var(--blue);
   transition: transform 150ms;
 }
@@ -968,8 +986,8 @@ body.lightbox-open { overflow: hidden; }
 }
 
 .pitta-month-grid {
-  border-top: 1px solid var(--border);
-  padding: 18px 20px 20px;
+  border-top: 1px solid var(--border-light);
+  padding: 18px 24px 24px;
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(104px, 1fr));
   gap: 10px;
@@ -997,7 +1015,7 @@ body.lightbox-open { overflow: hidden; }
   transition: background 150ms, color 150ms;
 }
 .pitta-month-link:hover { background: var(--green-dark); color: #fff; }
-.pitta-month-empty { display: block; padding: 8px 12px; color: var(--text-muted); font-size: 13.5px; }
+.pitta-month-empty { display: block; padding: 8px 12px; color: #6B857A; font-size: 13.5px; }
 
 /* -------------------------------------------------------------------------
    Membership application options + benefits ([db_membership_tiers])
@@ -1472,9 +1490,15 @@ body.lightbox-open { overflow: hidden; }
 /* -------------------------------------------------------------------------
    Archives — Library documents section
    ---------------------------------------------------------------------- */
+/* Shared banner-image container (design: padding 32px 20px 0). */
+.page-banner { max-width: var(--max-w); margin: 0 auto; padding: 32px 20px 0; }
+
 .library-columns {
+  max-width: var(--max-w);
+  margin: 0 auto;
+  padding: clamp(44px, 6vw, 72px) 20px 0;
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
   gap: 20px;
 }
 .library-col {
@@ -1483,10 +1507,25 @@ body.lightbox-open { overflow: hidden; }
   border-radius: var(--radius-card);
   padding: 28px;
 }
-.library-col h3 { font-family: var(--font-head); font-weight: 600; font-size: 20px; letter-spacing: -0.02em; color: var(--ink); margin-bottom: 16px; }
-.library-col ul { display: flex; flex-direction: column; gap: 12px; }
-.library-col li { font-size: 16.5px; line-height: 1.5; color: var(--text-body); list-style: none; }
-.library-col li a { display: block; padding-bottom: 12px; border-bottom: 1px solid var(--border-light); }
+.library-col-title {
+  margin: 0 0 16px;
+  font-family: var(--font-head);
+  font-size: 20px;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  color: var(--ink);
+}
+/* Single standalone document link, underlined by a hairline rule. */
+.library-doc {
+  display: block;
+  font-size: 17px;
+  line-height: 1.5;
+  border-bottom: 1px solid var(--border-light);
+  padding-bottom: 12px;
+}
+/* Publication rows are prose with an inline link — no block/border. */
+.library-pubs { display: grid; gap: 12px; }
+.library-pubs > div { font-size: 16.5px; line-height: 1.5; color: var(--text-body); }
 .library-col a { color: var(--blue); }
 
 /* -------------------------------------------------------------------------
@@ -1683,9 +1722,7 @@ body.lightbox-open { overflow: hidden; }
     gap: 12px;
   }
   .milestone-item::before { left: 86px; }
-  .pitta-month-grid { grid-template-columns: repeat(3, 1fr); }
   .activity-preview-grid { grid-template-columns: 1fr 1fr; }
-  .library-columns { grid-template-columns: 1fr; gap: 24px; }
   .stats-bar { grid-template-columns: repeat(2, 1fr); }
   .two-col-60-40, .two-col-50-50 { grid-template-columns: 1fr; }
 }

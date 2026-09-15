@@ -15,7 +15,7 @@ while (have_posts()) : the_post();
 
 <section class="section-white" style="padding: 0 20px 40px;">
   <div class="section-boxed">
-    <?php db_hero_image('aims_hero_image', get_the_ID(), 'Deccan Birders members in the field'); ?>
+    <?php db_hero_image('aims_hero_image', get_the_ID(), 'Deccan Birders members in the field', 'clamp(200px, 34vw, 400px)'); ?>
   </div>
 </section>
 

@@ -28,7 +28,7 @@ while (have_posts()) : the_post();
 
 <section class="section-white" style="padding: 0 20px 40px;">
   <div class="section-boxed">
-    <?php db_hero_image('about_hero_image', $id, 'A bird photographed by a Deccan Birders member'); ?>
+    <?php db_hero_image('about_hero_image', $id, 'A bird photographed by a Deccan Birders member', 'clamp(220px, 38vw, 440px)'); ?>
   </div>
 </section>
 
