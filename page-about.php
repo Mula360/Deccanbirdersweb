@@ -54,10 +54,7 @@ while (have_posts()) : the_post();
   </div>
 </section>
 
-<section class="join-band">
-  <p>Join 500+ birders across the Deccan Plateau</p>
-  <a href="/membership" class="btn btn-secondary">Become a member →</a>
-</section>
+<?php get_template_part('template-parts/join-band'); ?>
 
 <?php endwhile;
 get_footer();

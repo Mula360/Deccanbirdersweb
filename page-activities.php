@@ -63,5 +63,7 @@ while (have_posts()) : the_post();
   <?php endforeach; ?>
 </div>
 
+<?php get_template_part('template-parts/join-band'); ?>
+
 <?php endwhile;
 get_footer();

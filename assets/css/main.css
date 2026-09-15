@@ -1544,8 +1544,47 @@ body.lightbox-open { overflow: hidden; }
 .stats-bar .stat-number { font-family: var(--font-head); font-weight: 700; font-size: 40px; color: var(--ink); }
 .stats-bar .stat-label { color: var(--text-muted); font-size: 14px; margin-top: 6px; }
 
-.join-band { background: var(--ink); text-align: center; padding: 60px 20px; }
-.join-band p { color: #fff; font-family: var(--font-head); font-weight: 700; font-size: 26px; margin-bottom: 20px; }
+/* Membership call-to-action band: light blue, text left, button right. */
+.join-band { background: var(--blue-light); border-top: 1px solid var(--border); }
+.join-band-inner {
+  max-width: var(--max-w);
+  margin: 0 auto;
+  padding: clamp(48px, 7vw, 84px) 20px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 28px;
+  align-items: center;
+  justify-content: space-between;
+}
+.join-band-title {
+  margin: 0;
+  font-family: var(--font-head);
+  font-size: clamp(28px, 4vw, 44px);
+  line-height: 1.08;
+  letter-spacing: -0.03em;
+  font-weight: 700;
+  color: var(--ink);
+}
+.join-band-text {
+  margin: 12px 0 0;
+  font-size: clamp(17px, 2vw, 19px);
+  line-height: 1.5;
+  color: var(--text-body);
+  max-width: 44ch;
+}
+.join-band-btn {
+  flex-shrink: 0;
+  padding: 16px 30px;
+  background: var(--green-dark);
+  color: #fff;
+  border-radius: var(--radius-btn);
+  font-family: var(--font-head);
+  font-size: 16.5px;
+  font-weight: 600;
+  text-decoration: none;
+  transition: background 150ms;
+}
+.join-band-btn:hover { background: var(--ink); color: #fff; }
 
 /* Dark hero with a photograph bleeding through behind it (Membership). */
 .hero-photo { position: relative; overflow: hidden; background: var(--ink); }

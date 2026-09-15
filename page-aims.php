@@ -25,5 +25,7 @@ while (have_posts()) : the_post();
   </div>
 </section>
 
+<?php get_template_part('template-parts/join-band'); ?>
+
 <?php endwhile;
 get_footer();
