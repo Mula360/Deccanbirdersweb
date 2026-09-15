@@ -429,6 +429,8 @@ body.nav-open { overflow: hidden; }
 .event-card.is-open .event-toggle-more { display: none; }
 .event-card.is-open .event-toggle-less { display: inline; }
 
+/* `display:grid` would otherwise beat the UA's [hidden]{display:none}. */
+.event-details[hidden] { display: none; }
 .event-details {
   margin-top: 16px;
   padding-top: 16px;
