@@ -2069,7 +2069,9 @@ body.lightbox-open { overflow: hidden; }
 }
 .text-link--block { display: inline-block; margin-top: 22px; }
 
-.events-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 14px; }
+/* auto-fill, not auto-fit: with a single upcoming trip auto-fit collapses
+   the empty tracks and stretches that one card across the container. */
+.events-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 14px; }
 
 /* Activities: text column beside a grid of small cards. */
 .home-split {
