@@ -3,6 +3,31 @@
     "title": "Membership Page",
     "fields": [
         {
+            "key": "field_membership_hero_image",
+            "label": "Hero Image",
+            "name": "membership_hero_image",
+            "aria-label": "",
+            "type": "image",
+            "instructions": "Wide banner photo shown under the page heading.",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "",
+                "class": "",
+                "id": ""
+            },
+            "return_format": "array",
+            "preview_size": "large",
+            "library": "all",
+            "min_width": "",
+            "min_height": "",
+            "min_size": "",
+            "max_width": "",
+            "max_height": "",
+            "max_size": "",
+            "mime_types": ""
+        },
+        {
             "key": "field_membership_membership_intro",
             "label": "Membership Intro",
             "name": "membership_intro",
@@ -98,14 +123,30 @@
                 }
             ],
             "default_value": [
-                { "benefit_text": "Membership Card" },
-                { "benefit_text": "PITTA, the Society's monthly bulletin" },
-                { "benefit_text": "Regular birdwatching field trips" },
-                { "benefit_text": "Lectures, discussions, talks" },
-                { "benefit_text": "Annual nature camps and trekking" },
-                { "benefit_text": "National conservation projects like Asian Waterfowl Census, Salim Ali Bird Count, BirdLife International World Birdwatch" },
-                { "benefit_text": "Visits to bird sanctuaries and parks" },
-                { "benefit_text": "Nature photography opportunities" }
+                {
+                    "benefit_text": "Membership Card"
+                },
+                {
+                    "benefit_text": "PITTA, the Society's monthly bulletin"
+                },
+                {
+                    "benefit_text": "Regular birdwatching field trips"
+                },
+                {
+                    "benefit_text": "Lectures, discussions, talks"
+                },
+                {
+                    "benefit_text": "Annual nature camps and trekking"
+                },
+                {
+                    "benefit_text": "National conservation projects like Asian Waterfowl Census, Salim Ali Bird Count, BirdLife International World Birdwatch"
+                },
+                {
+                    "benefit_text": "Visits to bird sanctuaries and parks"
+                },
+                {
+                    "benefit_text": "Nature photography opportunities"
+                }
             ]
         },
         {

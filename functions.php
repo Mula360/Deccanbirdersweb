@@ -262,6 +262,33 @@ function db_sc_aims($atts) {
 }
 
 /* -----------------------------------------------------------------------
+ * 8a. Template helpers
+ * ---------------------------------------------------------------------*/
+
+/**
+ * Renders the wide banner image that sits under the page heading on most
+ * inner pages in the design. Falls back to the styled "Photo coming soon"
+ * placeholder when the ACF image field is empty (the media library is
+ * currently empty, so that's the normal case for now).
+ */
+function db_hero_image($field, $post_id, $fallback_alt = '', $ratio = '16/6') {
+  $img = $post_id ? get_field($field, $post_id) : null;
+  if (!empty($img['url'])) {
+    printf(
+      '<img src="%s" alt="%s" style="width:100%%;aspect-ratio:%s;object-fit:cover;border-radius:var(--radius-card);">',
+      esc_url($img['url']),
+      esc_attr($img['alt'] ?: $fallback_alt),
+      esc_attr($ratio)
+    );
+    return;
+  }
+  printf(
+    '<div class="img-placeholder" aria-label="Photo coming soon" style="aspect-ratio:%s;"><span>Photo coming soon</span></div>',
+    esc_attr($ratio)
+  );
+}
+
+/* -----------------------------------------------------------------------
  * 8b. Same-origin proxy for the deccan-birders-api Vercel endpoints
  *
  * The Vercel API's CORS config only allows the eventual production domain

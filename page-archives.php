@@ -13,6 +13,12 @@ while (have_posts()) : the_post();
   </div>
 </section>
 
+<section class="section-white" style="padding: 0 20px 40px;">
+  <div class="section-boxed">
+    <?php db_hero_image('archives_hero_image', get_the_ID(), 'Indian Roller photographed by a Deccan Birders member'); ?>
+  </div>
+</section>
+
 <section class="section-white" style="padding: 0 20px 60px;">
   <div class="section-boxed">
     <div class="library-columns">

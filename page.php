@@ -8,7 +8,7 @@
 global $post;
 $slug = $post ? $post->post_name : '';
 
-$known_templates = ['about', 'aims', 'activities', 'sightings', 'events', 'gallery', 'archives', 'membership', 'contact'];
+$known_templates = ['about', 'committee', 'aims', 'activities', 'sightings', 'events', 'gallery', 'archives', 'membership', 'contact'];
 
 if (in_array($slug, $known_templates, true) && locate_template('page-' . $slug . '.php')) {
   get_template_part('page-' . $slug);

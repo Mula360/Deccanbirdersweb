@@ -1,0 +1,50 @@
+{
+    "key": "group_committee_fields",
+    "title": "Committee Page",
+    "fields": [
+        {
+            "key": "field_committee_hero_image",
+            "label": "Hero Image",
+            "name": "committee_hero_image",
+            "aria-label": "",
+            "type": "image",
+            "instructions": "Wide banner photo shown under the page heading.",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "",
+                "class": "",
+                "id": ""
+            },
+            "return_format": "array",
+            "preview_size": "large",
+            "library": "all",
+            "min_width": "",
+            "min_height": "",
+            "min_size": "",
+            "max_width": "",
+            "max_height": "",
+            "max_size": "",
+            "mime_types": ""
+        }
+    ],
+    "location": [
+        [
+            {
+                "param": "page",
+                "operator": "==",
+                "value": "159"
+            }
+        ]
+    ],
+    "menu_order": 0,
+    "position": "normal",
+    "style": "default",
+    "label_placement": "top",
+    "instruction_placement": "label",
+    "hide_on_screen": "",
+    "active": true,
+    "description": "Committee page (\"committee\" slug, post 159). Member data itself lives in the About page's committee_members repeater.",
+    "show_in_rest": 0,
+    "modified": 1789430000
+}

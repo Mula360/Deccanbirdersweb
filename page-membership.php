@@ -6,16 +6,20 @@ get_header();
 while (have_posts()) : the_post();
 ?>
 
-<section class="hero-light">
-  <div class="hero-light-inner">
-    <span class="eyebrow" style="color:var(--blue);">Membership</span>
+<?php
+  // Design uses a dark hero with a photo bleeding through behind it.
+  $hero = get_field('membership_hero_image', get_the_ID());
+  $hero_url = !empty($hero['url']) ? $hero['url'] : '';
+?>
+<section class="hero-photo">
+  <?php if ($hero_url): ?>
+    <img class="hero-photo-bg" src="<?php echo esc_url($hero_url); ?>" alt="" aria-hidden="true">
+  <?php endif; ?>
+  <div class="hero-photo-scrim"></div>
+  <div class="hero-photo-inner">
+    <span class="eyebrow" style="color:var(--yellow);">Membership</span>
     <h1>Join 500+ members</h1>
-  </div>
-</section>
-
-<section class="section-white" style="padding: 0 20px 40px;">
-  <div class="section-boxed">
-    <p style="text-align:center;">Stay in the loop with everything you need to know about bird watching.</p>
+    <p>Stay in the loop with everything you need to know about bird watching.</p>
   </div>
 </section>
 

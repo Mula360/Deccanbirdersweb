@@ -3,6 +3,31 @@
     "title": "Aims Page",
     "fields": [
         {
+            "key": "field_aims_hero_image",
+            "label": "Hero Image",
+            "name": "aims_hero_image",
+            "aria-label": "",
+            "type": "image",
+            "instructions": "Wide banner photo shown under the page heading.",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "",
+                "class": "",
+                "id": ""
+            },
+            "return_format": "array",
+            "preview_size": "large",
+            "library": "all",
+            "min_width": "",
+            "min_height": "",
+            "min_size": "",
+            "max_width": "",
+            "max_height": "",
+            "max_size": "",
+            "mime_types": ""
+        },
+        {
             "key": "field_aims_aims",
             "label": "Aims",
             "name": "aims",
@@ -44,14 +69,30 @@
                 }
             ],
             "default_value": [
-                { "aim_text": "To inculcate in the people, especially the youth a spirit of adventure, a love and appreciation of the beauties of nature, especially the avifauna." },
-                { "aim_text": "To impress upon the people the role of avifauna in life on earth and the urgent need for their protection and conservation." },
-                { "aim_text": "To inculcate in the people a sense of responsibility towards maintaining the environment in a good state and the protection of the other inhabitants of this earth and particularly the avifauna." },
-                { "aim_text": "To work for the protection and conservation of bird sanctuaries, parks and habitats generally all over India and particularly in Telangana and Andhra Pradesh." },
-                { "aim_text": "To promote amongst the people, the knowledge of ornithology in all its branches including particularly the study of bird life of the Oriental Regions, particularly India and the adjoining zoo-geographical regions; both alive and otherwise." },
-                { "aim_text": "To carry out research in all branches of ornithology and to assist with information and advice as well as financially where possible, other institutions and individual in similar pursuits." },
-                { "aim_text": "To provide, equip, maintain and replenish a museum and other repositories for birds, both living and dead, which are suitable and necessary for the study of birds." },
-                { "aim_text": "To do all or any of the above mentioned acts solely or with another or others, for joint management or collaboration or affiliation or any other arrangements with societies or persons having similar or allied objects which may further or benefit the objects of this Society." }
+                {
+                    "aim_text": "To inculcate in the people, especially the youth a spirit of adventure, a love and appreciation of the beauties of nature, especially the avifauna."
+                },
+                {
+                    "aim_text": "To impress upon the people the role of avifauna in life on earth and the urgent need for their protection and conservation."
+                },
+                {
+                    "aim_text": "To inculcate in the people a sense of responsibility towards maintaining the environment in a good state and the protection of the other inhabitants of this earth and particularly the avifauna."
+                },
+                {
+                    "aim_text": "To work for the protection and conservation of bird sanctuaries, parks and habitats generally all over India and particularly in Telangana and Andhra Pradesh."
+                },
+                {
+                    "aim_text": "To promote amongst the people, the knowledge of ornithology in all its branches including particularly the study of bird life of the Oriental Regions, particularly India and the adjoining zoo-geographical regions; both alive and otherwise."
+                },
+                {
+                    "aim_text": "To carry out research in all branches of ornithology and to assist with information and advice as well as financially where possible, other institutions and individual in similar pursuits."
+                },
+                {
+                    "aim_text": "To provide, equip, maintain and replenish a museum and other repositories for birds, both living and dead, which are suitable and necessary for the study of birds."
+                },
+                {
+                    "aim_text": "To do all or any of the above mentioned acts solely or with another or others, for joint management or collaboration or affiliation or any other arrangements with societies or persons having similar or allied objects which may further or benefit the objects of this Society."
+                }
             ]
         }
     ],

@@ -13,6 +13,12 @@ while (have_posts()) : the_post();
   </div>
 </section>
 
+<section class="section-white" style="padding: 0 20px 40px;">
+  <div class="section-boxed">
+    <?php db_hero_image('aims_hero_image', get_the_ID(), 'Deccan Birders members in the field'); ?>
+  </div>
+</section>
+
 <section class="section-white" style="padding: 20px 20px 80px;">
   <div class="section-boxed">
     <?php echo do_shortcode('[db_aims]'); ?>

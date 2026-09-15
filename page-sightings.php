@@ -53,7 +53,7 @@ while (have_posts()) : the_post();
 
 <section class="section-white" style="padding: 40px 20px 80px;">
   <div class="section-boxed">
-    <h2 class="otd-heading">On this day — <span id="otd-date"></span></h2>
+    <h2 class="otd-heading">What Birders saw on this date in past years — <span id="otd-date"></span></h2>
     <div id="sightings-otd"></div>
     <script>
       var otdDateEl = document.getElementById('otd-date');
