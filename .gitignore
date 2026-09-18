@@ -1,2 +1,4 @@
 .DS_Store
 node_modules
+tools/pitta-index/.cache/
+tools/pitta-index/__pycache__/

@@ -53,7 +53,7 @@
             "aria-label": "",
             "type": "number",
             "instructions": "",
-            "required": 1,
+            "required": 0,
             "conditional_logic": 0,
             "wrapper": {
                 "width": "",
@@ -89,6 +89,46 @@
             "step": 1,
             "prepend": "",
             "append": ""
+        },
+        {
+            "aria-label": "",
+            "instructions": "\"Regular\", or \"Special - <name>\" for a special issue (e.g. \"Special - Talakona\").",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "",
+                "class": "",
+                "id": ""
+            },
+            "default_value": "Regular",
+            "placeholder": "",
+            "prepend": "",
+            "append": "",
+            "maxlength": "",
+            "key": "field_pitta_edition",
+            "label": "Edition",
+            "name": "edition",
+            "type": "text"
+        },
+        {
+            "aria-label": "",
+            "instructions": "Set by PITTA Archive → Sync from catalog; links this issue to its text in the search index. Leave as is.",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "",
+                "class": "",
+                "id": ""
+            },
+            "default_value": "",
+            "placeholder": "",
+            "prepend": "",
+            "append": "",
+            "maxlength": "",
+            "key": "field_pitta_catalog_key",
+            "label": "Catalog key",
+            "name": "catalog_key",
+            "type": "text"
         },
         {
             "key": "field_pitta_archive_url",
@@ -202,5 +242,5 @@
     "active": true,
     "description": "",
     "show_in_rest": 0,
-    "modified": 1789257600
+    "modified": 1789719900
 }

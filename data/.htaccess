@@ -1,0 +1,3 @@
+# Theme data files are read by PHP only; don't serve them directly
+# (the catalog's notes column holds editorial/Gmail references).
+Require all denied

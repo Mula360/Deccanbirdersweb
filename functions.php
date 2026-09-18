@@ -59,6 +59,10 @@ add_action('wp_enqueue_scripts', function() {
   if (is_page('gallery')) {
     wp_enqueue_script('db-videos', get_template_directory_uri() . '/assets/js/videos.js', [], $v, true);
   }
+  // PITTA search — load on archives page
+  if (is_page('archives')) {
+    wp_enqueue_script('db-pitta-search', get_template_directory_uri() . '/assets/js/pitta-search.js', [], $v, true);
+  }
 
   // Pass config to all JS
   wp_localize_script('db-main', 'DB_CONFIG', [
@@ -66,6 +70,7 @@ add_action('wp_enqueue_scripts', function() {
     'ajax_url' => admin_url('admin-ajax.php'),
     'nonce'    => wp_create_nonce('db_contact_nonce'),
     'region'   => 'IN',
+    'rest_url' => esc_url_raw(rest_url('db/v1/')),
   ]);
 });
 
@@ -486,6 +491,386 @@ add_action('rest_api_init', function() {
 });
 
 /* -----------------------------------------------------------------------
+ * 8b. PITTA archive — catalog sync + full-text search
+ *
+ * data/pitta-catalog.csv lists every edition (year, month, edition, Drive
+ * file id). tools/pitta-index/build_index.py turns those PDFs into
+ * data/pitta-index.json (per-page text). "PITTA Archive → Sync from
+ * catalog" mirrors the catalog into db_pitta posts, and
+ * /wp-json/db/v1/pitta-search searches the index, returning only editions
+ * that have a published post. Both sides key editions by
+ * db_pitta_catalog_key(), which must match catalog_key() in the script.
+ * ---------------------------------------------------------------------*/
+function db_pitta_catalog_key($year, $month, $edition) {
+  $slug = trim(preg_replace('/[^a-z0-9]+/', '-', strtolower(remove_accents($edition))), '-');
+  return sprintf('%d-%02d-%s', (int) $year, (int) $month, $slug);
+}
+
+/** Month names for 1–12 (index 0 unused). */
+function db_pitta_months() {
+  return ['', 'January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+}
+
+/** "Special - Talakona" → "Talakona"; Regular (or empty) → ''. */
+function db_pitta_special_name($edition) {
+  $edition = trim((string) $edition);
+  if ($edition === '' || strcasecmp($edition, 'Regular') === 0) return '';
+  return preg_replace('/^special\s*[-–—:]\s*/i', '', $edition);
+}
+
+function db_pitta_title($year, $month, $edition) {
+  $when = db_pitta_months()[(int) $month] . ' ' . $year;
+  $special = db_pitta_special_name($edition);
+  return $special === '' ? "PITTA — $when" : "PITTA Special: $special — $when";
+}
+
+/** Catalog rows as assoc arrays, each with its 'key'. */
+function db_pitta_catalog() {
+  $path = get_template_directory() . '/data/pitta-catalog.csv';
+  if (!is_readable($path)) return [];
+  $fh = fopen($path, 'r');
+  $head = fgetcsv($fh, 0, ',', '"', '');
+  $rows = [];
+  while (($cols = fgetcsv($fh, 0, ',', '"', '')) !== false) {
+    if (count($cols) !== count($head)) continue;
+    $row = array_combine($head, array_map('trim', $cols));
+    $row['key'] = db_pitta_catalog_key($row['year'], $row['month'], $row['edition']);
+    $rows[] = $row;
+  }
+  fclose($fh);
+  return $rows;
+}
+
+/**
+ * Work out what a sync would do. Returns lists of [row, post_id|null]
+ * for create/update, rows to skip with a reason, and posts to trash
+ * (issues with no catalog_key — the old hand-made/sample entries).
+ */
+function db_pitta_sync_plan() {
+  $existing = [];
+  $legacy = [];
+  foreach (get_posts(['post_type' => 'db_pitta', 'post_status' => ['publish', 'draft', 'pending', 'private'], 'posts_per_page' => -1]) as $p) {
+    $key = get_post_meta($p->ID, 'catalog_key', true);
+    if ($key) $existing[$key] = $p->ID; else $legacy[] = $p;
+  }
+  $plan = ['create' => [], 'update' => [], 'skip' => [], 'trash' => $legacy];
+  foreach (db_pitta_catalog() as $row) {
+    $month = (int) $row['month'];
+    if (strtoupper($row['status']) !== 'IN DRIVE' || $row['drive_id'] === '') {
+      $plan['skip'][] = [$row, 'Missing — no file yet'];
+    } elseif ($month < 1 || $month > 12) {
+      $plan['skip'][] = [$row, 'No month — date it in the catalog first'];
+    } elseif (isset($existing[$row['key']])) {
+      $plan['update'][] = [$row, $existing[$row['key']]];
+    } else {
+      $plan['create'][] = [$row, null];
+    }
+  }
+  return $plan;
+}
+
+function db_pitta_apply_row(array $row, $post_id) {
+  $post = [
+    'post_type'   => 'db_pitta',
+    'post_title'  => db_pitta_title($row['year'], $row['month'], $row['edition']),
+    'post_status' => 'publish',
+  ];
+  if ($post_id) {
+    $post['ID'] = $post_id;
+    wp_update_post($post);
+  } else {
+    $post_id = wp_insert_post($post);
+  }
+  $fields = [
+    'field_pitta_year'        => (int) $row['year'],
+    'field_pitta_month'       => (int) $row['month'],
+    'field_pitta_edition'     => $row['edition'],
+    'field_pitta_catalog_key' => $row['key'],
+    'field_pitta_archive_url' => 'https://drive.google.com/file/d/' . $row['drive_id'] . '/view',
+    'field_pitta_url_type'    => 'google_drive',
+    'field_pitta_is_part'     => 0,
+  ];
+  foreach ($fields as $field_key => $value) {
+    update_field($field_key, $value, $post_id);
+  }
+  return $post_id;
+}
+
+add_action('admin_menu', function() {
+  add_submenu_page('edit.php?post_type=db_pitta', 'Sync PITTA from catalog', 'Sync from catalog', 'manage_options', 'db-pitta-sync', 'db_pitta_sync_page');
+});
+
+function db_pitta_sync_page() {
+  if (!current_user_can('manage_options')) return;
+  if (!function_exists('update_field')) {
+    echo '<div class="wrap"><h1>Sync PITTA from catalog</h1><p>Advanced Custom Fields must be active.</p></div>';
+    return;
+  }
+
+  $done = null;
+  if (isset($_POST['db_pitta_sync']) && check_admin_referer('db_pitta_sync')) {
+    $plan = db_pitta_sync_plan();
+    foreach (array_merge($plan['create'], $plan['update']) as [$row, $post_id]) db_pitta_apply_row($row, $post_id);
+    foreach ($plan['trash'] as $p) wp_trash_post($p->ID);
+    db_pitta_bump_rev();
+    $done = [count($plan['create']), count($plan['update']), count($plan['trash'])];
+  }
+
+  $plan = db_pitta_sync_plan();
+  $index = db_pitta_index();
+  $row_label = function($row) {
+    return esc_html(trim($row['year'] . ' ' . (db_pitta_months()[(int) $row['month']] ?? '') . ' · ' . $row['edition']));
+  };
+  ?>
+  <div class="wrap">
+    <h1>Sync PITTA from catalog</h1>
+    <?php if ($done): ?>
+      <div class="notice notice-success"><p><?php printf('Done: %d created, %d updated, %d moved to Trash.', $done[0], $done[1], $done[2]); ?></p></div>
+    <?php endif; ?>
+    <p>Mirrors <code>data/pitta-catalog.csv</code> (shipped with the theme) into PITTA issues. Safe to run again — issues are matched by their catalog key, so a second run only updates them.</p>
+    <p>Search index: <?php echo $index ? esc_html(count($index['issues']) . ' editions, built ' . ($index['generated'] ?? '?')) : '<strong>not found</strong> — run tools/pitta-index/build_index.py and deploy data/pitta-index.json'; ?></p>
+
+    <h2><?php echo count($plan['create']); ?> to create · <?php echo count($plan['update']); ?> to update</h2>
+    <?php
+    $unindexed = array_filter(array_merge($plan['create'], $plan['update']), fn($x) => !isset($index['issues'][$x[0]['key']]));
+    if ($index && $unindexed): ?>
+      <p><strong><?php echo count($unindexed); ?> will not be searchable yet</strong> (no text in the index): <?php echo implode(', ', array_map(fn($x) => $row_label($x[0]), $unindexed)); ?></p>
+    <?php endif; ?>
+
+    <?php if ($plan['trash']): ?>
+      <h2><?php echo count($plan['trash']); ?> to move to Trash</h2>
+      <p>Issues not created from the catalog (e.g. the original sample issues):</p>
+      <ul style="list-style:disc;margin-left:20px;">
+        <?php foreach ($plan['trash'] as $p): ?><li><?php echo esc_html($p->post_title); ?></li><?php endforeach; ?>
+      </ul>
+    <?php endif; ?>
+
+    <?php if ($plan['skip']): ?>
+      <h2><?php echo count($plan['skip']); ?> skipped</h2>
+      <ul style="list-style:disc;margin-left:20px;">
+        <?php foreach ($plan['skip'] as [$row, $why]): ?><li><?php echo $row_label($row) . ' — ' . esc_html($why); ?></li><?php endforeach; ?>
+      </ul>
+    <?php endif; ?>
+
+    <form method="post">
+      <?php wp_nonce_field('db_pitta_sync'); ?>
+      <?php submit_button('Run sync', 'primary', 'db_pitta_sync'); ?>
+    </form>
+  </div>
+  <?php
+}
+
+/**
+ * Revision counter for search-result caching: bumped whenever a PITTA
+ * issue changes, so cached results never outlive an edit.
+ */
+function db_pitta_bump_rev() {
+  update_option('db_pitta_rev', (int) get_option('db_pitta_rev', 0) + 1, false);
+}
+add_action('save_post_db_pitta', 'db_pitta_bump_rev');
+add_action('trashed_post', function($id) { if (get_post_type($id) === 'db_pitta') db_pitta_bump_rev(); });
+add_action('untrashed_post', function($id) { if (get_post_type($id) === 'db_pitta') db_pitta_bump_rev(); });
+
+/**
+ * The parsed search index, or null. Not stored in a transient — at several
+ * MB it's too big for an options row — but only loaded on a cache miss.
+ */
+function db_pitta_index() {
+  static $index = false;
+  if ($index !== false) return $index;
+  $path = get_template_directory() . '/data/pitta-index.json';
+  $index = is_readable($path) ? json_decode(file_get_contents($path), true) : null;
+  if (!is_array($index) || !isset($index['issues'])) $index = null;
+  return $index;
+}
+
+/** Lowercase, strip accents, treat hyphens/dashes as spaces. */
+function db_pitta_fold($s) {
+  $s = remove_accents($s);
+  $s = preg_replace('/[\x{2010}-\x{2015}\-]/u', ' ', $s); // one-for-one, so positions line up with the original
+  return mb_strtolower($s, 'UTF-8');
+}
+
+/**
+ * db_pitta_fold() one character at a time, keeping any character whose
+ * folded form isn't a single character — slower, but the result is
+ * exactly as long as the input. Only used for snippet alignment.
+ */
+function db_pitta_fold_aligned($s) {
+  $out = '';
+  foreach (preg_split('//u', $s, -1, PREG_SPLIT_NO_EMPTY) as $ch) {
+    $f = db_pitta_fold($ch);
+    $out .= mb_strlen($f) === 1 ? $f : $ch;
+  }
+  return $out;
+}
+
+/**
+ * Search every edition's text (plus its title and date). Words match at
+ * the start of a word, so "pitta" also finds "pittas".
+ *
+ * A multi-word query is a phrase search: "indian pitta" returns only the
+ * editions containing those words in sequence (punctuation between them
+ * is ignored). Only when the phrase occurs nowhere does it fall back to
+ * editions containing all the words anywhere ('mode' => 'all_words').
+ * Ranked by hits, then newest.
+ */
+function db_pitta_search($q) {
+  $index = db_pitta_index();
+  if (!$index) return ['error' => 'index_missing', 'results' => [], 'total' => 0];
+
+  // Terms need a letter or digit; stray punctuation is dropped.
+  $words = array_values(array_unique(array_filter(
+    preg_split('/\s+/u', trim(db_pitta_fold($q)), -1, PREG_SPLIT_NO_EMPTY),
+    fn($w) => preg_match('/[\p{L}\p{N}]/u', $w)
+  )));
+  $words = array_slice($words, 0, 8);
+  if (!$words) return ['results' => [], 'total' => 0, 'mode' => 'phrase'];
+
+  $quoted = array_map(fn($w) => preg_quote($w, '/'), $words);
+  $phrase_re = '/(?<![\p{L}\p{N}])' . implode('[^\p{L}\p{N}]+', $quoted) . '[\p{L}\p{N}]*/u';
+  $any_re = '/(?<![\p{L}\p{N}])(?:' . implode('|', $quoted) . ')[\p{L}\p{N}]*/u';
+  $word_res = array_map(fn($w) => '/(?<![\p{L}\p{N}])' . $w . '/u', $quoted);
+
+  // Pass 1: score every edition, both ways.
+  $months = db_pitta_months();
+  $phrase_matches = [];
+  $word_matches = [];
+  foreach (get_posts(['post_type' => 'db_pitta', 'post_status' => 'publish', 'posts_per_page' => -1]) as $post) {
+    $key = get_post_meta($post->ID, 'catalog_key', true);
+    $year = (int) get_post_meta($post->ID, 'year', true);
+    $month = (int) get_post_meta($post->ID, 'month', true);
+    $pages = ($key && isset($index['issues'][$key])) ? $index['issues'][$key]['pages'] : [];
+    $folded = array_map('db_pitta_fold', $pages);
+    $meta = db_pitta_fold($post->post_title . ' ' . ($months[$month] ?? '') . ' ' . $year);
+    $all = $meta . "\n" . implode("\n", $folded);
+
+    $match = ['post' => $post, 'year' => $year, 'month' => $month, 'pages' => $pages, 'folded' => $folded];
+    if (preg_match($phrase_re, $all)) {
+      $phrase_matches[] = $match;
+    } elseif (!$phrase_matches && count($words) > 1) {
+      foreach ($word_res as $re) {
+        if (!preg_match($re, $all)) continue 2;
+      }
+      $word_matches[] = $match;
+    }
+  }
+
+  $mode = ($phrase_matches || count($words) === 1) ? 'phrase' : 'all_words';
+  $hit_re = $mode === 'phrase' ? $phrase_re : $any_re;
+  $matches = $mode === 'phrase' ? $phrase_matches : $word_matches;
+
+  // Pass 2: per-page hits for the chosen mode; rank; snippets for the top 50.
+  foreach ($matches as &$m) {
+    $m['page_hits'] = [];
+    foreach ($m['folded'] as $i => $text) {
+      if ($n = preg_match_all($hit_re, $text)) $m['page_hits'][$i] = $n;
+    }
+    arsort($m['page_hits']);
+    $m['hits'] = array_sum($m['page_hits']);
+  }
+  unset($m);
+  usort($matches, fn($a, $b) => [$b['hits'], $b['year'] * 100 + $b['month']] <=> [$a['hits'], $a['year'] * 100 + $a['month']]);
+
+  $results = [];
+  foreach (array_slice($matches, 0, 50) as $m) {
+    $post = $m['post'];
+    $url = get_post_meta($post->ID, 'archive_url', true);
+    $snippets = [];
+    foreach (array_slice(array_keys($m['page_hits']), 0, 3) as $i) {
+      $snippets[] = [
+        'page'    => $i + 1,
+        'snippet' => db_pitta_snippet($m['folded'][$i], $m['pages'][$i], $hit_re),
+        'link'    => db_pitta_page_link($url, $i + 1, $q),
+      ];
+    }
+    $results[] = [
+      'title'    => $post->post_title,
+      'edition'  => (string) get_post_meta($post->ID, 'edition', true),
+      'year'     => $m['year'],
+      'month'    => $m['month'],
+      'url'      => $url,
+      'url_type' => get_post_meta($post->ID, 'url_type', true),
+      'hits'     => $m['hits'],
+      'pages'    => $snippets,
+    ];
+  }
+  return ['results' => $results, 'total' => count($matches), 'mode' => $mode];
+}
+
+/**
+ * ~180-char excerpt of $original around the first match of $hit_re in
+ * $folded, HTML-escaped, with every match wrapped in <mark>. Positions in
+ * $folded index straight into $original as long as folding kept the length;
+ * when it didn't (e.g. "æ" → "ae"), the page is refolded character by
+ * character so they line up again.
+ */
+function db_pitta_snippet($folded, $original, $hit_re) {
+  if (mb_strlen($folded) !== mb_strlen($original)) $folded = db_pitta_fold_aligned($original);
+  $pos = 0;
+  if (preg_match($hit_re, $folded, $m, PREG_OFFSET_CAPTURE)) {
+    $pos = mb_strlen(substr($folded, 0, $m[0][1]));
+  }
+  $len = mb_strlen($folded);
+  $start = max(0, $pos - 70);
+  $end = min($len, $start + 180);
+  // Snap to word boundaries so the excerpt doesn't open or close mid-word.
+  if ($start > 0 && ($sp = mb_strpos($folded, ' ', $start)) !== false && $sp < $pos) $start = $sp + 1;
+  if ($end < $len && ($sp = mb_strrpos(mb_substr($folded, 0, $end), ' ')) !== false && $sp > $pos) $end = $sp;
+
+  $f = mb_substr($folded, $start, $end - $start);
+  $o = mb_substr($original, $start, $end - $start);
+  $out = '';
+  $at = 0;
+  if (preg_match_all($hit_re, $f, $ms, PREG_OFFSET_CAPTURE)) {
+    foreach ($ms[0] as [$hit, $byte]) {
+      $cpos = mb_strlen(substr($f, 0, $byte));
+      $clen = mb_strlen($hit);
+      $out .= esc_html(mb_substr($o, $at, $cpos - $at)) . '<mark>' . esc_html(mb_substr($o, $cpos, $clen)) . '</mark>';
+      $at = $cpos + $clen;
+    }
+  }
+  $out .= esc_html(mb_substr($o, $at));
+  return ($start > 0 ? '…' : '') . $out . ($end < $len ? '…' : '');
+}
+
+/**
+ * Link to a page of an issue: archive.org's reader can open at a page with
+ * the query highlighted; other hosts (Drive) just get the issue link.
+ */
+function db_pitta_page_link($url, $page, $q) {
+  if (preg_match('#^https?://(?:www\.)?archive\.org/details/([^/?#]+)#', (string) $url, $m)) {
+    return 'https://archive.org/details/' . $m[1] . '/page/n' . ($page - 1) . '/mode/2up?q=' . rawurlencode($q);
+  }
+  return $url;
+}
+
+add_action('rest_api_init', function() {
+  register_rest_route('db/v1', '/pitta-search', [
+    'methods'             => 'GET',
+    'permission_callback' => '__return_true',
+    'args'                => ['q' => ['required' => true, 'type' => 'string']],
+    'callback'            => function(WP_REST_Request $request) {
+      $q = trim(preg_replace('/\s+/u', ' ', wp_strip_all_tags((string) $request->get_param('q'))));
+      $q = mb_substr($q, 0, 100);
+      if (mb_strlen($q) < 3) {
+        return new WP_Error('db_pitta_query_too_short', 'Type at least 3 characters.', ['status' => 400]);
+      }
+      $index_path = get_template_directory() . '/data/pitta-index.json';
+      $cache_key = 'db_pitta_q_' . md5(implode('|', [
+        mb_strtolower($q), (int) get_option('db_pitta_rev', 0), @filemtime($index_path),
+      ]));
+      $data = get_transient($cache_key);
+      if ($data === false) {
+        $data = db_pitta_search($q);
+        if (empty($data['error'])) set_transient($cache_key, $data, 12 * HOUR_IN_SECONDS);
+      }
+      return db_rest_no_cache(rest_ensure_response($data));
+    },
+  ]);
+});
+
+/* -----------------------------------------------------------------------
  * 9. Seed data — runs once
  * ---------------------------------------------------------------------*/
 add_action('init', function() {
@@ -524,23 +909,7 @@ add_action('init', function() {
     update_field('is_past',       true,        $id);
   }
 
-  // 4 PITTA issues
-  $pittas = [
-    ['PITTA Vol 42 No 9',  2026, 42, 9,  'https://archive.org/details/pitta-vol42-no9/mode/2up',  'archive_org'],
-    ['PITTA Vol 42 No 8',  2026, 42, 8,  'https://archive.org/details/pitta-vol42-no8/mode/2up',  'archive_org'],
-    ['PITTA Vol 41 No 12', '2025', 41, 12, 'https://archive.org/details/pitta-vol41-no12/mode/2up', 'archive_org'],
-    ['PITTA Vol 41 No 6',  2025, 41, 6,  'https://drive.google.com/file/d/example/view',          'google_drive'],
-  ];
-  foreach ($pittas as [$title, $year, $vol, $issue, $url, $type]) {
-    $id = wp_insert_post(['post_title' => $title, 'post_status' => 'publish', 'post_type' => 'db_pitta']);
-    update_field('year',         $year,  $id);
-    update_field('volume',       $vol,   $id);
-    update_field('issue_number', $issue, $id);
-    update_field('month',        $issue, $id); // PITTA is monthly: issue N of a volume year is month N
-    update_field('archive_url',  $url,   $id);
-    update_field('url_type',     $type,  $id);
-    update_field('is_part',      false,  $id);
-  }
+  // PITTA issues come from data/pitta-catalog.csv via PITTA Archive → Sync from catalog.
 
   update_option('db_seeded_v1', true);
 });

@@ -37,7 +37,7 @@ while (have_posts()) : the_post();
 
 <section class="pitta-section">
   <h2 class="pitta-section-title">PITTA Archives</h2>
-  <p class="pitta-section-intro">Pick a year to see every issue. Issues from 2010–2013 are hosted on archive.org; later years on Google Drive.</p>
+  <p class="pitta-section-intro">Search the full text of every issue — a bird, a place, a member's name — or pick a year to browse.</p>
   <?php echo do_shortcode('[db_pitta_accordion]'); ?>
 </section>
 
