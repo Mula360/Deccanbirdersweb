@@ -186,18 +186,27 @@ function db_settings_fields() {
     'db_member_count'       => ['Member count', 'text', ''],
     'db_years_active'       => ['Years active', 'text', ''],
     'db_membership_form_url' => ['Membership form URL', 'url', ''],
-    'email_photos'          => ['Photo submissions email', 'text', 'Where photograph submissions are sent. Defaults to photos@deccanbirders.org.'],
-    'email_volunteers'      => ['Volunteer submissions email', 'text', 'Where volunteer sign-ups are sent. Defaults to info@deccanbirders.org.'],
+    'email_photos'          => ['Photo submissions email', 'text', 'Who reviews photograph submissions. Several addresses can be separated by commas. Defaults to photos@deccanbirders.org.'],
+    'email_volunteers'      => ['Volunteer submissions email', 'text', 'Who hears about volunteer sign-ups. Several addresses can be separated by commas. Defaults to info@deccanbirders.org.'],
     'volunteer_sheet_url'   => ['Volunteer sheet webhook URL', 'url', 'The Apps Script web app URL that appends volunteers to your Google Sheet. See docs/google-sheet-volunteers.md.'],
     'volunteer_sheet_secret' => ['Volunteer sheet secret', 'text', 'Must match the SECRET in the Apps Script, so only this site can write to the sheet.'],
   ];
 }
 
-/** Where each kind of submission is emailed. */
+/**
+ * Where each kind of submission is emailed. The setting takes a list
+ * separated by commas, so several committee members can be notified.
+ */
 function db_notify_email($kind) {
-  $defaults = ['photos' => 'photos@deccanbirders.org', 'volunteers' => 'info@deccanbirders.org'];
-  $set = db_setting('email_' . $kind);
-  return is_email($set) ? $set : $defaults[$kind];
+  // The committee members who handle submissions today; override either
+  // list in Settings → Site Settings without touching the theme.
+  $committee = ['srikanth@deccanbirders.org', 'Gowthama@deccanbirders.org', 'gokul@deccanbirders.org'];
+  $defaults = ['photos' => $committee, 'volunteers' => $committee];
+  $valid = array_values(array_filter(
+    array_map('trim', explode(',', db_setting('email_' . $kind))),
+    'is_email'
+  ));
+  return $valid ?: $defaults[$kind];
 }
 
 add_action('admin_menu', function() {
@@ -310,7 +319,7 @@ function db_handle_volunteer() {
   if (!$name || !$email) {
     wp_send_json(['success' => false, 'message' => 'Please fill in all required fields.']);
   }
-  $to           = 'info@deccanbirders.org';
+  $to           = db_notify_email('volunteers');
   $headers      = ['Content-Type: text/html; charset=UTF-8', "Reply-To: $name <$email>"];
   $help_with_str = $help_with ? implode(', ', $help_with) : 'Not specified';
   $body         = "<p><strong>From:</strong> $name ($email)</p><p><strong>Would like to help with:</strong> $help_with_str</p>";
