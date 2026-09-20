@@ -5,12 +5,15 @@
  *    snippet HTML is escaped server-side with only <mark> added.
  *  - the year grid (.pitta-year): narrowed to editions whose year/month/
  *    title match, plus every edition the full-text search found.
+ * With no query the grid is paged, YEARS_PER_PAGE years at a time; a
+ * search sets paging aside and shows every matching year.
  * The query is mirrored to ?q= so a search can be shared.
  */
 (function () {
   'use strict';
 
   const MIN_CHARS = 3;
+  const YEARS_PER_PAGE = 5;
 
   document.addEventListener('DOMContentLoaded', function () {
     const input = document.getElementById('pitta-search');
@@ -18,8 +21,11 @@
     if (!input || !results) return;
 
     const years = Array.from(document.querySelectorAll('.pitta-year'));
-    const initiallyOpen = years.map((y) => y.open);
     const endpoint = ((window.DB_CONFIG && DB_CONFIG.rest_url) || '/wp-json/db/v1/') + 'pitta-search';
+    const accordion = document.getElementById('pitta-accordion');
+    const yearPages = Math.max(1, Math.ceil(years.length / YEARS_PER_PAGE));
+    let yearPage = 1;
+    let pager = null;
 
     let timer = null;
     let controller = null;
@@ -39,18 +45,52 @@
       return a;
     }
 
+    // --- Year paging (only while no search is running) -------------------
+    function showYearPage(p) {
+      yearPage = Math.min(yearPages, Math.max(1, p));
+      const from = (yearPage - 1) * YEARS_PER_PAGE;
+      years.forEach((yearEl, i) => {
+        const onPage = i >= from && i < from + YEARS_PER_PAGE;
+        yearEl.hidden = !onPage;
+        yearEl.open = onPage && i === from; // newest year on the page opens
+        yearEl.querySelectorAll('.pitta-month-col, .pitta-month-link').forEach((n) => { n.hidden = false; });
+      });
+      if (pager) {
+        pager.hidden = false;
+        pager.querySelector('.events-pager-status').textContent =
+          `Page ${yearPage} of ${yearPages} · ${years.length} years`;
+        pager.querySelector('[data-step="-1"]').disabled = yearPage === 1;
+        pager.querySelector('[data-step="1"]').disabled = yearPage === yearPages;
+      }
+    }
+
+    function buildYearPager() {
+      if (yearPages < 2 || !accordion) return;
+      pager = document.createElement('nav');
+      pager.className = 'events-pager';
+      pager.setAttribute('aria-label', 'PITTA archive years');
+      pager.innerHTML =
+        '<button type="button" class="events-pager-btn" data-step="-1">← Newer</button>' +
+        '<span class="events-pager-status"></span>' +
+        '<button type="button" class="events-pager-btn" data-step="1">Older →</button>';
+      accordion.insertAdjacentElement('afterend', pager);
+      pager.querySelectorAll('.events-pager-btn').forEach((btn) => {
+        btn.addEventListener('click', () => {
+          showYearPage(yearPage + Number(btn.dataset.step));
+          accordion.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        });
+      });
+    }
+
     // --- Year grid -------------------------------------------------------
     // extraUrls: issue links the full-text search matched (null = not
     // searched yet, so only the local year/title filter applies).
     function filterGrid(q, extraUrls) {
       if (!q) {
-        years.forEach((yearEl, i) => {
-          yearEl.hidden = false;
-          yearEl.open = initiallyOpen[i];
-          yearEl.querySelectorAll('.pitta-month-col, .pitta-month-link').forEach((n) => { n.hidden = false; });
-        });
+        showYearPage(yearPage);
         return;
       }
+      if (pager) pager.hidden = true;
       // A bare year ("2019") means that year's issues, not every issue that
       // mentions it — the text matches are still listed in #pitta-results.
       const isYear = years.some((y) => y.dataset.search === q);
@@ -181,6 +221,9 @@
         search(input.value);
       }
     });
+
+    buildYearPager();
+    showYearPage(1);
 
     const initial = new URLSearchParams(window.location.search).get('q');
     if (initial) {

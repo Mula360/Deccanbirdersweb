@@ -134,6 +134,46 @@
             "placeholder": "https://www.youtube.com/channel/..."
         },
         {
+            "aria-label": "",
+            "conditional_logic": 0,
+            "required": 0,
+            "wrapper": {
+                "width": "",
+                "class": "",
+                "id": ""
+            },
+            "default_value": "",
+            "maxlength": "",
+            "prepend": "",
+            "append": "",
+            "key": "field_site_settings_youtube_channel_id",
+            "label": "YouTube Channel ID",
+            "name": "youtube_channel_id",
+            "type": "text",
+            "instructions": "The channel's ID (starts with UC). Found in YouTube Studio under Settings → Channel → Advanced settings.",
+            "placeholder": "UChYefSo9bbi-BBbRn9euCpg"
+        },
+        {
+            "aria-label": "",
+            "conditional_logic": 0,
+            "required": 0,
+            "wrapper": {
+                "width": "",
+                "class": "",
+                "id": ""
+            },
+            "default_value": "",
+            "maxlength": "",
+            "prepend": "",
+            "append": "",
+            "key": "field_site_settings_youtube_api_key",
+            "label": "YouTube API Key",
+            "name": "youtube_api_key",
+            "type": "text",
+            "instructions": "A YouTube Data API v3 key. Needed to list every video on the Gallery page; without it only the newest 12 show. Can also be set as DB_YOUTUBE_API_KEY in wp-config.php.",
+            "placeholder": "AIza..."
+        },
+        {
             "key": "field_site_settings_db_api_base_url",
             "label": "DB API Base URL",
             "name": "db_api_base_url",
@@ -233,5 +273,5 @@
     "active": true,
     "description": "",
     "show_in_rest": 0,
-    "modified": 1789257600
+    "modified": 1789896773
 }

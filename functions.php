@@ -74,6 +74,22 @@ add_action('wp_enqueue_scripts', function() {
   ]);
 });
 
+/**
+ * Open the connections the page is about to need, during the wait for
+ * HTML: the font files the stylesheet will ask for, and — on the Gallery
+ * page — YouTube's thumbnail and player hosts.
+ */
+add_filter('wp_resource_hints', function($urls, $relation) {
+  if ($relation === 'preconnect') {
+    $urls[] = ['href' => 'https://fonts.gstatic.com', 'crossorigin' => 'anonymous'];
+    if (is_page('gallery')) {
+      $urls[] = 'https://i.ytimg.com';
+      $urls[] = 'https://www.youtube-nocookie.com';
+    }
+  }
+  return $urls;
+}, 10, 2);
+
 /* -----------------------------------------------------------------------
  * 4. Custom post types
  * ---------------------------------------------------------------------*/
@@ -579,10 +595,125 @@ add_action('rest_api_init', function() {
     'methods'             => 'GET',
     'permission_callback' => '__return_true',
     'callback'            => function(WP_REST_Request $request) {
+      // With a YouTube key configured we fetch the channel here, which
+      // pages through every upload; the Vercel API only ever returned the
+      // newest 12. Without a key we fall back to it.
+      if (db_youtube_key()) {
+        return db_rest_no_cache(rest_ensure_response(db_youtube_videos()));
+      }
       return db_rest_no_cache(rest_ensure_response(db_proxy_fetch('/api/videos', $request, [], 6 * HOUR_IN_SECONDS)));
     },
   ]);
 });
+
+/* -----------------------------------------------------------------------
+ * 8c. YouTube uploads
+ *
+ * The full uploads playlist, fetched here rather than through the Vercel
+ * API so it can page past the first 50 and carry the publish date and
+ * description the cards show. Key and channel come from Site Settings (or
+ * the DB_YOUTUBE_API_KEY / DB_YOUTUBE_CHANNEL_ID constants); the whole
+ * list is cached for six hours.
+ * ---------------------------------------------------------------------*/
+function db_youtube_key() {
+  if (defined('DB_YOUTUBE_API_KEY') && DB_YOUTUBE_API_KEY) return DB_YOUTUBE_API_KEY;
+  return trim((string) get_option('options_youtube_api_key', ''));
+}
+
+function db_youtube_channel_id() {
+  if (defined('DB_YOUTUBE_CHANNEL_ID') && DB_YOUTUBE_CHANNEL_ID) return DB_YOUTUBE_CHANNEL_ID;
+  $id = trim((string) get_option('options_youtube_channel_id', ''));
+  return $id ?: 'UChYefSo9bbi-BBbRn9euCpg';
+}
+
+/** GET a YouTube Data API endpoint. Returns the decoded body or null. */
+function db_youtube_get($endpoint, array $params) {
+  $params['key'] = db_youtube_key();
+  $url = 'https://www.googleapis.com/youtube/v3/' . $endpoint . '?' . http_build_query($params);
+  $res = wp_remote_get($url, ['timeout' => 15]);
+  if (is_wp_error($res)) return ['error' => true, 'message' => $res->get_error_message()];
+  $body = json_decode(wp_remote_retrieve_body($res), true);
+  if (!is_array($body)) return ['error' => true, 'message' => 'Unreadable response from YouTube'];
+  if (isset($body['error'])) return ['error' => true, 'message' => $body['error']['message'] ?? 'YouTube API error'];
+  return $body;
+}
+
+function db_youtube_duration($iso) {
+  if (!preg_match('/PT(?:(\d+)H)?(?:(\d+)M)?(?:(\d+)S)?/', (string) $iso, $m)) return '?';
+  [$h, $min, $sec] = [(int) ($m[1] ?? 0), (int) ($m[2] ?? 0), (int) ($m[3] ?? 0)];
+  return $h ? sprintf('%d:%02d:%02d', $h, $min, $sec) : sprintf('%d:%02d', $min, $sec);
+}
+
+function db_youtube_views($n) {
+  $n = (int) $n;
+  if ($n >= 1000000) return round($n / 1000000, 1) . 'M';
+  if ($n >= 1000) return round($n / 1000, 1) . 'K';
+  return (string) $n;
+}
+
+/** Every upload, newest first. Cached; ['error' => true, …] on failure. */
+function db_youtube_videos($force = false) {
+  $cache_key = 'db_youtube_videos_' . md5(db_youtube_channel_id());
+  if (!$force) {
+    $cached = get_transient($cache_key);
+    if ($cached !== false) return $cached;
+  }
+
+  $channel = db_youtube_get('channels', ['part' => 'contentDetails', 'id' => db_youtube_channel_id()]);
+  if (!empty($channel['error'])) return $channel;
+  $uploads = $channel['items'][0]['contentDetails']['relatedPlaylists']['uploads'] ?? '';
+  if (!$uploads) return ['error' => true, 'message' => 'YouTube channel not found'];
+
+  // Page through the uploads playlist (50 at a time, max 10 pages).
+  $items = [];
+  $page_token = '';
+  for ($page = 0; $page < 10; $page++) {
+    $args = ['part' => 'snippet', 'playlistId' => $uploads, 'maxResults' => 50];
+    if ($page_token) $args['pageToken'] = $page_token;
+    $res = db_youtube_get('playlistItems', $args);
+    if (!empty($res['error'])) {
+      if (!$items) return $res;
+      break; // keep the pages we already have
+    }
+    $items = array_merge($items, $res['items'] ?? []);
+    $page_token = $res['nextPageToken'] ?? '';
+    if (!$page_token) break;
+  }
+  if (!$items) return ['error' => true, 'message' => 'No uploads found'];
+
+  // Duration and view count come from a second endpoint, 50 ids per call.
+  $ids = array_values(array_filter(array_map(fn($i) => $i['snippet']['resourceId']['videoId'] ?? '', $items)));
+  $meta = [];
+  foreach (array_chunk($ids, 50) as $chunk) {
+    $res = db_youtube_get('videos', ['part' => 'contentDetails,statistics', 'id' => implode(',', $chunk)]);
+    if (!empty($res['error'])) break; // duration/views are optional
+    foreach ($res['items'] ?? [] as $v) $meta[$v['id']] = $v;
+  }
+
+  $data = [];
+  foreach ($items as $i) {
+    $snippet = $i['snippet'] ?? [];
+    $id = $snippet['resourceId']['videoId'] ?? '';
+    if (!$id) continue;
+    $m = $meta[$id] ?? [];
+    $description = trim(preg_replace('/\s+/u', ' ', (string) ($snippet['description'] ?? '')));
+    $data[] = [
+      'videoId'     => $id,
+      'title'       => $snippet['title'] ?? '',
+      'description' => mb_substr($description, 0, 200),
+      'published'   => $snippet['publishedAt'] ?? '',
+      'thumbnail'   => $snippet['thumbnails']['medium']['url'] ?? "https://i.ytimg.com/vi/$id/mqdefault.jpg",
+      'duration'    => isset($m['contentDetails']) ? db_youtube_duration($m['contentDetails']['duration']) : '?',
+      'views'       => isset($m['statistics']) ? db_youtube_views($m['statistics']['viewCount'] ?? 0) : '?',
+    ];
+  }
+
+  // Private and deleted uploads come back without a playable snippet.
+  usort($data, fn($a, $b) => strcmp($b['published'], $a['published']));
+  $payload = ['data' => $data, 'count' => count($data)];
+  set_transient($cache_key, $payload, 6 * HOUR_IN_SECONDS);
+  return $payload;
+}
 
 /* -----------------------------------------------------------------------
  * 8b. PITTA archive — catalog sync + full-text search

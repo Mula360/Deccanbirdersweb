@@ -6,28 +6,48 @@
  * the species as the title, the location beneath it, and the photographer
  * credit on its own rule-separated line. Clicking a card opens a lightbox
  * (an addition to the design, but it stays out of the way until used).
+ *
+ * Paged at 24 a page via ?photos=N, so a growing gallery never loads every
+ * full-size photo in one page. Links carry #photos-panel so the Gallery
+ * page comes back on the Photographs tab.
  */
 
-$photos = get_posts(['post_type' => 'db_gallery_photo', 'posts_per_page' => -1, 'post_status' => 'publish']);
-if (!$photos) {
+$per_page = 24;
+
+$paged = max(1, (int) ($_GET['photos'] ?? 1));
+$query = new WP_Query([
+  'post_type'      => 'db_gallery_photo',
+  'post_status'    => 'publish',
+  'posts_per_page' => $per_page,
+  'paged'          => $paged,
+  'no_found_rows'  => false, // pagination needs the total
+]);
+if (!$query->have_posts()) {
   echo '<p class="db-empty">' . esc_html__('No photos yet.', 'deccan-birders') . '</p>';
   return;
 }
 ?>
 <div class="photo-masonry" id="photos-grid">
-  <?php foreach ($photos as $photo):
+  <?php foreach ($query->posts as $photo):
     $img      = get_field('photo', $photo->ID);
     $species  = get_field('species_name', $photo->ID);
     $location = get_field('photo_location', $photo->ID);
     $credit   = get_field('photographer', $photo->ID);
     if (!$img) continue;
-    $src = $img['sizes']['large'] ?? $img['url'];
+    $alt = trim($species . ($location ? ' photographed at ' . $location : ''));
   ?>
   <figure class="photo-card" tabindex="0" role="button"
           aria-label="<?php echo esc_attr(trim($species . ($location ? ' — ' . $location : ''))); ?>">
-    <img src="<?php echo esc_url($src); ?>"
-         alt="<?php echo esc_attr(trim($species . ($location ? ' photographed at ' . $location : ''))); ?>"
-         loading="lazy" width="<?php echo (int) $img['width']; ?>" height="<?php echo (int) $img['height']; ?>">
+    <?php
+    // wp_get_attachment_image() adds srcset/sizes, so phones fetch a phone-sized
+    // file instead of the full "large" one.
+    echo wp_get_attachment_image($img['ID'], 'large', false, [
+      'alt'      => $alt,
+      'loading'  => 'lazy',
+      'decoding' => 'async',
+      'sizes'    => '(max-width: 700px) 100vw, (max-width: 1100px) 50vw, 360px',
+    ]);
+    ?>
     <figcaption>
       <?php if ($species): ?><span class="photo-species"><?php echo esc_html($species); ?></span><?php endif; ?>
       <?php if ($location): ?><span class="photo-place"><?php echo esc_html($location); ?></span><?php endif; ?>
@@ -36,6 +56,26 @@ if (!$photos) {
   </figure>
   <?php endforeach; ?>
 </div>
+
+<?php if ($query->max_num_pages > 1):
+  $page_url = function($n) {
+    return esc_url(add_query_arg('photos', $n, get_permalink()) . '#photos-panel');
+  };
+?>
+<nav class="events-pager" aria-label="Photo gallery pages">
+  <?php if ($paged > 1): ?>
+    <a class="events-pager-btn" href="<?php echo $page_url($paged - 1); ?>">← Newer</a>
+  <?php else: ?>
+    <span class="events-pager-btn" aria-disabled="true">← Newer</span>
+  <?php endif; ?>
+  <span class="events-pager-status">Page <?php echo (int) $paged; ?> of <?php echo (int) $query->max_num_pages; ?> · <?php echo (int) $query->found_posts; ?> photographs</span>
+  <?php if ($paged < $query->max_num_pages): ?>
+    <a class="events-pager-btn" href="<?php echo $page_url($paged + 1); ?>">Older →</a>
+  <?php else: ?>
+    <span class="events-pager-btn" aria-disabled="true">Older →</span>
+  <?php endif; ?>
+</nav>
+<?php endif; ?>
 
 <div class="lightbox" id="db-lightbox" hidden aria-modal="true" role="dialog" aria-label="Photo lightbox">
   <button class="lightbox-close" aria-label="Close lightbox">✕</button>
