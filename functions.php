@@ -184,7 +184,7 @@ function db_settings_fields() {
     'youtube_api_key'       => ['YouTube API key', 'text', 'A YouTube Data API v3 key: lists every video on the Gallery. Without it only the newest 12 show. Can also be set as DB_YOUTUBE_API_KEY in wp-config.php.'],
     'db_api_base_url'       => ['Bird data API URL', 'url', 'The Vercel deployment used for eBird and Calendar data. No trailing slash.'],
     'db_member_count'       => ['Member count', 'text', ''],
-    'db_years_active'       => ['Years active', 'text', ''],
+    'db_founded_year'       => ['Founded year', 'text', 'Used to count the "Years …" figure on the home page, which works itself out from this. Defaults to 1980.'],
     'db_membership_form_url' => ['Membership form URL', 'url', ''],
     'email_photos'          => ['Photo submissions email', 'text', 'Who reviews photograph submissions. Several addresses can be separated by commas. Defaults to photos@deccanbirders.org.'],
     'email_volunteers'      => ['Volunteer submissions email', 'text', 'Who hears about volunteer sign-ups. Several addresses can be separated by commas. Defaults to info@deccanbirders.org.'],
@@ -194,17 +194,16 @@ function db_settings_fields() {
 }
 
 /**
- * Years the society has been going, counted from the founding year so
- * the homepage stat never goes stale. "Years active" in Site Settings
- * overrides it if the committee ever wants a fixed figure.
+ * Years the society has been going. Always counted, never stored, so the
+ * homepage stat cannot go stale — only the founding year is a setting,
+ * and it hardly changes.
  */
 function db_founded_year() {
-  return 1980;
+  $year = (int) db_setting('db_founded_year');
+  return ($year >= 1800 && $year <= (int) current_time('Y')) ? $year : 1980;
 }
 
 function db_years_active() {
-  $override = (int) db_setting('db_years_active');
-  if ($override > 0) return $override;
   return max(1, (int) current_time('Y') - db_founded_year());
 }
 
