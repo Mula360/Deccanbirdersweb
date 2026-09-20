@@ -55,9 +55,18 @@ while (have_posts()) : the_post();
 
 <section class="stats-band">
   <div class="stats-band-inner">
-    <?php foreach ($stats as $s): ?>
+    <?php foreach ($stats as $s):
+      // A stat labelled "Years …" holding a plain age counts itself from
+      // the founding year, so the number stays right without anyone
+      // editing the page each January. A year like 1987 is left alone,
+      // as is anything else on the band.
+      $age = trim((string) $s['stat_number']);
+      $number = (preg_match('/^\s*years\b/i', (string) $s['stat_label']) && ctype_digit($age) && (int) $age <= 150)
+        ? (string) db_years_active()
+        : $s['stat_number'];
+    ?>
       <div class="stat-col">
-        <div class="stat-number"><?php echo esc_html($s['stat_number']); ?></div>
+        <div class="stat-number"><?php echo esc_html($number); ?></div>
         <div class="stat-label"><?php echo esc_html($s['stat_label']); ?></div>
       </div>
     <?php endforeach; ?>
