@@ -425,8 +425,12 @@ body.nav-open { overflow: hidden; }
 .event-chip strong { font-family: var(--font-head); font-weight: 700; color: var(--ink); }
 
 /* The toggle sits in its own column at the end of the row, so it lines
-   up across cards however long the titles are. */
+   up across cards however long the titles are. On the home page it is a
+   link to the same trip on the Events page rather than a button. */
 .event-toggle-wrap { justify-self: end; }
+a.event-toggle { display: inline-block; text-decoration: none; }
+/* Briefly mark the trip arrived at from the home page. */
+.event-card.is-linked { border-color: var(--blue); }
 .event-toggle {
   padding: 0;
   background: none;

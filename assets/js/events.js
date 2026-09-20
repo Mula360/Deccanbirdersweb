@@ -71,7 +71,7 @@ async function initHomeEvents() {
     if (json.error) throw new Error(json.message || 'Request failed');
     const data = json.data || [];
     if (!data.length) { grid.innerHTML = '<p>No upcoming trips. Check back soon.</p>'; return; }
-    grid.innerHTML = data.slice(0, 3).map((e, i) => renderCard('upcoming', upcomingFields(e), i)).join('');
+    grid.innerHTML = data.slice(0, 3).map((e, i) => renderCard('upcoming', upcomingFields(e), i, { linkToEvents: true })).join('');
   } catch (e) {
     grid.innerHTML = '<p>Could not load events.</p>';
   }
@@ -179,9 +179,14 @@ function coordinatorLine(coordinators) {
     </div>`;
 }
 
-function renderCard(kind, data, index) {
+function renderCard(kind, data, index, opts = {}) {
   const { day, month, dayName } = formatDate(data.date);
   const id = `${kind}-${index}`;
+  // On the home page the details live on the Events page: the link opens
+  // that trip there, already expanded (see openRequestedEvent).
+  const detailsHref = opts.linkToEvents && data.id
+    ? `/events/#event-${encodeURIComponent(data.id)}`
+    : '';
 
   const chips = kind === 'past'
     ? `<div class="event-chips">
@@ -201,7 +206,7 @@ function renderCard(kind, data, index) {
   const hasDetails = details.trim() !== '';
 
   return `
-  <article class="event-card${hasDetails ? ' is-expandable' : ''}" data-card="${id}">
+  <article class="event-card${hasDetails ? ' is-expandable' : ''}" data-card="${id}"${data.id ? ` data-event-id="${escapeHtml(data.id)}" id="event-${escapeHtml(data.id)}"` : ''}>
     <div class="event-date-block">
       <span class="event-day">${day}</span>
       <span class="event-month">${escapeHtml(month)}</span>
@@ -213,7 +218,13 @@ function renderCard(kind, data, index) {
       ${kind === 'upcoming' && data.time ? `<div class="event-meta">${escapeHtml(dayName)} · ${escapeHtml(data.time)}</div>` : ''}
       ${chips}
     </div>
-    ${hasDetails ? `
+    ${hasDetails && detailsHref ? `
+      <div class="event-toggle-wrap">
+        <a class="event-toggle" href="${escapeHtml(detailsHref)}">
+          <span class="event-toggle-more">More details</span>
+        </a>
+      </div>` : ''}
+    ${hasDetails && !detailsHref ? `
       <div class="event-toggle-wrap">
         <button type="button" class="event-toggle" aria-expanded="false" aria-controls="panel-${id}">
           <span class="event-toggle-more">More details</span>
@@ -226,6 +237,7 @@ function renderCard(kind, data, index) {
 
 function upcomingFields(e) {
   return {
+    id:           e.id || '',
     title:        cleanTitle(e.title),
     date:         e.date,
     place:        e.place || '',
@@ -246,9 +258,12 @@ function upcomingFields(e) {
 
 const PAGE_SIZE = 10;
 
-function paginate(container, kind, items, toFields) {
-  let page = 1;
+function paginate(container, kind, items, toFields, focusId = '') {
   const pages = Math.max(1, Math.ceil(items.length / PAGE_SIZE));
+  // Arriving from the home page's "More details": start on whichever page
+  // holds that trip rather than always the first.
+  const focusIndex = focusId ? items.findIndex((it) => String(it.id || '') === focusId) : -1;
+  let page = focusIndex > -1 ? Math.floor(focusIndex / PAGE_SIZE) + 1 : 1;
 
   function paint() {
     const startIdx = (page - 1) * PAGE_SIZE;
@@ -285,6 +300,28 @@ function paginate(container, kind, items, toFields) {
   }
 
   paint();
+  if (focusIndex > -1) expandEvent(container, focusId);
+}
+
+/** Open one card and scroll to it; it collapses again like any other. */
+function expandEvent(container, eventId) {
+  const card = container.querySelector(`[data-event-id="${CSS.escape(eventId)}"]`);
+  if (!card) return;
+  const btn = card.querySelector('.event-toggle');
+  const panel = card.querySelector('.event-details');
+  if (btn && panel && btn.getAttribute('aria-expanded') !== 'true') {
+    btn.setAttribute('aria-expanded', 'true');
+    card.classList.add('is-open');
+    panel.hidden = false;
+  }
+  card.classList.add('is-linked');
+  requestAnimationFrame(() => card.scrollIntoView({ behavior: 'smooth', block: 'center' }));
+}
+
+/** The trip asked for in the URL, as /events/#event-<calendar id>. */
+function requestedEventId() {
+  const hash = decodeURIComponent(window.location.hash || '');
+  return hash.startsWith('#event-') ? hash.slice('#event-'.length) : '';
 }
 
 /* -------------------------------------------------------------------------
@@ -321,7 +358,7 @@ async function initEventsPage() {
     if (!data.length) {
       upcoming.innerHTML = '<div class="events-empty"><p>No upcoming trips scheduled. We plan trips every month — check back soon.</p></div>';
     } else {
-      paginate(upcoming, 'upcoming', data, upcomingFields);
+      paginate(upcoming, 'upcoming', data, upcomingFields, requestedEventId());
     }
   } catch (e) {
     upcoming.innerHTML = '<p>Could not load events.</p>';
