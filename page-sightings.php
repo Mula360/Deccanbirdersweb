@@ -3,8 +3,9 @@
  * Template for the Sightings page — rendered directly in PHP (no Elementor).
  * All dynamic content is populated client-side by sightings.js.
  *
- * Scope is all of India (region IN). The design's region pill group is kept
- * as a single static "India" pill so the scope is stated without offering a
+ * Scope is all of India, with Telangana and Andhra Pradesh records listed
+ * first (see db_sightings_regional() in functions.php). The design's region
+ * pill group is kept as a single static pill so the scope is stated without offering a
  * switch we no longer support.
  */
 get_header();
@@ -15,13 +16,13 @@ while (have_posts()) : the_post();
   <div class="hero-light-inner">
     <span class="eyebrow" style="color:var(--blue);">Live from eBird</span>
     <h1>Recent Sightings</h1>
-    <p class="hero-standfirst">Every record below is pulled from checklists submitted to eBird across India. Submit yours and it appears here.</p>
+    <p class="hero-standfirst">Every record below is pulled from checklists submitted to eBird across India, with Telangana and Andhra Pradesh first. Submit yours and it appears here.</p>
   </div>
 </section>
 
 <div class="sightings-scope">
   <div class="region-pills">
-    <span class="region-pill is-active">India</span>
+    <span class="region-pill is-active">Telangana &amp; Andhra Pradesh first</span>
   </div>
   <div class="sightings-updated">Updated every 15 minutes</div>
 </div>

@@ -6,7 +6,9 @@
  * Expected markup (page-sightings.php): a .gallery-tabs bar with
  * data-tab="notable|recent|hotspots", the matching #sightings-* panels,
  * the #sightings-lookup card (with #species-search-input / -dropdown /
- * -results), and #sightings-otd. Scope is all of India.
+ * -results), and #sightings-otd. Scope is all of India; the WP proxy puts
+ * Telangana and Andhra Pradesh records first (db_sightings_regional()),
+ * and tags each record with local: true/false.
  *
  *   <!-- Homepage strip -->
  *   <div id="home-sightings-rows"></div>

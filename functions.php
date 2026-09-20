@@ -408,7 +408,8 @@ function db_iucn_watchlist() {
 /**
  * Filters a list of sighting records (mapRecord() shape from the API) down
  * to species on the IUCN watchlist, tags each with its status, and sorts
- * most-threatened first.
+ * most-threatened first — within the home states before the rest of India,
+ * so db_sightings_regional()'s ordering survives this sort.
  */
 function db_filter_notable_by_iucn(array $records) {
   $watchlist = db_iucn_watchlist();
@@ -424,10 +425,93 @@ function db_filter_notable_by_iucn(array $records) {
   }
 
   usort($notable, function($a, $b) use ($rank) {
-    return ($rank[$a['iucnStatus']] ?? 9) <=> ($rank[$b['iucnStatus']] ?? 9);
+    return [empty($a['local']), $rank[$a['iucnStatus']] ?? 9]
+       <=> [empty($b['local']), $rank[$b['iucnStatus']] ?? 9];
   });
 
   return $notable;
+}
+
+/* -----------------------------------------------------------------------
+ * Home-state priority for eBird data.
+ *
+ * The society is based in Hyderabad, so Telangana and Andhra Pradesh
+ * records come first and the rest of India follows. eBird has no "order
+ * by region" option, so each state is fetched as its own region and the
+ * results are merged here: the same upstream calls as before, each still
+ * cached by db_proxy_fetch(), just combined in priority order. Records
+ * carry 'local' => true/false.
+ * ---------------------------------------------------------------------*/
+function db_home_regions() {
+  // eBird calls Telangana IN-TS, not the ISO 3166-2 code IN-TG — an IN-TG
+  // request is accepted but comes back empty, with no error to notice.
+  return ['IN-TS', 'IN-AP'];
+}
+
+/** Key used to spot the same record arriving from two regions. */
+function db_sighting_dedupe_key($tab, array $r) {
+  if ($tab === 'hotspots') return $r['locId'] ?? wp_json_encode($r);
+  return ($r['species'] ?? '') . '|' . ($r['locId'] ?? '') . '|' . ($r['when'] ?? '');
+}
+
+/**
+ * Each region arrives sorted on its own, so a merged group (Telangana +
+ * Andhra Pradesh) has to be re-sorted the way that tab sorts.
+ */
+function db_sort_sightings($tab, array $records) {
+  if ($tab === 'hotspots') {
+    usort($records, fn($a, $b) => (int) ($b['species'] ?? 0) <=> (int) ($a['species'] ?? 0));
+  } elseif ($tab === 'onthisday') {
+    usort($records, fn($a, $b) => (int) ($b['count'] ?? 0) <=> (int) ($a['count'] ?? 0));
+  } else {
+    usort($records, fn($a, $b) => strcmp((string) ($b['when'] ?? ''), (string) ($a['when'] ?? '')));
+  }
+  return $records;
+}
+
+/**
+ * Fetch $tab for each home state and then for the wider region, and merge.
+ * $limits caps how many records each group contributes ([local, rest]);
+ * null means no cap. Returns the merged list, or a proxy error array.
+ */
+function db_sightings_regional(WP_REST_Request $request, $tab, $ttl, array $allowed_params, array $limits = [null, null]) {
+  $base = $request->get_param('region') ?: 'IN';
+  $groups = [];
+  $error = null;
+
+  foreach ([db_home_regions(), [$base]] as $is_rest => $regions) {
+    $records = [];
+    foreach ($regions as $region) {
+      $sub = new WP_REST_Request('GET', $request->get_route());
+      $sub->set_query_params(array_merge($request->get_query_params(), ['region' => $region, 'tab' => $tab]));
+      $res = db_proxy_fetch('/api/sightings', $sub, $allowed_params, $ttl);
+      if (!empty($res['error'])) { $error = $res; continue; }
+      foreach ($res['data'] ?? [] as $r) {
+        $r['local'] = !$is_rest;
+        $records[] = $r;
+      }
+    }
+    $groups[] = db_sort_sightings($tab, $records);
+  }
+
+  // Every region failed upstream: pass the error through rather than an
+  // empty list, so the page can say so instead of showing "no sightings".
+  if ($error && !$groups[0] && !$groups[1]) return $error;
+
+  $merged = [];
+  $seen = [];
+  foreach ($groups as $i => $records) {
+    $kept = 0;
+    foreach ($records as $r) {
+      $key = db_sighting_dedupe_key($tab, $r);
+      if (isset($seen[$key])) continue;
+      if ($limits[$i] !== null && $kept >= $limits[$i]) break;
+      $seen[$key] = true;
+      $merged[] = $r;
+      $kept++;
+    }
+  }
+  return $merged;
 }
 
 /**
@@ -470,13 +554,23 @@ add_action('rest_api_init', function() {
       // proxying eBird's /recent/notable, pull the full /recent feed and
       // filter it against our own conservation-status watchlist.
       if ($tab === 'notable') {
-        $recent_request = new WP_REST_Request('GET', $request->get_route());
-        $recent_request->set_query_params(array_merge($request->get_query_params(), ['tab' => 'recent']));
-        $recent = db_proxy_fetch('/api/sightings', $recent_request, ['region', 'tab'], $ttl);
+        $recent = db_sightings_regional($request, 'recent', $ttl, ['region', 'tab']);
         if (!empty($recent['error'])) return db_rest_no_cache(rest_ensure_response($recent));
-        return db_rest_no_cache(rest_ensure_response(['data' => db_filter_notable_by_iucn($recent['data'] ?? [])]));
+        return db_rest_no_cache(rest_ensure_response(['data' => db_filter_notable_by_iucn($recent)]));
       }
 
+      // Telangana and Andhra Pradesh first, then the rest of India.
+      // Hotspots and "on this day" are fixed-length lists, so each group
+      // gets half the slots; the sightings feeds are shown in full.
+      $limits = ['hotspots' => [5, 5], 'onthisday' => [10, 10]];
+      if (isset($limits[$tab]) || $tab === 'recent') {
+        $data = db_sightings_regional($request, $tab, $ttl, ['region', 'tab', 'm', 'd'], $limits[$tab] ?? [null, null]);
+        if (!empty($data['error'])) return db_rest_no_cache(rest_ensure_response($data));
+        return db_rest_no_cache(rest_ensure_response(['data' => $data]));
+      }
+
+      // hotspot_species and the species lookup are already tied to one
+      // place, so they pass straight through.
       return db_rest_no_cache(rest_ensure_response(db_proxy_fetch('/api/sightings', $request, ['region', 'tab', 'm', 'd', 'locId', 'speciesCode'], $ttl)));
     },
   ]);

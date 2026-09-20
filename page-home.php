@@ -124,10 +124,10 @@ while (have_posts()) : the_post();
 <section class="home-section">
   <div class="section-head">
     <div>
-      <span class="eyebrow eyebrow--lede" style="color:var(--blue);">Live from eBird · India</span>
+      <span class="eyebrow eyebrow--lede" style="color:var(--blue);">Live from eBird · Telangana, Andhra Pradesh &amp; India</span>
       <h2 class="section-h2">What's being seen right now</h2>
     </div>
-    <div class="region-pills"><span class="region-pill region-pill--sm is-active">India</span></div>
+    <div class="region-pills"><span class="region-pill region-pill--sm is-active">Telangana &amp; Andhra Pradesh first</span></div>
   </div>
   <div class="home-sightings" id="home-sightings-rows">
     <div class="home-sighting-cell"><span class="sk-block" style="width:70%"></span></div>
