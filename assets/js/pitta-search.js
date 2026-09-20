@@ -61,7 +61,22 @@
       if (footStatus) footStatus.textContent = current + ' · ' + baseStatus;
     }
 
-    pills.forEach((b) => b.addEventListener('click', () => showYear(b.dataset.year)));
+    function scrollToYear(year) {
+      const panel = panels.find((p) => p.dataset.year === String(year));
+      const title = panel && panel.querySelector('.year-title');
+      if (!title) return;
+      const top = window.scrollY + title.getBoundingClientRect().top - 24;
+      if (Math.abs(top - window.scrollY) > 8) window.scrollTo(0, top);
+    }
+
+    pills.forEach((b) => b.addEventListener('click', () => {
+      showYear(b.dataset.year);
+      // Bring the grid into view: covers are lazy, so a year switched to
+      // while scrolled elsewhere would otherwise sit blank until scrolled.
+      // Instant rather than smooth — switching years should feel like a
+      // swap, not a journey past the years in between.
+      scrollToYear(b.dataset.year);
+    }));
 
     if (foot) {
       foot.querySelectorAll('.btn[data-step]').forEach((btn) => {
@@ -70,7 +85,7 @@
           const next = years[years.indexOf(current) + Number(btn.dataset.step)];
           if (next) {
             showYear(next);
-            document.querySelector('.years').scrollIntoView({ behavior: 'smooth', block: 'start' });
+            scrollToYear(next);
           }
         });
       });
