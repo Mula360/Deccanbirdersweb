@@ -973,6 +973,18 @@ add_action('rest_api_init', function() {
     },
   ]);
 
+  // Forms read their security token from here rather than from the page,
+  // because a cached page can outlive the token baked into it (tokens
+  // last 24h; LiteSpeed may serve a page for longer). Same-origin only in
+  // practice: no CORS headers, so another site's script cannot read it.
+  register_rest_route('db/v1', '/nonce', [
+    'methods'             => 'GET',
+    'permission_callback' => '__return_true',
+    'callback'            => function() {
+      return db_rest_no_cache(rest_ensure_response(['nonce' => wp_create_nonce('db_contact_nonce')]));
+    },
+  ]);
+
   register_rest_route('db/v1', '/videos', [
     'methods'             => 'GET',
     'permission_callback' => '__return_true',

@@ -16,6 +16,25 @@
     initPhotoSubmitForm();
   });
 
+  /**
+   * A security token that is definitely current. The one in DB_CONFIG
+   * comes from the page HTML, which LiteSpeed caches — tokens expire
+   * after 24 hours, so a cached page can carry a dead one and every
+   * submission would fail with "Security check failed". Fetching it at
+   * submit time sidesteps that; DB_CONFIG is the fallback if the request
+   * fails (offline, say), since a stale token beats no token.
+   */
+  async function freshNonce() {
+    const base = (typeof DB_CONFIG !== 'undefined' && DB_CONFIG.rest_url) || '/wp-json/db/v1/';
+    try {
+      const res = await fetch(base + 'nonce', { cache: 'no-store' });
+      const json = await res.json();
+      return json.nonce || DB_CONFIG.nonce;
+    } catch (e) {
+      return DB_CONFIG.nonce;
+    }
+  }
+
   function initHamburger() {
     const ham = document.querySelector('.hamburger');
     const nav = document.querySelector('.mobile-nav');
@@ -73,7 +92,7 @@
 
       const data = new FormData(form);
       data.append('action', 'db_contact');
-      data.append('nonce', DB_CONFIG.nonce);
+      data.append('nonce', await freshNonce());
 
       try {
         const res = await fetch(DB_CONFIG.ajax_url, { method: 'POST', body: data });
@@ -128,7 +147,7 @@
 
       const data = new FormData(form);
       data.append('action', 'db_volunteer');
-      data.append('nonce', DB_CONFIG.nonce);
+      data.append('nonce', await freshNonce());
 
       try {
         const res = await fetch(DB_CONFIG.ajax_url, { method: 'POST', body: data });
@@ -203,7 +222,7 @@
 
       const data = new FormData(form);
       data.append('action', 'db_photo_submit');
-      data.append('nonce', DB_CONFIG.nonce);
+      data.append('nonce', await freshNonce());
 
       try {
         const res = await fetch(DB_CONFIG.ajax_url, { method: 'POST', body: data });
@@ -259,7 +278,7 @@
 
       const data = new FormData(form);
       data.append('action', 'db_sighting_report');
-      data.append('nonce', DB_CONFIG.nonce);
+      data.append('nonce', await freshNonce());
 
       try {
         const res = await fetch(DB_CONFIG.ajax_url, { method: 'POST', body: data });
