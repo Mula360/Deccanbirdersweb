@@ -833,6 +833,13 @@ function db_sighting_dedupe_key($tab, array $r) {
   return ($r['species'] ?? '') . '|' . ($r['locId'] ?? '') . '|' . ($r['when'] ?? '');
 }
 
+/** The eight most-matched pages (1-based), listed in reading order. */
+function db_pitta_page_numbers(array $page_hits) {
+  $pages = array_map(fn($i) => $i + 1, array_slice(array_keys($page_hits), 0, 8));
+  sort($pages, SORT_NUMERIC);
+  return $pages;
+}
+
 /**
  * Slice a record list for the requested page. Without a per_page param
  * the whole list comes back, so older callers keep working.
@@ -1198,6 +1205,19 @@ function db_pitta_special_name($edition) {
   return preg_replace('/^special\s*[-–—:]\s*/i', '', $edition);
 }
 
+/**
+ * The cover thumbnail for an edition, or '' when there isn't one yet.
+ * Covers are rendered from the PDFs by tools/pitta-index/build_covers.py
+ * and named after the catalog key, so no lookup table is needed.
+ */
+function db_pitta_cover_url($catalog_key) {
+  if (!$catalog_key) return '';
+  $file = '/assets/pitta-covers/' . $catalog_key . '.jpg';
+  return is_readable(get_template_directory() . $file)
+    ? get_template_directory_uri() . $file
+    : '';
+}
+
 function db_pitta_title($year, $month, $edition) {
   $when = db_pitta_months()[(int) $month] . ' ' . $year;
   $special = db_pitta_special_name($edition);
@@ -1464,15 +1484,21 @@ function db_pitta_search($q) {
         'link'    => db_pitta_page_link($url, $i + 1, $q),
       ];
     }
+    $edition = (string) get_post_meta($post->ID, 'edition', true);
     $results[] = [
-      'title'    => $post->post_title,
-      'edition'  => (string) get_post_meta($post->ID, 'edition', true),
-      'year'     => $m['year'],
-      'month'    => $m['month'],
-      'url'      => $url,
-      'url_type' => get_post_meta($post->ID, 'url_type', true),
-      'hits'     => $m['hits'],
-      'pages'    => $snippets,
+      'title'     => $post->post_title,
+      'edition'   => $edition,
+      'special'   => db_pitta_special_name($edition),
+      'cover'     => db_pitta_cover_url($key),
+      'year'      => $m['year'],
+      'month'     => $m['month'],
+      'url'       => $url,
+      'url_type'  => get_post_meta($post->ID, 'url_type', true),
+      'hits'      => $m['hits'],
+      // Every page that matched, for the "p. 2, 7, 11" line on a card —
+      // page_hits is ordered by hit count, so re-sort into reading order.
+      'pageNumbers' => db_pitta_page_numbers($m['page_hits']),
+      'pages'     => $snippets,
     ];
   }
   return ['results' => $results, 'total' => count($matches), 'mode' => $mode];

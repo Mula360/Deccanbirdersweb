@@ -1,11 +1,18 @@
 <?php
 /**
- * [db_pitta_accordion] — PITTA newsletter archive (db_pitta CPT), grouped
- * by year with a 12-month grid per year (each month showing a "Read" link
- * when an issue exists — plus one per Special edition or part — and an em
- * dash otherwise), plus a search box. assets/js/pitta-search.js filters
- * the grid and lists full-text matches from /wp-json/db/v1/pitta-search
- * in #pitta-results.
+ * [db_pitta_accordion] — the PITTA archive on the Archives page.
+ *
+ * Issues are shown as their front covers: a row of year pills, then one
+ * year at a time as a grid of twelve month slots (a cover where an issue
+ * exists, a dashed placeholder where it doesn't), with Special issues
+ * following the twelve as wide cards. Covers come from
+ * assets/pitta-covers/{catalog_key}.jpg (tools/pitta-index/build_covers.py).
+ *
+ * Every year is rendered here and hidden with [hidden], so the archive is
+ * in the HTML for search engines and works without JavaScript; the covers
+ * are lazy, so a hidden year never downloads its images.
+ * assets/js/pitta-search.js switches years and fills #pitta-results from
+ * /wp-json/db/v1/pitta-search.
  */
 
 $issues = get_posts(['post_type' => 'db_pitta', 'posts_per_page' => -1, 'post_status' => 'publish']);
@@ -14,65 +21,151 @@ if (!$issues) {
   return;
 }
 
-$months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+$months = db_pitta_months(); // 1-indexed
 
-// Group by year, then by month — a month can hold more than one issue
-// (e.g. a volume published in two parts).
+// Group by year, splitting the regular monthly run from the Specials: the
+// twelve months keep their slots however many Specials a year happens to have.
 $by_year = [];
 foreach ($issues as $issue) {
-  $y = get_field('year', $issue->ID) ?: 'Unknown';
-  $m = (int) get_field('month', $issue->ID);
-  if ($m < 1 || $m > 12) continue;
-  $by_year[$y][$m][] = $issue;
+  $year  = (int) get_field('year', $issue->ID);
+  $month = (int) get_field('month', $issue->ID);
+  if (!$year || $month < 1 || $month > 12) continue;
+  $special = db_pitta_special_name(get_field('edition', $issue->ID));
+  if ($special !== '') {
+    $by_year[$year]['specials'][] = ['post' => $issue, 'month' => $month, 'name' => $special];
+  } else {
+    $by_year[$year]['months'][$month][] = $issue;
+  }
 }
 krsort($by_year);
-$first = true;
+
+$this_year  = (int) current_time('Y');
+$this_month = (int) current_time('n');
+$total      = count($issues);
+$first_year = min(array_keys($by_year));
+
+/** One issue's link, cover and title. */
+$issue_data = function($issue) {
+  $key = get_post_meta($issue->ID, 'catalog_key', true);
+  return [
+    'url'     => get_field('archive_url', $issue->ID),
+    'cover'   => db_pitta_cover_url($key),
+    'title'   => $issue->post_title,
+    'is_part' => (bool) get_field('is_part', $issue->ID),
+    'part'    => get_field('part_number', $issue->ID),
+    'drive'   => get_field('url_type', $issue->ID) === 'google_drive',
+  ];
+};
 ?>
-<div class="pitta-search-wrap">
-  <input type="search" id="pitta-search" placeholder="Search every PITTA issue — e.g. Indian Pitta, Talakona, 2019" aria-label="Search the text of every PITTA issue" autocomplete="off">
+<div class="pitta-head">
+  <div>
+    <h2 class="pitta-section-title">PITTA Archives</h2>
+    <p class="intro">
+      <?php printf(
+        /* translators: 1: number of issues, 2: first year in the archive */
+        esc_html__('%1$d editions since %2$d — the full text of every page is searchable.', 'deccan-birders'),
+        $total,
+        $first_year
+      ); ?>
+    </p>
+  </div>
+  <label class="search" id="pitta-search-box">
+    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="7" cy="7" r="5"/><path d="m11 11 4 4"/></svg>
+    <input id="pitta-search" type="search" placeholder="<?php esc_attr_e('Search issues — a bird, a place, a member', 'deccan-birders'); ?>"
+           aria-label="<?php esc_attr_e('Search the text of every PITTA issue', 'deccan-birders'); ?>" autocomplete="off">
+    <button class="clear" type="button" id="pitta-search-clear"><?php esc_html_e('Clear ×', 'deccan-birders'); ?></button>
+  </label>
 </div>
-<div class="pitta-results" id="pitta-results" aria-live="polite" hidden></div>
-<div class="pitta-accordion" id="pitta-accordion">
-<?php foreach ($by_year as $year => $by_month):
-  $count = array_sum(array_map('count', $by_month));
+
+<section class="results" id="pitta-results" aria-live="polite"></section>
+
+<div class="years" id="pitta-years">
+  <?php foreach (array_keys($by_year) as $i => $year):
+    $count = count($by_year[$year]['specials'] ?? []);
+    foreach ($by_year[$year]['months'] ?? [] as $in_month) $count += count($in_month);
+  ?>
+    <button type="button" class="year-pill" data-year="<?php echo esc_attr($year); ?>" aria-pressed="<?php echo $i === 0 ? 'true' : 'false'; ?>">
+      <?php echo esc_html($year); ?><span class="n"><?php echo esc_html($count); ?></span>
+    </button>
+  <?php endforeach; ?>
+</div>
+
+<?php foreach (array_keys($by_year) as $i => $year):
+  $year_months   = $by_year[$year]['months'] ?? [];
+  $year_specials = $by_year[$year]['specials'] ?? [];
+  $regular_count = array_sum(array_map('count', $year_months));
 ?>
-  <details class="pitta-year" data-search="<?php echo esc_attr(strtolower($year)); ?>" <?php if ($first) echo 'open'; ?>>
-    <summary class="pitta-year-heading">
-      <span class="pitta-year-number"><?php echo esc_html($year); ?></span>
-      <span class="pitta-count"><?php echo esc_html($count); ?> issue<?php echo $count === 1 ? '' : 's'; ?></span>
-    </summary>
-    <div class="pitta-month-grid">
-      <?php for ($m = 1; $m <= 12; $m++):
-        $issues_in_month = $by_month[$m] ?? [];
+<div class="pitta-year-panel" data-year="<?php echo esc_attr($year); ?>" <?php if ($i !== 0) echo 'hidden'; ?>>
+  <div class="year-title">
+    <strong><?php echo esc_html($year); ?></strong>
+    <span>
+      <?php
+      printf(esc_html(_n('%d regular issue', '%d regular issues', $regular_count, 'deccan-birders')), $regular_count);
+      if ($year_specials) printf(esc_html(' · %d special'), count($year_specials));
       ?>
-        <div class="pitta-month-col">
-          <span class="pitta-month-label"><?php echo esc_html($months[$m - 1]); ?></span>
-          <?php if ($issues_in_month): ?>
-            <div class="pitta-month-links">
-              <?php foreach ($issues_in_month as $issue):
-                $url     = get_field('archive_url', $issue->ID);
-                $type    = get_field('url_type', $issue->ID);
-                $is_part = get_field('is_part', $issue->ID);
-                $part_no = get_field('part_number', $issue->ID);
-                $special = db_pitta_special_name(get_field('edition', $issue->ID));
-                $label   = $special !== ''
-                  ? 'Special: ' . $special
-                  : ($type === 'google_drive' ? 'Open in Drive' : 'Read') . ($is_part ? ' (Pt ' . $part_no . ')' : '');
-              ?>
-                <a href="<?php echo esc_url($url); ?>" target="_blank" rel="noopener"
-                   class="pitta-month-link"
-                   data-search="<?php echo esc_attr(strtolower($year . ' ' . $months[$m - 1] . ' ' . $issue->post_title)); ?>"
-                   title="<?php echo esc_attr($issue->post_title); ?>">
-                  <?php echo esc_html($label); ?>
-                </a>
-              <?php endforeach; ?>
-            </div>
-          <?php else: ?>
-            <span class="pitta-month-empty" data-empty>—</span>
-          <?php endif; ?>
+    </span>
+  </div>
+
+  <div class="grid">
+    <?php for ($m = 1; $m <= 12; $m++):
+      $in_month = $year_months[$m] ?? [];
+      if (!$in_month):
+        // Nothing published that month — or not published yet.
+        $future = $year > $this_year || ($year === $this_year && $m > $this_month);
+      ?>
+        <div class="issue gap">
+          <div class="cover"><?php echo $future ? esc_html__('Coming soon', 'deccan-birders') : esc_html__('Not published', 'deccan-birders'); ?></div>
+          <div class="cap"><?php echo esc_html($months[$m]); ?></div>
         </div>
-      <?php endfor; ?>
-    </div>
-  </details>
-<?php $first = false; endforeach; ?>
+      <?php else:
+        foreach ($in_month as $issue):
+          $d = $issue_data($issue);
+          $caption = $months[$m] . ($d['is_part'] ? ' (Pt ' . $d['part'] . ')' : '');
+      ?>
+        <a class="issue" href="<?php echo esc_url($d['url']); ?>" target="_blank" rel="noopener"
+           data-search="<?php echo esc_attr(strtolower($year . ' ' . $months[$m] . ' ' . $d['title'])); ?>"
+           title="<?php echo esc_attr($d['title']); ?>">
+          <div class="frame">
+            <?php if ($d['cover']): ?>
+              <img class="cover" src="<?php echo esc_url($d['cover']); ?>" alt="" loading="lazy" decoding="async" width="300" height="400">
+            <?php else: ?>
+              <span class="cover cover--none" aria-hidden="true"><?php echo esc_html($months[$m]); ?></span>
+            <?php endif; ?>
+          </div>
+          <div class="cap"><?php echo esc_html($caption); ?></div>
+        </a>
+      <?php endforeach; endif; ?>
+    <?php endfor; ?>
+
+    <?php foreach ($year_specials as $special):
+      $d = $issue_data($special['post']);
+    ?>
+      <a class="special" href="<?php echo esc_url($d['url']); ?>" target="_blank" rel="noopener"
+         data-search="<?php echo esc_attr(strtolower($year . ' ' . $months[$special['month']] . ' ' . $special['name'] . ' ' . $d['title'])); ?>"
+         title="<?php echo esc_attr($d['title']); ?>">
+        <div class="cover">
+          <?php if ($d['cover']): ?>
+            <img src="<?php echo esc_url($d['cover']); ?>" alt="" loading="lazy" decoding="async">
+          <?php endif; ?>
+          <div class="shade" aria-hidden="true"></div>
+          <span class="tag"><?php esc_html_e('SPECIAL ISSUE', 'deccan-birders'); ?></span>
+          <div class="txt">
+            <b><?php echo esc_html($special['name']); ?></b>
+            <small><?php echo esc_html($months[$special['month']] . ' ' . $year); ?> · <?php echo $d['drive'] ? esc_html__('Open in Drive ↗', 'deccan-birders') : esc_html__('Read ↗', 'deccan-birders'); ?></small>
+          </div>
+        </div>
+      </a>
+    <?php endforeach; ?>
+  </div>
+</div>
+<?php endforeach; ?>
+
+<div class="foot" id="pitta-foot">
+  <button type="button" class="btn btn-ghost" data-step="-1">‹ <?php esc_html_e('Newer', 'deccan-birders'); ?></button>
+  <span id="pitta-foot-status"><?php printf(
+    esc_html__('%1$d years · %2$d issues', 'deccan-birders'),
+    count($by_year),
+    $total
+  ); ?></span>
+  <button type="button" class="btn btn-dark" data-step="1"><?php esc_html_e('Older', 'deccan-birders'); ?> ›</button>
 </div>

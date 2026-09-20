@@ -1262,186 +1262,206 @@ a.events-pager-btn { text-decoration: none; display: inline-block; }
 body.lightbox-open { overflow: hidden; }
 
 /* -------------------------------------------------------------------------
-   PITTA accordion ([db_pitta_accordion])
+   PITTA archive ([db_pitta_accordion]) — covers by year
+   Follows the archives-2a design, on this site's tokens and fonts.
    ---------------------------------------------------------------------- */
-/* PITTA section container (design: clamp(40px,5vw,64px) top,
-   clamp(60px,8vw,96px) bottom). */
 .pitta-section {
   max-width: var(--max-w);
   margin: 0 auto;
   padding: clamp(40px, 5vw, 64px) 20px clamp(60px, 8vw, 96px);
 }
+
+/* Heading and search pill share a line until they can't. */
+.pitta-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: 32px;
+  flex-wrap: wrap;
+}
 .pitta-section-title {
-  margin: 0;
+  margin: 0 0 10px;
   font-family: var(--font-head);
-  font-size: clamp(26px, 3.4vw, 38px);
+  font-size: clamp(30px, 4vw, 40px);
+  line-height: 1;
   letter-spacing: -0.03em;
   font-weight: 700;
   color: var(--ink);
 }
-.pitta-section-intro { margin: 12px 0 26px; font-size: 17px; color: var(--text-muted); max-width: 50ch; }
+.pitta-head .intro { margin: 0; max-width: 520px; font-size: 17px; color: var(--text-muted); }
 
-.pitta-search-wrap { margin-bottom: 24px; }
-#pitta-search {
-  width: 100%;
-  max-width: 560px;
-  font-family: var(--font-body);
-  font-size: 15px;
-  padding: 12px 16px;
-  border: 2px solid var(--border);
-  border-radius: var(--radius-sm);
-  background: white;
-  color: var(--ink);
-  transition: border-color 150ms;
-}
-#pitta-search:focus { outline: none; border-color: var(--blue); }
-
-.pitta-accordion { display: flex; flex-direction: column; gap: 10px; }
-
-.pitta-year {
-  border: 1px solid var(--border);
-  border-radius: 14px;
+.pitta-section .search {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex: 1 1 320px;
+  max-width: 420px;
+  height: 52px;
+  padding: 0 18px;
   background: #fff;
-  overflow: hidden;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-btn);
 }
-.pitta-year-heading {
-  padding: 20px 24px;
-  gap: 16px;
-  cursor: pointer;
-  font-family: var(--font-head);
-  font-weight: 700;
+.pitta-section .search:focus-within { border-color: var(--blue); box-shadow: 0 0 0 3px var(--blue-light); }
+.pitta-section .search svg { flex: none; color: var(--text-muted); }
+.pitta-section .search input {
+  flex: 1;
+  min-width: 0;
+  border: 0;
+  outline: 0;
+  background: transparent;
+  font-family: var(--font-body);
   font-size: 16px;
   color: var(--ink);
-  list-style: none;
-  display: flex;
-  align-items: baseline;
-  gap: 10px;
 }
-.pitta-year-heading::-webkit-details-marker { display: none; }
-.pitta-year-number { font-size: clamp(22px, 3vw, 28px); font-weight: 700; letter-spacing: -0.03em; color: var(--ink); }
-.pitta-year-heading::after {
-  content: '+';
-  margin-left: auto;
-  font-size: 22px;
-  color: var(--blue);
-  transition: transform 150ms;
-}
-.pitta-year[open] .pitta-year-heading::after { transform: rotate(45deg); }
-.pitta-count {
-  font-family: var(--font-head);
-  font-weight: 600;
-  font-size: 13.5px;
+.pitta-section .search input::placeholder { color: #6B857A; }
+.pitta-section .search .clear {
+  display: none;
+  font-size: 14px;
   color: var(--text-muted);
   padding: 4px 10px;
-  background: var(--blue-light);
-  border-radius: 999px;
-}
-
-.pitta-month-grid {
-  border-top: 1px solid var(--border-light);
-  padding: 18px 24px 24px;
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(104px, 1fr));
-  gap: 10px;
-}
-.pitta-month-col { display: grid; gap: 6px; }
-.pitta-month-label {
-  font-family: var(--font-head);
-  font-weight: 600;
-  font-size: 11.5px;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: var(--text-muted);
-}
-.pitta-month-links { display: flex; flex-wrap: wrap; gap: 6px; }
-.pitta-month-link {
-  display: block;
-  padding: 8px 12px;
-  background: #E8F1EA; /* exact design token */
-  color: var(--green-dark);
-  border-radius: 8px;
-  font-family: var(--font-head);
-  font-size: 13.5px;
-  font-weight: 600;
-  text-decoration: none;
-  transition: background 150ms, color 150ms;
-}
-.pitta-month-link:hover { background: var(--green-dark); color: #fff; }
-.pitta-month-empty { display: block; padding: 8px 12px; color: #6B857A; font-size: 13.5px; }
-
-/* The search toggles [hidden] on grid cells and links; those rules set
-   display explicitly, so [hidden] needs to win over them. */
-.pitta-accordion [hidden],
-.pitta-results[hidden] { display: none !important; }
-
-/* Full-text search results (assets/js/pitta-search.js) */
-.pitta-results { margin: -8px 0 28px; }
-.pitta-results-msg { margin: 0; padding: 16px 20px; border-radius: 14px; background: var(--surface); color: var(--text-muted); font-size: 15.5px; }
-.pitta-results-msg.is-error { background: #FDF3DA; color: var(--ink); }
-.pitta-results-count { margin: 0 0 12px; font-family: var(--font-head); font-weight: 600; font-size: 14px; color: var(--text-muted); }
-.pitta-hits { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; }
-.pitta-hit {
-  border: 1px solid var(--border);
-  border-radius: 14px;
-  background: #fff;
-  padding: 18px 22px;
-}
-.pitta-hit-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; }
-.pitta-hit-heading { min-width: 0; }
-.pitta-hit-title {
-  margin: 0;
-  font-family: var(--font-head);
-  font-size: 17px;
-  font-weight: 700;
-  letter-spacing: -0.02em;
-  color: var(--ink);
-}
-.pitta-hit-meta { display: block; margin-top: 2px; font-size: 14px; color: var(--text-muted); }
-.pitta-hit-read {
-  flex-shrink: 0;
-  padding: 8px 14px;
-  background: #E8F1EA;
-  color: var(--green-dark);
-  border-radius: 8px;
-  font-family: var(--font-head);
-  font-size: 13.5px;
-  font-weight: 600;
-  text-decoration: none;
+  border-radius: var(--radius-btn);
+  background: var(--surface);
+  border: 0;
+  cursor: pointer;
   white-space: nowrap;
-  transition: background 150ms, color 150ms;
 }
-.pitta-hit-read:hover { background: var(--green-dark); color: #fff; }
-.pitta-hit-snippets { list-style: none; margin: 12px 0 0; padding: 0; display: grid; gap: 6px; }
-.pitta-hit-snippet {
-  display: flex;
-  gap: 12px;
-  padding: 8px 10px;
-  margin: 0 -10px;
-  border-radius: 8px;
-  color: var(--text-body);
-  font-size: 15px;
-  line-height: 1.5;
+.pitta-section .search.has-query .clear { display: inline-block; }
+
+/* Search results panel */
+.pitta-section .results { display: none; margin-top: 28px; background: #fff; border: 1px solid var(--border); border-radius: var(--radius-card); padding: 24px 28px; }
+.pitta-section .results.show { display: block; }
+.pitta-section .results-head { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; flex-wrap: wrap; }
+.pitta-section .results-head strong { font-family: var(--font-head); font-size: 18px; font-weight: 700; color: var(--ink); }
+.pitta-section .results-head span { font-size: 14px; color: var(--text-muted); }
+.pitta-section .results-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 16px; margin-top: 18px; }
+.pitta-section .result {
+  display: grid;
+  grid-template-columns: 64px minmax(0, 1fr);
+  gap: 14px;
+  padding: 14px;
+  border-radius: 12px;
+  background: var(--surface);
   text-decoration: none;
-  transition: background 150ms;
+  color: inherit;
+  align-items: start;
 }
-.pitta-hit-snippet:hover { background: var(--blue-light); }
-.pitta-hit-page {
-  flex-shrink: 0;
-  min-width: 38px;
+.pitta-section .result:hover { background: var(--blue-light); color: inherit; }
+.pitta-section .result img, .pitta-section .result .thumb { width: 64px; aspect-ratio: 3 / 4; border-radius: 6px; object-fit: cover; background: var(--border); }
+.pitta-section .result .t { font-family: var(--font-head); font-size: 15px; font-weight: 700; color: var(--ink); }
+.pitta-section .result .k { font-size: 13px; color: var(--green-dark); font-weight: 600; margin-top: 2px; }
+.pitta-section .result .s { font-size: 14px; line-height: 1.45; color: var(--text-body); margin-top: 8px; }
+.pitta-section .result mark { background: rgba(242, 183, 5, 0.35); font-weight: 600; padding: 0 2px; border-radius: 2px; color: inherit; }
+.pitta-section .results-foot { margin-top: 16px; font-size: 14px; color: var(--text-muted); }
+.pitta-section .results-foot button {
+  background: none;
+  border: 0;
+  padding: 0;
+  cursor: pointer;
   font-family: var(--font-head);
-  font-size: 12.5px;
+  font-size: 14px;
   font-weight: 600;
   color: var(--blue);
-  padding-top: 2px;
 }
-.pitta-hit-text { min-width: 0; overflow-wrap: anywhere; }
-.pitta-hit-text mark { background: rgba(242, 183, 5, 0.35); color: var(--ink); padding: 0 2px; border-radius: 3px; }
+.pitta-section .results-msg { margin: 0; font-size: 15.5px; color: var(--text-muted); }
+.pitta-section .results-msg.is-error { color: var(--ink); }
 
-@media (max-width: 560px) {
-  .pitta-hit { padding: 16px; }
-  .pitta-hit-top { flex-direction: column; gap: 10px; }
-  .pitta-hit-snippet { flex-direction: column; gap: 2px; }
+/* Year pills */
+.pitta-section .years { display: flex; gap: 8px; margin-top: 36px; align-items: center; flex-wrap: wrap; }
+.pitta-section .year-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  font-family: var(--font-head);
+  font-size: 15px;
+  font-weight: 700;
+  padding: 11px 18px;
+  border-radius: var(--radius-btn);
+  background: #fff;
+  color: var(--ink);
+  border: 1px solid var(--border);
+  transition: background 150ms, border-color 150ms, color 150ms;
 }
+.pitta-section .year-pill:hover { border-color: var(--blue); }
+.pitta-section .year-pill .n { font-family: var(--font-body); font-size: 12px; font-weight: 600; padding: 2px 7px; border-radius: var(--radius-btn); background: var(--blue-light); color: var(--blue); }
+.pitta-section .year-pill[aria-pressed="true"] { background: var(--ink); color: #fff; border-color: var(--ink); }
+.pitta-section .year-pill[aria-pressed="true"] .n { background: rgba(255, 255, 255, 0.18); color: #fff; }
+
+/* One year's grid */
+.pitta-section .year-title { margin-top: 28px; display: flex; align-items: baseline; gap: 14px; }
+.pitta-section .year-title strong { font-family: var(--font-head); font-size: 32px; line-height: 1; font-weight: 700; letter-spacing: -0.02em; color: var(--ink); }
+.pitta-section .year-title span { font-size: 15px; color: var(--text-muted); }
+.pitta-section .grid { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 20px; margin-top: 20px; align-items: start; }
+@media (max-width: 900px) { .pitta-section .grid { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
+@media (max-width: 560px) { .pitta-section .grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; } }
+
+.pitta-section .issue { display: block; text-decoration: none; color: inherit; }
+.pitta-section .issue .frame { padding: 6px; background: #fff; border: 1px solid var(--border); border-radius: var(--radius-sm); transition: border-color 150ms; }
+.pitta-section .issue:hover .frame { border-color: var(--blue); }
+.pitta-section .issue img.cover, .pitta-section .issue .cover { display: block; width: 100%; aspect-ratio: 3 / 4; border-radius: 4px; object-fit: cover; background: var(--border); }
+/* An issue whose cover hasn't been rendered yet still gets a tile. */
+.pitta-section .issue .cover--none {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--green-light);
+  color: var(--green-dark);
+  font-family: var(--font-head);
+  font-size: 13px;
+  font-weight: 600;
+}
+.pitta-section .issue .cap { margin-top: 10px; font-family: var(--font-head); font-size: 14px; font-weight: 600; color: var(--text-muted); }
+.pitta-section .issue:hover .cap { color: var(--ink); }
+.pitta-section .gap .cover {
+  border: 1.5px dashed var(--border);
+  background: transparent;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-body);
+  font-size: 13px;
+  color: #6B857A;
+  text-align: center;
+  padding: 12px;
+  aspect-ratio: 3 / 4;
+  border-radius: var(--radius-sm);
+}
+.pitta-section .gap .cap { color: #6B857A; }
+/* Dimmed while a search narrows the grid. */
+.pitta-section .dim { opacity: 0.35; }
+
+/* Special issue — follows the twelve months, spans two columns. */
+.pitta-section .special { grid-column: span 2; display: block; text-decoration: none; color: #fff; }
+.pitta-section .special .cover { position: relative; aspect-ratio: 2.1 / 1.33; border-radius: 12px; overflow: hidden; background: var(--ink); outline: 2px solid var(--yellow); outline-offset: 3px; }
+.pitta-section .special img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+.pitta-section .special .shade { position: absolute; inset: 0; background: linear-gradient(180deg, rgba(0, 0, 0, 0) 30%, rgba(0, 0, 0, 0.6)); }
+.pitta-section .special .tag {
+  position: absolute;
+  left: 16px;
+  top: 16px;
+  background: var(--yellow);
+  color: var(--ink);
+  font-family: var(--font-head);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  padding: 4px 8px;
+  border-radius: 4px;
+}
+.pitta-section .special .txt { position: absolute; left: 16px; right: 16px; bottom: 16px; }
+.pitta-section .special .txt b { display: block; font-family: var(--font-head); font-size: 22px; line-height: 1.2; font-weight: 700; letter-spacing: -0.01em; }
+.pitta-section .special .txt small { display: block; font-size: 13px; margin-top: 6px; color: rgba(255, 255, 255, 0.85); }
+.pitta-section .special:hover .cover { outline-color: var(--blue); }
+@media (max-width: 560px) { .pitta-section .special .txt b { font-size: 18px; } }
+
+/* Year stepper under the grid */
+.pitta-section .foot { display: flex; justify-content: space-between; align-items: center; gap: 12px; margin-top: 44px; padding-top: 24px; border-top: 1px solid var(--border); }
+.pitta-section .foot .btn { padding: 11px 20px; border-radius: var(--radius-btn); font-family: var(--font-head); font-size: 14px; font-weight: 600; text-decoration: none; cursor: pointer; }
+.pitta-section .foot .btn-ghost { border: 1px solid var(--border); background: #fff; color: #6B857A; }
+.pitta-section .foot .btn-dark { background: var(--ink); color: #fff; border: 1px solid var(--ink); }
+.pitta-section .foot .btn:disabled { opacity: 0.4; cursor: not-allowed; }
+.pitta-section .foot span { font-size: 14px; color: var(--text-muted); }
 
 /* -------------------------------------------------------------------------
    Membership application options + benefits ([db_membership_tiers])
@@ -1963,40 +1983,24 @@ body.lightbox-open { overflow: hidden; }
 /* Shared banner-image container (design: padding 32px 20px 0). */
 .page-banner { max-width: var(--max-w); margin: 0 auto; padding: 32px 20px 0; }
 
-.library-columns {
-  max-width: var(--max-w);
-  margin: 0 auto;
-  padding: clamp(44px, 6vw, 72px) 20px 0;
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-  gap: 20px;
-}
-.library-col {
-  background: #fff;
-  border: 1px solid var(--border);
-  border-radius: var(--radius-card);
-  padding: 28px;
-}
-.library-col-title {
-  margin: 0 0 16px;
-  font-family: var(--font-head);
-  font-size: 20px;
-  font-weight: 600;
-  letter-spacing: -0.02em;
+.library-wrap { max-width: var(--max-w); margin: 0 auto; padding: clamp(44px, 6vw, 72px) 20px 0; }
+.docs { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; }
+.docs .card { background: #fff; border: 1px solid var(--border); border-radius: 14px; padding: 24px 28px; }
+.docs .card h3 { margin: 0; font-family: var(--font-head); font-size: 19px; font-weight: 700; color: var(--ink); }
+.docs .card a {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 14px 0 0;
+  margin-top: 10px;
+  border-top: 1px solid var(--border-light);
+  text-decoration: none;
   color: var(--ink);
+  font-weight: 600;
 }
-/* Single standalone document link, underlined by a hairline rule. */
-.library-doc {
-  display: block;
-  font-size: 17px;
-  line-height: 1.5;
-  border-bottom: 1px solid var(--border-light);
-  padding-bottom: 12px;
-}
-/* Publication rows are prose with an inline link — no block/border. */
-.library-pubs { display: grid; gap: 12px; }
-.library-pubs > div { font-size: 16.5px; line-height: 1.5; color: var(--text-body); }
-.library-col a { color: var(--blue); }
+.docs .card a + a { padding-top: 14px; margin-top: 14px; }
+.docs .card a .by { color: var(--text-muted); font-weight: 400; }
+.docs .card a:hover { color: var(--blue); }
 
 /* -------------------------------------------------------------------------
    Contact page — phone/email info block
