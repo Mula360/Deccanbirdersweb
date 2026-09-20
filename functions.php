@@ -194,6 +194,21 @@ function db_settings_fields() {
 }
 
 /**
+ * Years the society has been going, counted from the founding year so
+ * the homepage stat never goes stale. "Years active" in Site Settings
+ * overrides it if the committee ever wants a fixed figure.
+ */
+function db_founded_year() {
+  return 1980;
+}
+
+function db_years_active() {
+  $override = (int) db_setting('db_years_active');
+  if ($override > 0) return $override;
+  return max(1, (int) current_time('Y') - db_founded_year());
+}
+
+/**
  * Where each kind of submission is emailed. The setting takes a list
  * separated by commas, so several committee members can be notified.
  */

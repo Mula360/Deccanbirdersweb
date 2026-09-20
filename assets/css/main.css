@@ -2331,6 +2331,29 @@ body.lightbox-open { overflow: hidden; }
 .pitta-collage img { width: 100%; height: 100%; min-height: 110px; object-fit: cover; border-radius: 12px; }
 .pitta-collage img:first-child { grid-row: span 2; min-height: 150px; }
 
+/* Home "what's being seen right now" scrolls sideways, so the strip can
+   carry a longer run of records than four cells would fit. */
+.home-sightings-scroller {
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+  scroll-snap-type: x proximity;
+  -webkit-overflow-scrolling: touch;
+  margin: 0 -20px;
+  padding: 2px 20px 12px;
+  scrollbar-width: thin;
+}
+.home-sightings-scroller .home-sightings {
+  flex-wrap: nowrap;
+  min-width: min-content;
+}
+.home-sightings-scroller .home-sighting-cell {
+  flex: 0 0 clamp(210px, 24vw, 260px);
+  scroll-snap-align: start;
+}
+.home-sightings-scroller::-webkit-scrollbar { height: 8px; }
+.home-sightings-scroller::-webkit-scrollbar-thumb { background: var(--border); border-radius: 999px; }
+.home-sightings-scroller::-webkit-scrollbar-thumb:hover { background: #C8D3CC; }
+
 /* eBird strip — hairline-divided cells. */
 .home-sightings {
   display: flex;

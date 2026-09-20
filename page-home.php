@@ -18,7 +18,8 @@ while (have_posts()) : the_post();
     $stats = [
       ['stat_number' => '1980', 'stat_label' => 'Founded, as the Birdwatchers Society of Andhra Pradesh'],
       ['stat_number' => '12',   'stat_label' => 'Issues of PITTA published every year'],
-      ['stat_number' => '45',   'stat_label' => 'Years of field records and waterfowl counts'],
+      // Counts itself from the founding year, so it never goes stale.
+      ['stat_number' => (string) db_years_active(), 'stat_label' => 'Years of field records and waterfowl counts'],
     ];
   }
 
@@ -124,16 +125,18 @@ while (have_posts()) : the_post();
 <section class="home-section">
   <div class="section-head">
     <div>
-      <span class="eyebrow eyebrow--lede" style="color:var(--blue);">Live from eBird · Telangana, Andhra Pradesh &amp; India</span>
+      <span class="eyebrow eyebrow--lede" style="color:var(--blue);">Live from eBird</span>
       <h2 class="section-h2">What's being seen right now</h2>
     </div>
-    <div class="region-pills"><span class="region-pill region-pill--sm is-active">Telangana &amp; Andhra Pradesh first</span></div>
   </div>
-  <div class="home-sightings" id="home-sightings-rows">
-    <div class="home-sighting-cell"><span class="sk-block" style="width:70%"></span></div>
-    <div class="home-sighting-cell"><span class="sk-block" style="width:70%"></span></div>
-    <div class="home-sighting-cell"><span class="sk-block" style="width:70%"></span></div>
-    <div class="home-sighting-cell"><span class="sk-block" style="width:70%"></span></div>
+  <!-- Scrolls sideways: a longer run of records than four cells would fit. -->
+  <div class="home-sightings-scroller">
+    <div class="home-sightings" id="home-sightings-rows">
+      <div class="home-sighting-cell"><span class="sk-block" style="width:70%"></span></div>
+      <div class="home-sighting-cell"><span class="sk-block" style="width:70%"></span></div>
+      <div class="home-sighting-cell"><span class="sk-block" style="width:70%"></span></div>
+      <div class="home-sighting-cell"><span class="sk-block" style="width:70%"></span></div>
+    </div>
   </div>
   <a href="/sightings" class="text-link text-link--block">Notable sightings and hotspots →</a>
 </section>

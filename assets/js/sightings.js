@@ -554,8 +554,9 @@ async function loadOnThisDay() {
 async function initHomeStrip() {
   const strip = document.getElementById('home-sightings-rows');
   if (!strip) return;
-  // The strip shows four rows, so it asks for exactly four.
-  const data = await fetchRecords('recent', { page: 1, per_page: 4 }, true);
+  // The strip scrolls sideways, so it carries a longer run than the four
+  // cells on show — still a fraction of the full feed.
+  const data = await fetchRecords('recent', { page: 1, per_page: 15 }, true);
   if (!data) { strip.innerHTML = '<p class="strip-error">Could not load sightings.</p>'; return; }
   strip.innerHTML = data.map(renderSightingRow).join('');
   // Auto-refresh every 15 minutes
