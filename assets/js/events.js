@@ -163,16 +163,20 @@ function detailRow(label, value) {
  */
 /**
  * Whom to ring about a trip, read out of the calendar invitation by
- * db_event_coordinators() in functions.php. The number is a tel: link,
- * so it dials straight from a phone.
+ * db_event_coordinators() in functions.php. It sits right under the trip
+ * name — on the Events page and on the home page, which uses these same
+ * cards — so nobody has to open the details to find a number. Each one
+ * is a tel: link, so it dials straight from a phone.
  */
-function coordinatorRow(coordinators) {
+function coordinatorLine(coordinators) {
   if (!coordinators || !coordinators.length) return '';
   const people = coordinators.map((c) =>
     `<a class="event-coordinator" href="tel:${escapeHtml(c.tel)}">${escapeHtml(c.name)} · ${escapeHtml(c.phone)}</a>`
-  ).join('');
-  return `<div class="event-detail"><span class="event-detail-label">${coordinators.length > 1 ? 'Trip coordinators' : 'Trip coordinator'}</span>`
-    + `<span class="event-coordinators">${people}</span></div>`;
+  ).join('<span class="event-coordinator-sep" aria-hidden="true">,</span> ');
+  return `<div class="event-coordinators">
+      <span class="event-coordinators-label">${coordinators.length > 1 ? 'Coordinators' : 'Coordinator'}</span>
+      ${people}
+    </div>`;
 }
 
 function renderCard(kind, data, index) {
@@ -192,7 +196,6 @@ function renderCard(kind, data, index) {
     : detailRow('Meeting point', data.meetingPoint) + detailRow('Starts', data.time) +
       detailRow('Led by', data.leader) + detailRow('Fee', data.fee ? `₹${data.fee}` : '') +
       (data.loanerBins ? detailRow('Binoculars', 'Loaner pairs available') : '') +
-      coordinatorRow(data.coordinators) +
       (data.notes ? `<div class="event-detail-notes">${escapeHtml(data.notes)}</div>` : '');
 
   const hasDetails = details.trim() !== '';
@@ -205,6 +208,7 @@ function renderCard(kind, data, index) {
     </div>
     <div class="event-body">
       <div class="event-title">${escapeHtml(data.title)}</div>
+      ${kind === 'upcoming' ? coordinatorLine(data.coordinators) : ''}
       ${data.place ? `<div class="event-meta">${escapeHtml(data.place)}</div>` : ''}
       ${kind === 'upcoming' && data.time ? `<div class="event-meta">${escapeHtml(dayName)} · ${escapeHtml(data.time)}</div>` : ''}
       ${chips}

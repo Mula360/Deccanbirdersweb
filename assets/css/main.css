@@ -2354,14 +2354,29 @@ body.lightbox-open { overflow: hidden; }
 .home-sightings-scroller::-webkit-scrollbar-thumb { background: var(--border); border-radius: 999px; }
 .home-sightings-scroller::-webkit-scrollbar-thumb:hover { background: #C8D3CC; }
 
-/* Trip coordinators on an upcoming event card: tappable phone links. */
-.event-coordinators { display: flex; flex-direction: column; gap: 2px; }
+/* Trip coordinators, directly under the trip name on an upcoming card
+   (Events page and home page alike): tappable phone links. */
+.event-coordinators {
+  margin-top: 6px;
+  font-size: 14.5px;
+  line-height: 1.5;
+  color: var(--text-muted);
+}
+.event-coordinators-label {
+  font-family: var(--font-head);
+  font-size: 11.5px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  margin-right: 6px;
+}
 .event-coordinator {
   color: var(--blue);
   text-decoration: none;
   font-weight: 600;
   border-bottom: 1px solid transparent;
-  align-self: flex-start;
+  white-space: nowrap;
 }
 .event-coordinator:hover { border-bottom-color: currentColor; }
 
