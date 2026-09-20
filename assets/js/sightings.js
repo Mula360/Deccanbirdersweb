@@ -129,13 +129,19 @@ async function fetchTab(tab, extra = {}, standalone = false) {
     const json = await res.json();
     if (json.error) {
       console.error('Sightings API error:', json.message);
-      return [];
+      return { data: [] };
     }
-    return json.data || [];
+    return json;
   } catch (e) {
     if (e.name !== 'AbortError') console.error('Sightings fetch error:', e);
     return null;
   }
+}
+
+// Most callers only want the records.
+async function fetchRecords(tab, extra = {}, standalone = false) {
+  const res = await fetchTab(tab, extra, standalone);
+  return res === null ? null : (res.data || []);
 }
 
 /* -------------------------------------------------------------------------
@@ -143,54 +149,56 @@ async function fetchTab(tab, extra = {}, standalone = false) {
  * ---------------------------------------------------------------------- */
 
 /* -------------------------------------------------------------------------
- * Shared pagination. The design lays Notable out as a 3-4 across card grid,
- * so a "page" is 10 rows of that grid — 30 records. The same page size is
- * used for the recent list so both tabs behave consistently.
+ * Pagination. The server slices the feed (per_page below) so a page view
+ * carries 30 records instead of the whole 1,200-record region feed; paging
+ * asks for the next slice, which the server already has cached.
  * ---------------------------------------------------------------------- */
 
 const PAGE_SIZE = 30;
 
-function paginateInto(el, items, renderItem, wrapClass) {
-  let page = 1;
-  const pages = Math.max(1, Math.ceil(items.length / PAGE_SIZE));
+function pagerHtml(page, pages, total) {
+  if (pages <= 1) return `<p class="records-count">${total} record${total === 1 ? '' : 's'}</p>`;
+  return `
+    <nav class="events-pager" aria-label="Sightings pages">
+      <button type="button" class="events-pager-btn" data-step="-1"${page === 1 ? ' disabled' : ''}>← Previous</button>
+      <span class="events-pager-status">Page ${page} of ${pages} · ${total} records</span>
+      <button type="button" class="events-pager-btn" data-step="1"${page === pages ? ' disabled' : ''}>Next →</button>
+    </nav>`;
+}
 
-  function paint() {
-    const start = (page - 1) * PAGE_SIZE;
-    const slice = items.slice(start, start + PAGE_SIZE);
+/**
+ * Render one server-supplied page, wiring its pager to fetch the next.
+ * res is the endpoint envelope: { data, page, pages, total }.
+ */
+function renderPage(el, tab, res, renderItem, wrapClass, emptyMsg) {
+  if (!el || res === null) return;
+  const items = res.data || [];
+  if (!items.length && (res.page || 1) === 1) { el.innerHTML = emptyState(emptyMsg); return; }
 
-    const nav = pages > 1 ? `
-      <nav class="events-pager" aria-label="Sightings pages">
-        <button type="button" class="events-pager-btn" data-step="-1"${page === 1 ? ' disabled' : ''}>← Previous</button>
-        <span class="events-pager-status">Page ${page} of ${pages} · ${items.length} records</span>
-        <button type="button" class="events-pager-btn" data-step="1"${page === pages ? ' disabled' : ''}>Next →</button>
-      </nav>` : `<p class="records-count">${items.length} record${items.length === 1 ? '' : 's'}</p>`;
+  const page = res.page || 1;
+  const pages = res.pages || 1;
+  el.innerHTML = `<div class="${wrapClass}">${items.map(renderItem).join('')}</div>${pagerHtml(page, pages, res.total || items.length)}`;
 
-    el.innerHTML = `<div class="${wrapClass}">${slice.map(renderItem).join('')}</div>${nav}`;
-
-    el.querySelectorAll('.events-pager-btn').forEach((btn) => {
-      btn.addEventListener('click', () => {
-        page = Math.min(pages, Math.max(1, page + Number(btn.dataset.step)));
-        paint();
-        el.scrollIntoView({ behavior: 'smooth', block: 'start' });
-      });
+  el.querySelectorAll('.events-pager-btn').forEach((btn) => {
+    btn.addEventListener('click', async () => {
+      const next = Math.min(pages, Math.max(1, page + Number(btn.dataset.step)));
+      if (next === page) return;
+      el.querySelectorAll('.events-pager-btn').forEach((b) => { b.disabled = true; });
+      const fresh = await fetchTab(tab, { page: next, per_page: PAGE_SIZE });
+      renderPage(el, tab, fresh, renderItem, wrapClass, emptyMsg);
+      el.scrollIntoView({ behavior: 'smooth', block: 'start' });
     });
-  }
-
-  paint();
+  });
 }
 
-function renderNotable(data) {
-  const el = document.getElementById('sightings-notable');
-  if (!el || data === null) return;
-  if (!data.length) { el.innerHTML = emptyState('No notable sightings reported recently.'); return; }
-  paginateInto(el, data, renderSightingCard, 'sighting-cards');
+function renderNotable(res) {
+  renderPage(document.getElementById('sightings-notable'), 'notable', res,
+    renderSightingCard, 'sighting-cards', 'No notable sightings reported recently.');
 }
 
-function renderRecent(data) {
-  const el = document.getElementById('sightings-recent');
-  if (!el || data === null) return;
-  if (!data.length) { el.innerHTML = emptyState('No recent sightings reported in the last 14 days.'); return; }
-  paginateInto(el, data, renderRecentRow, 'recent-list');
+function renderRecent(res) {
+  renderPage(document.getElementById('sightings-recent'), 'recent', res,
+    renderRecentRow, 'recent-list', 'No recent sightings reported in the last 14 days.');
 }
 
 // Hotspots: 5 rows, each expandable to show that hotspot's species list.
@@ -251,7 +259,7 @@ async function toggleHotspot(row) {
   }
 
   panel.innerHTML = '<span class="hotspot-loading">Loading species…</span>';
-  const species = await fetchTab('hotspot_species', { locId }, true);
+  const species = await fetchRecords('hotspot_species', { locId }, true);
 
   if (species === null) return; // aborted — leave whatever is showing
 
@@ -276,7 +284,12 @@ let lookupInitialized = false;
 
 async function ensureLookupIndex() {
   if (lookupIndex) return lookupIndex;
-  const [notable, recent] = await Promise.all([fetchTab('notable', {}, true), fetchTab('recent', {}, true)]);
+  // The lookup filters across everything, so this one asks for the
+  // unpaged feeds (no per_page) — the only place that still does.
+  const [notable, recent] = await Promise.all([
+    fetchRecords('notable', {}, true),
+    fetchRecords('recent', {}, true),
+  ]);
   const all = [...(notable || []), ...(recent || [])];
 
   lookupIndex = new Map();
@@ -454,15 +467,15 @@ async function loadTab(tab) {
   switch (tab) {
     case 'notable':
       showSkeleton('sightings-notable');
-      renderNotable(await fetchTab('notable'));
+      renderNotable(await fetchTab('notable', { page: 1, per_page: PAGE_SIZE }));
       break;
     case 'recent':
       showSkeleton('sightings-recent');
-      renderRecent(await fetchTab('recent'));
+      renderRecent(await fetchTab('recent', { page: 1, per_page: PAGE_SIZE }));
       break;
     case 'hotspots':
       showSkeleton('sightings-hotspots', 5);
-      renderHotspots(await fetchTab('hotspots'));
+      renderHotspots(await fetchRecords('hotspots'));
       break;
     case 'lookup':
       renderSpeciesLookup();
@@ -474,14 +487,64 @@ async function loadTab(tab) {
  * On This Day
  * ---------------------------------------------------------------------- */
 
+/**
+ * "On this day" asks eBird for ten years of records, so a cold cache
+ * costs ten upstream calls per region. Fetching the three regions in
+ * parallel (merge=0) instead of having the server chain them means the
+ * first records appear in roughly a third of the time; whatever has
+ * arrived is drawn each time a region lands.
+ */
+const OTD_REGIONS = [
+  { region: 'IN-TS', local: true },
+  { region: 'IN-AP', local: true },
+  { region: 'IN', local: false },
+];
+const OTD_PER_GROUP = 10;
+
+function mergeOnThisDay(groups) {
+  const seen = new Set();
+  const out = [];
+  [true, false].forEach((wantLocal) => {
+    const bucket = groups
+      .filter((g) => g.local === wantLocal)
+      .flatMap((g) => g.records)
+      .sort((a, b) => (Number(b.count) || 0) - (Number(a.count) || 0));
+    let kept = 0;
+    bucket.forEach((r) => {
+      const key = `${r.species}|${r.locId}|${r.when}`;
+      if (seen.has(key) || kept >= OTD_PER_GROUP) return;
+      seen.add(key);
+      out.push({ ...r, local: wantLocal });
+      kept++;
+    });
+  });
+  return out;
+}
+
 async function loadOnThisDay() {
   const now = new Date();
   const m = String(now.getMonth() + 1).padStart(2, '0');
   const d = String(now.getDate()).padStart(2, '0');
   showSkeleton('sightings-otd', 3);
-  const data = await fetchTab('onthisday', { m, d }, true);
-  renderOnThisDay(data);
-  renderHomeOnThisDay(data);
+
+  const groups = [];
+  let painted = false;
+  await Promise.all(OTD_REGIONS.map(async ({ region: r, local }) => {
+    const records = await fetchRecords('onthisday', { m, d, region: r, merge: '0' }, true);
+    if (!records || !records.length) return;
+    groups.push({ local, records });
+    // Draw as soon as the home states are in, then again as the rest land.
+    if (local || !painted) {
+      painted = true;
+      const merged = mergeOnThisDay(groups);
+      renderOnThisDay(merged);
+      renderHomeOnThisDay(merged);
+    }
+  }));
+
+  const merged = mergeOnThisDay(groups);
+  renderOnThisDay(merged);
+  renderHomeOnThisDay(merged);
 }
 
 /* -------------------------------------------------------------------------
@@ -491,9 +554,10 @@ async function loadOnThisDay() {
 async function initHomeStrip() {
   const strip = document.getElementById('home-sightings-rows');
   if (!strip) return;
-  const data = await fetchTab('recent', {}, true);
+  // The strip shows four rows, so it asks for exactly four.
+  const data = await fetchRecords('recent', { page: 1, per_page: 4 }, true);
   if (!data) { strip.innerHTML = '<p class="strip-error">Could not load sightings.</p>'; return; }
-  strip.innerHTML = data.slice(0, 4).map(renderSightingRow).join('');
+  strip.innerHTML = data.map(renderSightingRow).join('');
   // Auto-refresh every 15 minutes
   setTimeout(initHomeStrip, 15 * 60 * 1000);
 }

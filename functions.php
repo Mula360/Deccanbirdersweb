@@ -41,7 +41,10 @@ add_action('wp_enqueue_scripts', function() {
     $v = filemtime($main_css_path);
   }
 
-  wp_enqueue_style('db-fonts', 'https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700&family=Source+Sans+3:wght@400;600&display=swap', [], null);
+  // Fonts are served from this domain (assets/fonts) rather than Google's
+  // CDN: one less third-party connection, and no request to Google from a
+  // visitor's browser.
+  wp_enqueue_style('db-fonts', get_template_directory_uri() . '/assets/css/fonts.css', [], $v);
   wp_enqueue_style('db-vars', get_template_directory_uri() . '/assets/css/variables.css', [], $v);
   wp_enqueue_style('db-main', get_template_directory_uri() . '/assets/css/main.css', ['db-vars'], $v);
 
@@ -76,12 +79,20 @@ add_action('wp_enqueue_scripts', function() {
 
 /**
  * Open the connections the page is about to need, during the wait for
- * HTML: the font files the stylesheet will ask for, and — on the Gallery
- * page — YouTube's thumbnail and player hosts.
+ * HTML: on the Gallery page, YouTube's thumbnail and player hosts. Fonts
+ * are same-origin, so they need no hint.
  */
+add_action('wp_head', function() {
+  // The two faces almost every page starts with. Without this they'd only
+  // be discovered after the stylesheet parses, delaying the first text.
+  foreach (['sora-700-latin.woff2', 'source-sans-3-400-latin.woff2'] as $file) {
+    printf('<link rel="preload" as="font" type="font/woff2" href="%s" crossorigin>' . "\n",
+      esc_url(get_template_directory_uri() . '/assets/fonts/' . $file));
+  }
+}, 1);
+
 add_filter('wp_resource_hints', function($urls, $relation) {
   if ($relation === 'preconnect') {
-    $urls[] = ['href' => 'https://fonts.gstatic.com', 'crossorigin' => 'anonymous'];
     if (is_page('gallery')) {
       $urls[] = 'https://i.ytimg.com';
       $urls[] = 'https://www.youtube-nocookie.com';
@@ -471,6 +482,28 @@ function db_sighting_dedupe_key($tab, array $r) {
 }
 
 /**
+ * Slice a record list for the requested page. Without a per_page param
+ * the whole list comes back, so older callers keep working.
+ * Returns ['data' => …, 'page' => n, 'pages' => n, 'total' => n].
+ */
+function db_sightings_page(WP_REST_Request $request, array $records) {
+  $total = count($records);
+  $per_page = (int) $request->get_param('per_page');
+  if ($per_page < 1) {
+    return ['data' => $records, 'page' => 1, 'pages' => 1, 'total' => $total];
+  }
+  $per_page = min($per_page, 200);
+  $pages = max(1, (int) ceil($total / $per_page));
+  $page = min(max(1, (int) $request->get_param('page') ?: 1), $pages);
+  return [
+    'data'  => array_slice($records, ($page - 1) * $per_page, $per_page),
+    'page'  => $page,
+    'pages' => $pages,
+    'total' => $total,
+  ];
+}
+
+/**
  * Each region arrives sorted on its own, so a merged group (Telangana +
  * Andhra Pradesh) has to be re-sorted the way that tab sorts.
  */
@@ -569,20 +602,31 @@ add_action('rest_api_init', function() {
       // in this specific region (e.g. Painted Stork). So instead of
       // proxying eBird's /recent/notable, pull the full /recent feed and
       // filter it against our own conservation-status watchlist.
-      if ($tab === 'notable') {
-        $recent = db_sightings_regional($request, 'recent', $ttl, ['region', 'tab']);
-        if (!empty($recent['error'])) return db_rest_no_cache(rest_ensure_response($recent));
-        return db_rest_no_cache(rest_ensure_response(['data' => db_filter_notable_by_iucn($recent)]));
-      }
+      // merge=0 asks for one region, unmerged — "on this day" uses it to
+      // pull its regions in parallel from the browser instead of waiting
+      // for all of them here (30 upstream eBird calls, ~11s cold).
+      if ($request->get_param('merge') !== '0') {
+        // "Notable" here means IUCN Near Threatened or worse — a different
+        // definition than eBird's own "notable" (locally rare/reviewed),
+        // which would miss a species that's globally threatened but common
+        // in this specific region (e.g. Painted Stork). So instead of
+        // proxying eBird's /recent/notable, pull the full /recent feed and
+        // filter it against our own conservation-status watchlist.
+        if ($tab === 'notable') {
+          $recent = db_sightings_regional($request, 'recent', $ttl, ['region', 'tab']);
+          if (!empty($recent['error'])) return db_rest_no_cache(rest_ensure_response($recent));
+          return db_rest_no_cache(rest_ensure_response(db_sightings_page($request, db_filter_notable_by_iucn($recent))));
+        }
 
-      // Telangana and Andhra Pradesh first, then the rest of India.
-      // Hotspots and "on this day" are fixed-length lists, so each group
-      // gets half the slots; the sightings feeds are shown in full.
-      $limits = ['hotspots' => [5, 5], 'onthisday' => [10, 10]];
-      if (isset($limits[$tab]) || $tab === 'recent') {
-        $data = db_sightings_regional($request, $tab, $ttl, ['region', 'tab', 'm', 'd'], $limits[$tab] ?? [null, null]);
-        if (!empty($data['error'])) return db_rest_no_cache(rest_ensure_response($data));
-        return db_rest_no_cache(rest_ensure_response(['data' => $data]));
+        // Telangana and Andhra Pradesh first, then the rest of India.
+        // Hotspots is a fixed-length list, so each group gets half the
+        // slots; the sightings feeds are paged instead.
+        $limits = ['hotspots' => [5, 5], 'onthisday' => [10, 10]];
+        if (isset($limits[$tab]) || $tab === 'recent') {
+          $data = db_sightings_regional($request, $tab, $ttl, ['region', 'tab', 'm', 'd'], $limits[$tab] ?? [null, null]);
+          if (!empty($data['error'])) return db_rest_no_cache(rest_ensure_response($data));
+          return db_rest_no_cache(rest_ensure_response(db_sightings_page($request, $data)));
+        }
       }
 
       // hotspot_species and the species lookup are already tied to one
