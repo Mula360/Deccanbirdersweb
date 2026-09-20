@@ -161,6 +161,20 @@ function detailRow(label, value) {
  * The summary line stays minimal; everything else lives in the panel that
  * opens when the card is activated.
  */
+/**
+ * Whom to ring about a trip, read out of the calendar invitation by
+ * db_event_coordinators() in functions.php. The number is a tel: link,
+ * so it dials straight from a phone.
+ */
+function coordinatorRow(coordinators) {
+  if (!coordinators || !coordinators.length) return '';
+  const people = coordinators.map((c) =>
+    `<a class="event-coordinator" href="tel:${escapeHtml(c.tel)}">${escapeHtml(c.name)} · ${escapeHtml(c.phone)}</a>`
+  ).join('');
+  return `<div class="event-detail"><span class="event-detail-label">${coordinators.length > 1 ? 'Trip coordinators' : 'Trip coordinator'}</span>`
+    + `<span class="event-coordinators">${people}</span></div>`;
+}
+
 function renderCard(kind, data, index) {
   const { day, month, dayName } = formatDate(data.date);
   const id = `${kind}-${index}`;
@@ -178,6 +192,7 @@ function renderCard(kind, data, index) {
     : detailRow('Meeting point', data.meetingPoint) + detailRow('Starts', data.time) +
       detailRow('Led by', data.leader) + detailRow('Fee', data.fee ? `₹${data.fee}` : '') +
       (data.loanerBins ? detailRow('Binoculars', 'Loaner pairs available') : '') +
+      coordinatorRow(data.coordinators) +
       (data.notes ? `<div class="event-detail-notes">${escapeHtml(data.notes)}</div>` : '');
 
   const hasDetails = details.trim() !== '';
@@ -213,6 +228,7 @@ function upcomingFields(e) {
     leader:       '',
     fee:          e.fee || '',
     loanerBins:   !!e.loanerBins,
+    coordinators: e.coordinators || [],
     notes:        stripHtml(e.note)
   };
 }

@@ -2354,6 +2354,17 @@ body.lightbox-open { overflow: hidden; }
 .home-sightings-scroller::-webkit-scrollbar-thumb { background: var(--border); border-radius: 999px; }
 .home-sightings-scroller::-webkit-scrollbar-thumb:hover { background: #C8D3CC; }
 
+/* Trip coordinators on an upcoming event card: tappable phone links. */
+.event-coordinators { display: flex; flex-direction: column; gap: 2px; }
+.event-coordinator {
+  color: var(--blue);
+  text-decoration: none;
+  font-weight: 600;
+  border-bottom: 1px solid transparent;
+  align-self: flex-start;
+}
+.event-coordinator:hover { border-bottom-color: currentColor; }
+
 /* eBird strip — hairline-divided cells. */
 .home-sightings {
   display: flex;

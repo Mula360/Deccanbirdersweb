@@ -932,13 +932,61 @@ function db_rest_no_cache(WP_REST_Response $response) {
   return $response;
 }
 
+/* -----------------------------------------------------------------------
+ * Trip coordinators
+ *
+ * Calendar invitations end with the committee members to ring, as
+ * "Gowthama Poludasu - 9440910967" (sometimes several lines, sometimes a
+ * +91 prefix or spaced digits). The Vercel API passes the description
+ * through untouched, so the names and numbers are pulled out here and
+ * added to each event for the Events page to show.
+ * ---------------------------------------------------------------------*/
+function db_event_coordinators($description) {
+  if (!$description) return [];
+  // Tags become line breaks so "<br>Name - 99999 99999" still reads as a line.
+  $text = html_entity_decode(strip_tags(preg_replace('#<(br|/p|/div|/li)[^>]*>#i', "\n", $description)), ENT_QUOTES, 'UTF-8');
+  $text = str_replace("\xc2\xa0", ' ', $text);
+
+  // Anything after the "coordinators" line is the contact list; without
+  // such a heading, scan the tail of the description instead.
+  if (preg_match('/coordinator[s]?\b/i', $text, $m, PREG_OFFSET_CAPTURE)) {
+    $text = substr($text, $m[0][1]);
+  }
+
+  $found = [];
+  foreach (preg_split('/\r\n|\r|\n/', $text) as $line) {
+    $line = trim(preg_replace('/\s+/u', ' ', $line));
+    if ($line === '' || mb_strlen($line) > 80) continue;
+    // "Name - 9440910967", "Name – +91 94409 10967", "Name: 094409-10967"
+    if (!preg_match('/^([\p{L}][\p{L}\.\s]{2,40}?)\s*[-–—:]\s*((?:\+?91[\s-]?)?[6-9]\d{4}[\s-]?\d{5})$/u', $line, $m)) continue;
+    $name = trim($m[1]);
+    $digits = preg_replace('/\D/', '', $m[2]);
+    if (strlen($digits) === 12 && str_starts_with($digits, '91')) $digits = substr($digits, 2);
+    if (strlen($digits) !== 10) continue;
+    $found[$digits] = [
+      'name'  => $name,
+      'phone' => substr($digits, 0, 5) . ' ' . substr($digits, 5),
+      'tel'   => '+91' . $digits,
+    ];
+    if (count($found) >= 4) break;
+  }
+  return array_values($found);
+}
+
 add_action('rest_api_init', function() {
   register_rest_route('db/v1', '/events', [
     'methods'             => 'GET',
     'permission_callback' => '__return_true',
     'callback'            => function(WP_REST_Request $request) {
       $ttl = $request->get_param('scope') === 'past' ? 6 * HOUR_IN_SECONDS : HOUR_IN_SECONDS;
-      return db_rest_no_cache(rest_ensure_response(db_proxy_fetch('/api/events', $request, ['scope'], $ttl)));
+      $res = db_proxy_fetch('/api/events', $request, ['scope'], $ttl);
+      if (!empty($res['data']) && is_array($res['data'])) {
+        foreach ($res['data'] as &$event) {
+          $event['coordinators'] = db_event_coordinators($event['note'] ?? '');
+        }
+        unset($event);
+      }
+      return db_rest_no_cache(rest_ensure_response($res));
     },
   ]);
 
