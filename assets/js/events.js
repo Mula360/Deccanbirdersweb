@@ -212,13 +212,15 @@ function renderCard(kind, data, index) {
       ${data.place ? `<div class="event-meta">${escapeHtml(data.place)}</div>` : ''}
       ${kind === 'upcoming' && data.time ? `<div class="event-meta">${escapeHtml(dayName)} · ${escapeHtml(data.time)}</div>` : ''}
       ${chips}
-      ${hasDetails ? `
+    </div>
+    ${hasDetails ? `
+      <div class="event-toggle-wrap">
         <button type="button" class="event-toggle" aria-expanded="false" aria-controls="panel-${id}">
           <span class="event-toggle-more">More details</span>
           <span class="event-toggle-less">Hide details</span>
-        </button>` : ''}
-    </div>
-    ${hasDetails ? `<div class="event-details" id="panel-${id}" hidden>${details}</div>` : ''}
+        </button>
+      </div>
+      <div class="event-details" id="panel-${id}" hidden>${details}</div>` : ''}
   </article>`;
 }
 

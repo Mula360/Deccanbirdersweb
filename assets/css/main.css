@@ -354,12 +354,22 @@ body.nav-open { overflow: hidden; }
   background: #fff;
   border: 1px solid var(--border);
   border-radius: 16px;
-  padding: 24px;
-  display: flex;
-  flex-wrap: wrap;
+  padding: 20px 24px;
+  display: grid;
+  grid-template-columns: 60px minmax(0, 1fr) auto;
   gap: 18px;
-  align-items: flex-start;
+  align-items: center;
   transition: border-color 150ms;
+}
+/* The details panel drops below, spanning the whole row. */
+.event-card > .event-details { grid-column: 1 / -1; }
+@media (max-width: 640px) {
+  .event-card {
+    grid-template-columns: 52px minmax(0, 1fr);
+    align-items: start;
+    gap: 14px;
+  }
+  .event-card > .event-toggle-wrap { grid-column: 2; justify-self: start; margin-top: 12px; }
 }
 .event-card.is-expandable:hover { border-color: var(--blue); }
 
@@ -414,8 +424,10 @@ body.nav-open { overflow: hidden; }
 }
 .event-chip strong { font-family: var(--font-head); font-weight: 700; color: var(--ink); }
 
+/* The toggle sits in its own column at the end of the row, so it lines
+   up across cards however long the titles are. */
+.event-toggle-wrap { justify-self: end; }
 .event-toggle {
-  margin-top: 14px;
   padding: 0;
   background: none;
   border: 0;
@@ -759,15 +771,14 @@ body.modal-open { overflow: hidden; }
    Events page — list and pagination
    ---------------------------------------------------------------------- */
 .events-empty { color: var(--text-muted); padding: 40px 0; text-align: center; }
-/* Design puts these cards in a grid (minmax(260px,1fr), 14px gap); 320px
-   here so the expanded detail panel has room. auto-fill rather than
-   auto-fit: with a single event auto-fit collapses the empty tracks and
-   stretches that one card across the full container. */
-.events-list {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-  gap: 14px;
-  align-items: start;
+/* One trip to a line, newest first: the full width gives the title,
+   coordinator and location room to read as a sentence instead of
+   wrapping inside a narrow column. Same on the home page. */
+.events-list,
+.events-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
 }
 
 /* Pager — 10 events per page on each tab. */
@@ -2239,7 +2250,8 @@ body.lightbox-open { overflow: hidden; }
 
 /* auto-fill, not auto-fit: with a single upcoming trip auto-fit collapses
    the empty tracks and stretches that one card across the container. */
-.events-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 14px; }
+/* Home upcoming trips use the same full-width rows as the Events page
+   (see .events-list above). */
 
 /* Activities: text column beside a grid of small cards. */
 .home-split {
