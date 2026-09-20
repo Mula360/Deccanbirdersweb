@@ -18,15 +18,15 @@
           <span class="logo-name">Deccan Birders</span>
         <?php endif; ?>
       </a>
-      <p class="footer-tagline"><?php echo esc_html(get_field('footer_tagline','option') ?: 'Since 1980, documenting the birds of the Deccan Plateau through field trips, citizen science, and the monthly PITTA bulletin.'); ?></p>
+      <p class="footer-tagline"><?php echo esc_html(db_setting('footer_tagline') ?: 'Since 1980, documenting the birds of the Deccan Plateau through field trips, citizen science, and the monthly PITTA bulletin.'); ?></p>
       <div class="footer-social">
-        <?php if ($eb = get_field('social_ebird','option')): ?>
+        <?php if ($eb = db_setting('social_ebird')): ?>
           <a href="<?php echo esc_url($eb); ?>" target="_blank" rel="noopener" class="social-link">eBird</a>
         <?php endif; ?>
-        <?php if ($fb = get_field('social_facebook','option')): ?>
+        <?php if ($fb = db_setting('social_facebook')): ?>
           <a href="<?php echo esc_url($fb); ?>" target="_blank" rel="noopener" class="social-link">Facebook</a>
         <?php endif; ?>
-        <?php if ($wa = get_field('contact_whatsapp','option')): ?>
+        <?php if ($wa = db_setting('contact_whatsapp')): ?>
           <a href="https://wa.me/91<?php echo esc_attr(preg_replace('/\D/','',$wa)); ?>" target="_blank" rel="noopener" class="social-link">WhatsApp</a>
         <?php endif; ?>
       </div>
@@ -39,11 +39,11 @@
 
     <div class="footer-col footer-contact">
       <h3 class="footer-heading">Contact</h3>
-      <?php if ($addr = get_field('contact_address','option')): ?>
+      <?php if ($addr = db_setting('contact_address')): ?>
         <address class="footer-address"><?php echo nl2br(esc_html($addr)); ?></address>
       <?php endif; ?>
       <a href="mailto:info@deccanbirders.org" class="footer-email">info@deccanbirders.org</a>
-      <?php if ($ph = get_field('contact_phone','option')): ?>
+      <?php if ($ph = db_setting('contact_phone')): ?>
         <p class="footer-phone"><?php echo esc_html($ph); ?></p>
       <?php endif; ?>
     </div>

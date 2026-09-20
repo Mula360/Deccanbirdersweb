@@ -8,7 +8,7 @@
  */
 get_header();
 while (have_posts()) : the_post();
-  $youtube = get_field('social_youtube', 'option') ?: 'https://www.youtube.com/channel/UChYefSo9bbi-BBbRn9euCpg';
+  $youtube = db_setting('social_youtube') ?: 'https://www.youtube.com/channel/UChYefSo9bbi-BBbRn9euCpg';
 ?>
 
 <section class="hero-light">

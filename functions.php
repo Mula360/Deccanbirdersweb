@@ -136,13 +136,113 @@ add_action('init', function() {
 /* -----------------------------------------------------------------------
  * 5. ACF options page
  * ---------------------------------------------------------------------*/
-if (function_exists('acf_add_options_page')) {
-  acf_add_options_page([
-    'page_title' => 'Site Settings',
-    'menu_title' => 'Site Settings',
-    'menu_slug'  => 'site-settings',
-    'capability' => 'manage_options',
-  ]);
+// ACF options pages are a Pro feature, and this site runs ACF free — so
+// the Site Settings page ACF was asked for never appeared, and every
+// value below silently fell back to its hard-coded default. The settings
+// are stored under the same options_<name> keys ACF would use, so they
+// still work if Pro is ever installed; it registers its own page then and
+// this one stands down. Must be on acf/init: ACF 6 ignores an options
+// page registered while functions.php is still loading.
+add_action('acf/init', function() {
+  if (function_exists('acf_add_options_page')) {
+    acf_add_options_page([
+      'page_title' => 'Site Settings',
+      'menu_title' => 'Site Settings',
+      'menu_slug'  => 'site-settings',
+      'capability' => 'manage_options',
+      'redirect'   => false,
+    ]);
+  }
+});
+
+/**
+ * A Site Settings value. Stored as options_<name>, the same key ACF Pro's
+ * options pages use, so both the theme's own settings page and ACF read
+ * and write the same place.
+ */
+function db_setting($name) {
+  $val = get_option('options_' . $name, '');
+  if (is_string($val) && trim($val) !== '') return trim($val);
+  if (function_exists('get_field')) {
+    $acf = get_field($name, 'option');
+    if (is_string($acf) && trim($acf) !== '') return trim($acf);
+  }
+  return '';
+}
+
+/** The Site Settings fields: name => [label, type, hint]. */
+function db_settings_fields() {
+  return [
+    'footer_tagline'        => ['Footer tagline', 'text', 'The line under the logo in the footer.'],
+    'contact_address'       => ['Contact address', 'textarea', ''],
+    'contact_phone'         => ['Contact phone', 'text', ''],
+    'contact_whatsapp'      => ['WhatsApp number', 'text', 'Digits only, with country code, e.g. 919738840070.'],
+    'social_ebird'          => ['eBird URL', 'url', ''],
+    'social_facebook'       => ['Facebook URL', 'url', ''],
+    'social_youtube'        => ['YouTube channel URL', 'url', 'The "Open our YouTube channel" button on the Gallery.'],
+    'youtube_channel_id'    => ['YouTube channel ID', 'text', 'Starts with UC. YouTube Studio → Settings → Channel → Advanced.'],
+    'youtube_api_key'       => ['YouTube API key', 'text', 'A YouTube Data API v3 key: lists every video on the Gallery. Without it only the newest 12 show. Can also be set as DB_YOUTUBE_API_KEY in wp-config.php.'],
+    'db_api_base_url'       => ['Bird data API URL', 'url', 'The Vercel deployment used for eBird and Calendar data. No trailing slash.'],
+    'db_member_count'       => ['Member count', 'text', ''],
+    'db_years_active'       => ['Years active', 'text', ''],
+    'db_membership_form_url' => ['Membership form URL', 'url', ''],
+  ];
+}
+
+add_action('admin_menu', function() {
+  // ACF Pro registers its own Site Settings page; don't offer two.
+  if (function_exists('acf_add_options_page')) return;
+  add_options_page('Site Settings', 'Site Settings', 'manage_options', 'db-site-settings', 'db_settings_page');
+});
+
+add_action('admin_init', function() {
+  if (function_exists('acf_add_options_page')) return;
+  foreach (array_keys(db_settings_fields()) as $name) {
+    register_setting('db_site_settings', 'options_' . $name, [
+      'type'              => 'string',
+      'sanitize_callback' => 'db_sanitize_setting',
+      'default'           => '',
+    ]);
+  }
+});
+
+function db_sanitize_setting($value) {
+  $value = is_string($value) ? trim($value) : '';
+  return strpos($value, "\n") !== false ? sanitize_textarea_field($value) : sanitize_text_field($value);
+}
+
+function db_settings_page() {
+  if (!current_user_can('manage_options')) return;
+  ?>
+  <div class="wrap">
+    <h1>Site Settings</h1>
+    <p>Used across the site: the footer, the contact page, and the live data feeds.</p>
+    <form method="post" action="options.php">
+      <?php settings_fields('db_site_settings'); ?>
+      <table class="form-table" role="presentation">
+        <?php foreach (db_settings_fields() as $name => [$label, $type, $hint]):
+          $value = get_option('options_' . $name, '');
+          $id = 'db-' . $name;
+        ?>
+          <tr>
+            <th scope="row"><label for="<?php echo esc_attr($id); ?>"><?php echo esc_html($label); ?></label></th>
+            <td>
+              <?php if ($type === 'textarea'): ?>
+                <textarea id="<?php echo esc_attr($id); ?>" name="<?php echo esc_attr('options_' . $name); ?>" rows="3" class="large-text"><?php echo esc_textarea($value); ?></textarea>
+              <?php else: ?>
+                <input id="<?php echo esc_attr($id); ?>" name="<?php echo esc_attr('options_' . $name); ?>"
+                       type="<?php echo $type === 'url' ? 'url' : 'text'; ?>"
+                       value="<?php echo esc_attr($value); ?>" class="regular-text">
+              <?php endif; ?>
+              <?php if ($hint): ?><p class="description"><?php echo esc_html($hint); ?></p><?php endif; ?>
+            </td>
+          </tr>
+        <?php endforeach; ?>
+      </table>
+      <?php submit_button(); ?>
+    </form>
+  </div>
+  <?php
 }
 
 /* -----------------------------------------------------------------------
@@ -661,13 +761,12 @@ add_action('rest_api_init', function() {
  * ---------------------------------------------------------------------*/
 function db_youtube_key() {
   if (defined('DB_YOUTUBE_API_KEY') && DB_YOUTUBE_API_KEY) return DB_YOUTUBE_API_KEY;
-  return trim((string) get_option('options_youtube_api_key', ''));
+  return db_setting('youtube_api_key');
 }
 
 function db_youtube_channel_id() {
   if (defined('DB_YOUTUBE_CHANNEL_ID') && DB_YOUTUBE_CHANNEL_ID) return DB_YOUTUBE_CHANNEL_ID;
-  $id = trim((string) get_option('options_youtube_channel_id', ''));
-  return $id ?: 'UChYefSo9bbi-BBbRn9euCpg';
+  return db_setting('youtube_channel_id') ?: 'UChYefSo9bbi-BBbRn9euCpg';
 }
 
 /** GET a YouTube Data API endpoint. Returns the decoded body or null. */

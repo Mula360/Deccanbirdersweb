@@ -13,9 +13,9 @@
  */
 get_header();
 while (have_posts()) : the_post();
-  $phone = get_field('contact_phone', 'option') ?: '+91 97388 40070';
+  $phone = db_setting('contact_phone') ?: '+91 97388 40070';
   // wa.me needs digits only, no +, spaces or dashes.
-  $wa_raw = get_field('contact_whatsapp', 'option');
+  $wa_raw = db_setting('contact_whatsapp');
   $wa = preg_replace('/\D+/', '', $wa_raw ?: $phone);
 ?>
 
