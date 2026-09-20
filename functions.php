@@ -186,7 +186,18 @@ function db_settings_fields() {
     'db_member_count'       => ['Member count', 'text', ''],
     'db_years_active'       => ['Years active', 'text', ''],
     'db_membership_form_url' => ['Membership form URL', 'url', ''],
+    'email_photos'          => ['Photo submissions email', 'text', 'Where photograph submissions are sent. Defaults to photos@deccanbirders.org.'],
+    'email_volunteers'      => ['Volunteer submissions email', 'text', 'Where volunteer sign-ups are sent. Defaults to info@deccanbirders.org.'],
+    'volunteer_sheet_url'   => ['Volunteer sheet webhook URL', 'url', 'The Apps Script web app URL that appends volunteers to your Google Sheet. See docs/google-sheet-volunteers.md.'],
+    'volunteer_sheet_secret' => ['Volunteer sheet secret', 'text', 'Must match the SECRET in the Apps Script, so only this site can write to the sheet.'],
   ];
+}
+
+/** Where each kind of submission is emailed. */
+function db_notify_email($kind) {
+  $defaults = ['photos' => 'photos@deccanbirders.org', 'volunteers' => 'info@deccanbirders.org'];
+  $set = db_setting('email_' . $kind);
+  return is_email($set) ? $set : $defaults[$kind];
 }
 
 add_action('admin_menu', function() {
@@ -305,8 +316,226 @@ function db_handle_volunteer() {
   $body         = "<p><strong>From:</strong> $name ($email)</p><p><strong>Would like to help with:</strong> $help_with_str</p>";
   wp_mail($to, "New volunteer: $name", $body, $headers);
   wp_mail($email, 'Thank you for volunteering — Deccan Birders', "<p>Hi $name,</p><p>Thank you for offering to help. A committee member will be in touch soon.</p><p>— Deccan Birders</p>", $headers);
+
+  db_append_to_sheet([
+    'submitted' => current_time('mysql'),
+    'name'      => $name,
+    'email'     => $email,
+    'help_with' => $help_with_str,
+    'source'    => 'Volunteer form',
+  ]);
+
   wp_send_json(['success' => true]);
 }
+
+/**
+ * Append a row to the volunteer Google Sheet through its Apps Script web
+ * app (see docs/google-sheet-volunteers.md). The sheet is a convenience,
+ * not the record of truth — the email still goes out either way — so a
+ * failure is logged for the admin notice rather than shown to the person
+ * who just filled the form in.
+ */
+function db_append_to_sheet(array $row) {
+  $url = db_setting('volunteer_sheet_url');
+  if (!$url) return false;
+  $row['secret'] = db_setting('volunteer_sheet_secret');
+
+  $res = wp_remote_post($url, [
+    'timeout'     => 8,
+    'redirection' => 5, // Apps Script answers via a redirect
+    'headers'     => ['Content-Type' => 'application/json'],
+    'body'        => wp_json_encode($row),
+  ]);
+
+  $failed = is_wp_error($res) ? $res->get_error_message() : '';
+  if (!$failed) {
+    $code = wp_remote_retrieve_response_code($res);
+    $body = json_decode(wp_remote_retrieve_body($res), true);
+    if ($code < 200 || $code >= 300) $failed = 'HTTP ' . $code;
+    elseif (isset($body['ok']) && !$body['ok']) $failed = (string) ($body['error'] ?? 'rejected by the sheet');
+  }
+
+  if ($failed) {
+    $log = (array) get_option('db_sheet_failures', []);
+    array_unshift($log, ['when' => current_time('mysql'), 'error' => $failed, 'name' => $row['name'] ?? '']);
+    update_option('db_sheet_failures', array_slice($log, 0, 20), false);
+    return false;
+  }
+  delete_option('db_sheet_failures');
+  return true;
+}
+
+/** Say so in wp-admin when the sheet stopped accepting rows. */
+add_action('admin_notices', function() {
+  if (!current_user_can('manage_options')) return;
+  $log = (array) get_option('db_sheet_failures', []);
+  if (!$log) return;
+  printf(
+    '<div class="notice notice-warning"><p><strong>Volunteer sheet:</strong> %d recent submission(s) could not be written to the Google Sheet — most recently %s (%s). The volunteer emails were still sent. Check the webhook URL and secret in <a href="%s">Site Settings</a>.</p></div>',
+    count($log),
+    esc_html($log[0]['when']),
+    esc_html($log[0]['error']),
+    esc_url(admin_url('options-general.php?page=db-site-settings'))
+  );
+});
+
+/* -----------------------------------------------------------------------
+ * 7b. Photograph submissions
+ *
+ * A public upload form, so it is deliberately cautious: nonce, a hidden
+ * honeypot field, a few submissions per hour per address, JPEG only, a
+ * size cap, and the file is verified to be a real image before it is
+ * accepted. Submissions land as a PENDING Gallery entry — approving one
+ * is just pressing Publish in wp-admin — and never appear on the site
+ * until a committee member does that.
+ * ---------------------------------------------------------------------*/
+const DB_PHOTO_MAX_BYTES = 10 * MB_IN_BYTES;
+const DB_PHOTO_MAX_PER_HOUR = 3;
+
+/** Crude per-visitor throttle: true when this one has had enough. */
+function db_rate_limited($action, $max_per_hour) {
+  $ip = $_SERVER['REMOTE_ADDR'] ?? '';
+  if (!$ip) return false;
+  $key = 'db_rate_' . md5($action . '|' . $ip);
+  $count = (int) get_transient($key);
+  if ($count >= $max_per_hour) return true;
+  set_transient($key, $count + 1, HOUR_IN_SECONDS);
+  return false;
+}
+
+add_action('wp_ajax_nopriv_db_photo_submit', 'db_handle_photo_submit');
+add_action('wp_ajax_db_photo_submit', 'db_handle_photo_submit');
+function db_handle_photo_submit() {
+  if (!wp_verify_nonce($_POST['nonce'] ?? '', 'db_contact_nonce')) {
+    wp_send_json(['success' => false, 'message' => 'Security check failed. Please reload the page and try again.']);
+  }
+  // Honeypot: a field hidden from people, filled in only by bots.
+  if (!empty($_POST['website'])) {
+    wp_send_json(['success' => true]); // silently drop
+  }
+  if (db_rate_limited('photo', DB_PHOTO_MAX_PER_HOUR)) {
+    wp_send_json(['success' => false, 'message' => 'That is a few submissions in a short time — please try again in an hour.']);
+  }
+
+  $name     = sanitize_text_field($_POST['name'] ?? '');
+  $email    = sanitize_email($_POST['email'] ?? '');
+  $species  = sanitize_text_field($_POST['species'] ?? '');
+  $location = sanitize_text_field($_POST['location'] ?? '');
+  $consent  = !empty($_POST['consent']);
+
+  if (!$name || !$email || !$species || !$location) {
+    wp_send_json(['success' => false, 'message' => 'Please fill in every field.']);
+  }
+  if (!is_email($email)) {
+    wp_send_json(['success' => false, 'message' => 'That email address does not look right.']);
+  }
+  if (!$consent) {
+    wp_send_json(['success' => false, 'message' => 'Please confirm the photograph is yours to publish.']);
+  }
+
+  $file = $_FILES['photo'] ?? null;
+  if (!$file || ($file['error'] ?? UPLOAD_ERR_NO_FILE) !== UPLOAD_ERR_OK) {
+    wp_send_json(['success' => false, 'message' => 'Please attach a JPEG photograph.']);
+  }
+  if ($file['size'] > DB_PHOTO_MAX_BYTES) {
+    wp_send_json(['success' => false, 'message' => 'That file is over 10 MB. Please send a smaller JPEG.']);
+  }
+  // Extension, declared type and actual content must all say JPEG.
+  $check = wp_check_filetype_and_ext($file['tmp_name'], $file['name'], ['jpg|jpeg' => 'image/jpeg']);
+  $size = @getimagesize($file['tmp_name']);
+  if (empty($check['type']) || $check['type'] !== 'image/jpeg' || !$size || $size[2] !== IMAGETYPE_JPEG) {
+    wp_send_json(['success' => false, 'message' => 'Please send a JPEG photograph (.jpg).']);
+  }
+
+  require_once ABSPATH . 'wp-admin/includes/file.php';
+  require_once ABSPATH . 'wp-admin/includes/media.php';
+  require_once ABSPATH . 'wp-admin/includes/image.php';
+
+  $post_id = wp_insert_post([
+    'post_type'   => 'db_gallery_photo',
+    'post_title'  => $species . ($location ? ' — ' . $location : ''),
+    'post_status' => 'pending',
+  ], true);
+  if (is_wp_error($post_id)) {
+    wp_send_json(['success' => false, 'message' => 'Something went wrong saving your photograph. Please try again later.']);
+  }
+
+  $attachment_id = media_handle_upload('photo', $post_id, ['post_title' => $species]);
+  if (is_wp_error($attachment_id)) {
+    wp_delete_post($post_id, true);
+    wp_send_json(['success' => false, 'message' => 'That photograph could not be read. Please try another JPEG.']);
+  }
+
+  update_field('field_gallery_photo', $attachment_id, $post_id);
+  update_field('field_gallery_species_name', $species, $post_id);
+  update_field('field_gallery_photo_location', $location, $post_id);
+  update_field('field_gallery_photographer', $name, $post_id);
+  // Kept out of the ACF fields: only for replying to the submitter.
+  update_post_meta($post_id, '_db_submitter_email', $email);
+  update_post_meta($post_id, '_db_submitted_at', current_time('mysql'));
+
+  $edit_link = admin_url('post.php?post=' . $post_id . '&action=edit');
+  $headers = ['Content-Type: text/html; charset=UTF-8', "Reply-To: $name <$email>"];
+  wp_mail(
+    db_notify_email('photos'),
+    'Photograph submitted: ' . $species,
+    '<p><strong>' . esc_html($species) . '</strong> by ' . esc_html($name) . ' (' . esc_html($email) . ')</p>'
+    . '<p><strong>Where and when:</strong> ' . esc_html($location) . '</p>'
+    . '<p>It is waiting as a pending Gallery entry. Publishing it puts it on the site and tells the photographer; '
+    . 'moving it to Trash declines it, also with a note to them.</p>'
+    . '<p><a href="' . esc_url($edit_link) . '">Review this submission</a></p>',
+    $headers
+  );
+  wp_mail(
+    $email,
+    'We received your photograph — Deccan Birders',
+    '<p>Hi ' . esc_html($name) . ',</p><p>Thank you for sending us your photograph of the '
+    . esc_html($species) . '. A committee member will review it, usually within a week, and you will hear back either way.</p>'
+    . '<p>— Deccan Birders</p>',
+    ['Content-Type: text/html; charset=UTF-8']
+  );
+
+  wp_send_json(['success' => true]);
+}
+
+/**
+ * Tell the photographer what happened to their submission: published, or
+ * declined. Only fires for entries that came through the form (they are
+ * the ones carrying a submitter address).
+ */
+add_action('transition_post_status', function($new_status, $old_status, $post) {
+  if ($post->post_type !== 'db_gallery_photo' || $new_status === $old_status) return;
+  $email = get_post_meta($post->ID, '_db_submitter_email', true);
+  if (!$email || !is_email($email)) return;
+  $name = get_field('photographer', $post->ID) ?: 'there';
+  $headers = ['Content-Type: text/html; charset=UTF-8'];
+
+  if ($new_status === 'publish' && !get_post_meta($post->ID, '_db_published_notified', true)) {
+    update_post_meta($post->ID, '_db_published_notified', 1);
+    wp_mail($email, 'Your photograph is in the gallery — Deccan Birders',
+      '<p>Hi ' . esc_html($name) . ',</p><p>Your photograph is now in the Deccan Birders gallery, credited to you: '
+      . '<a href="' . esc_url(home_url('/gallery/')) . '">see it here</a>.</p><p>Thank you for sharing it.</p><p>— Deccan Birders</p>',
+      $headers);
+  }
+
+  if ($new_status === 'trash' && $old_status === 'pending') {
+    wp_mail($email, 'About the photograph you sent — Deccan Birders',
+      '<p>Hi ' . esc_html($name) . ',</p><p>Thank you for sending us your photograph. On this occasion the committee '
+      . 'has not taken it for the gallery. Please do keep sending them — we would like to see more.</p><p>— Deccan Birders</p>',
+      $headers);
+  }
+}, 10, 3);
+
+/** Who sent it, in the Gallery list, so pending entries are reviewable at a glance. */
+add_filter('manage_db_gallery_photo_posts_columns', function($cols) {
+  $cols['db_submitter'] = 'Submitted by';
+  return $cols;
+});
+add_action('manage_db_gallery_photo_posts_custom_column', function($col, $post_id) {
+  if ($col !== 'db_submitter') return;
+  $email = get_post_meta($post_id, '_db_submitter_email', true);
+  echo $email ? esc_html($email) : '—';
+}, 10, 2);
 
 add_action('wp_ajax_nopriv_db_sighting_report', 'db_handle_sighting_report');
 add_action('wp_ajax_db_sighting_report', 'db_handle_sighting_report');

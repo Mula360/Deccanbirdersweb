@@ -47,7 +47,11 @@ while (have_posts()) : the_post();
           <li>Approvals usually take a week; you'll hear back either way.</li>
         </ul>
       </div>
-      <form id="db-photo-submit-form" class="stacked-form" novalidate>
+      <form id="db-photo-submit-form" class="stacked-form" novalidate enctype="multipart/form-data">
+        <!-- Honeypot: hidden from people, filled in by bots. -->
+        <div class="hp-field" aria-hidden="true">
+          <label>Website<input type="text" name="website" tabindex="-1" autocomplete="off"></label>
+        </div>
         <div class="field-row">
           <label class="stacked-field">
             <span class="stacked-label">Photographer name</span>
