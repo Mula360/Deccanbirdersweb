@@ -990,6 +990,9 @@ function db_event_coordinators($description) {
   $previous_name = '';
   foreach (preg_split('/\r\n|\r|\n/', $text) as $line) {
     $line = trim(preg_replace('/\s+/u', ' ', $line));
+    // Writers often label the line itself — "Trip Coordinator: K Sudhir
+    // 8977613055" — so drop any leading label before reading it.
+    $line = trim(preg_replace('/^(?:trip|event)?\s*(?:coordinators?|contacts?|call)\s*[-–—:]*\s*/iu', '', $line));
     if ($line === '' || mb_strlen($line) > 160) continue;
 
     // A line holding only a number belongs to the name above it.
