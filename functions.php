@@ -334,6 +334,13 @@ function db_handle_volunteer() {
   if (!wp_verify_nonce($_POST['nonce'] ?? '', 'db_contact_nonce')) {
     wp_send_json(['success' => false, 'message' => 'Security check failed.']);
   }
+  // Hidden from people, filled in by bots — drop it without a word.
+  if (!empty($_POST['website'])) {
+    wp_send_json(['success' => true]);
+  }
+  if (db_rate_limited('volunteer', 3)) {
+    wp_send_json(['success' => false, 'message' => 'That is a few submissions in a short time — please try again in an hour.']);
+  }
   $name          = sanitize_text_field($_POST['name'] ?? '');
   $email         = sanitize_email($_POST['email'] ?? '');
   $help_with_raw = $_POST['help_with'] ?? [];

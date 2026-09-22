@@ -49,6 +49,47 @@ while (have_posts()) : the_post();
       <p class="field-error" id="form-global-error"></p>
       <button type="submit" class="btn btn-primary">Send message</button>
     </form>
+
+    <!-- Volunteering: handled by wp_ajax db_volunteer, which emails the
+         committee and appends a row to the volunteer sheet when one is
+         configured (Settings → Site Settings). -->
+    <div class="contact-card contact-card--volunteer">
+      <h2 class="card-heading card-heading--lg">Lend a hand</h2>
+      <p class="card-intro">Trips, counts and the newsletter all run on members' time. Tell us what you'd enjoy helping with and a committee member will be in touch.</p>
+      <form id="db-volunteer-form" class="stacked-form" novalidate>
+        <div class="hp-field" aria-hidden="true">
+          <label>Website<input type="text" name="website" tabindex="-1" autocomplete="off"></label>
+        </div>
+        <label class="stacked-field">
+          <span class="stacked-label">Name</span>
+          <input type="text" name="name" placeholder="Your name" required>
+          <span class="field-error" id="vf-error-name"></span>
+        </label>
+        <label class="stacked-field">
+          <span class="stacked-label">Email</span>
+          <input type="email" name="email" placeholder="you@example.com" required>
+          <span class="field-error" id="vf-error-email"></span>
+        </label>
+        <fieldset class="stacked-field checkbox-set">
+          <legend class="stacked-label">I'd like to help with</legend>
+          <?php foreach ([
+            'Field trips and walks',
+            'Annual waterfowl census',
+            'School and college outreach',
+            'PITTA newsletter',
+            'Photography and the gallery',
+            'Anything that needs doing',
+          ] as $option): ?>
+            <label class="form-checkbox">
+              <input type="checkbox" name="help_with[]" value="<?php echo esc_attr($option); ?>">
+              <?php echo esc_html($option); ?>
+            </label>
+          <?php endforeach; ?>
+        </fieldset>
+        <p class="field-error" id="vf-error-global"></p>
+        <button type="submit" class="btn btn-primary">Submit</button>
+      </form>
+    </div>
   </div>
 
   <div class="contact-col">

@@ -2018,6 +2018,12 @@ body.lightbox-open { overflow: hidden; }
 .docs .card a .by { color: var(--text-muted); font-weight: 400; }
 .docs .card a:hover { color: var(--blue); }
 
+/* Volunteering sits under the message form in the same column. */
+.contact-card--volunteer { margin-top: 20px; }
+.checkbox-set { border: 0; padding: 0; margin: 0; }
+.checkbox-set legend { padding: 0; }
+.checkbox-set .form-checkbox { margin-top: 10px; }
+
 /* -------------------------------------------------------------------------
    Contact page — phone/email info block
    ---------------------------------------------------------------------- */
