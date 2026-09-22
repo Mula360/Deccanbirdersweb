@@ -947,36 +947,115 @@ function db_rest_no_cache(WP_REST_Response $response) {
  * through untouched, so the names and numbers are pulled out here and
  * added to each event for the Events page to show.
  * ---------------------------------------------------------------------*/
+/** The invitation's text, with tags turned into line breaks. */
+function db_event_text($description) {
+  $text = preg_replace('#<(br|/p|/div|/li|/h[1-6])[^>]*>#i', "\n", (string) $description);
+  $text = html_entity_decode(strip_tags($text), ENT_QUOTES, 'UTF-8');
+  return str_replace("\xc2\xa0", ' ', $text);
+}
+
+/** A 10-digit Indian mobile from whatever grouping the writer used. */
+function db_event_phone_digits($raw) {
+  $digits = preg_replace('/\D/', '', $raw);
+  if (strlen($digits) === 12 && str_starts_with($digits, '91')) $digits = substr($digits, 2);
+  if (strlen($digits) === 11 && $digits[0] === '0') $digits = substr($digits, 1);
+  return strlen($digits) === 10 && in_array($digits[0], ['6', '7', '8', '9'], true) ? $digits : '';
+}
+
+/**
+ * The committee members to ring, read out of the invitation. Writers vary:
+ * "Gowthama Poludasu - 9440910967", "K Sudhir 8977613055", a +91 prefix,
+ * digits grouped with spaces, two on one line, or the number on the line
+ * after the name — all of which turn up in real invitations, so all are
+ * accepted. A name is letters, dots and spaces; a number is a 10-digit
+ * Indian mobile, which keeps lines like "Rs. 100/- per head" out.
+ */
 function db_event_coordinators($description) {
   if (!$description) return [];
-  // Tags become line breaks so "<br>Name - 99999 99999" still reads as a line.
-  $text = html_entity_decode(strip_tags(preg_replace('#<(br|/p|/div|/li)[^>]*>#i', "\n", $description)), ENT_QUOTES, 'UTF-8');
-  $text = str_replace("\xc2\xa0", ' ', $text);
+  $text = db_event_text($description);
 
   // Anything after the "coordinators" line is the contact list; without
-  // such a heading, scan the tail of the description instead.
+  // such a heading, scan the whole description.
   if (preg_match('/coordinator[s]?\b/i', $text, $m, PREG_OFFSET_CAPTURE)) {
     $text = substr($text, $m[0][1]);
   }
 
+  $name_re = '[\p{L}][\p{L}\.\s]{1,39}';
+  $num_re  = '(?:(?:\+?91|0)[\s-]?)?[6-9]\d{4}[\s-]?\d{5}';
+  // Words that introduce the list rather than name anybody, so a stray
+  // number on the next line can't be attributed to "Coordinators".
+  $heading_re = '/\b(coordinator|committee|member|contact|information|call|details|number)/i';
+
   $found = [];
+  $previous_name = '';
   foreach (preg_split('/\r\n|\r|\n/', $text) as $line) {
     $line = trim(preg_replace('/\s+/u', ' ', $line));
-    if ($line === '' || mb_strlen($line) > 80) continue;
-    // "Name - 9440910967", "Name – +91 94409 10967", "Name: 094409-10967"
-    if (!preg_match('/^([\p{L}][\p{L}\.\s]{2,40}?)\s*[-–—:]\s*((?:\+?91[\s-]?)?[6-9]\d{4}[\s-]?\d{5})$/u', $line, $m)) continue;
-    $name = trim($m[1]);
-    $digits = preg_replace('/\D/', '', $m[2]);
-    if (strlen($digits) === 12 && str_starts_with($digits, '91')) $digits = substr($digits, 2);
-    if (strlen($digits) !== 10) continue;
-    $found[$digits] = [
+    if ($line === '' || mb_strlen($line) > 160) continue;
+
+    // A line holding only a number belongs to the name above it.
+    if (preg_match('/^(' . $num_re . ')$/u', $line, $m) && $previous_name !== '') {
+      $digits = db_event_phone_digits($m[1]);
+      if ($digits) $found[$digits] = $previous_name;
+      $previous_name = '';
+      continue;
+    }
+
+    // "Name 99999 99999" / "Name - 99999 99999", possibly several per line.
+    $matched = false;
+    foreach (preg_split('/\s*(?:,|;|&|\band\b)\s*/iu', $line) as $part) {
+      if (!preg_match('/^(' . $name_re . ')\s*(?:[-–—:]\s*)?(' . $num_re . ')$/u', trim($part), $m)) continue;
+      $digits = db_event_phone_digits($m[2]);
+      if (!$digits) continue;
+      $found[$digits] = trim($m[1]);
+      $matched = true;
+    }
+    if ($matched) { $previous_name = ''; continue; }
+
+    // Remember a plain name in case the next line is its number.
+    $previous_name = (preg_match('/^(' . $name_re . ')$/u', $line) && !preg_match($heading_re, $line))
+      ? $line
+      : '';
+  }
+
+  $out = [];
+  foreach (array_slice($found, 0, 4, true) as $digits => $name) {
+    $out[] = [
       'name'  => $name,
       'phone' => substr($digits, 0, 5) . ' ' . substr($digits, 5),
       'tel'   => '+91' . $digits,
     ];
-    if (count($found) >= 4) break;
   }
-  return array_values($found);
+  return $out;
+}
+
+/**
+ * The map link for where the trip actually ends up. Invitations often carry
+ * two: a meeting point to convoy from, and the final stop for people joining
+ * directly ("Those who wish to join directly at the final stop can reach at
+ * Lakshimapur Lake … <link>"). The card's pin should be the final stop, so
+ * prefer the last link introduced that way, and otherwise the last link.
+ */
+function db_event_destination_map($description) {
+  if (!$description) return '';
+  $text = db_event_text($description);
+  if (!preg_match_all('#https?://(?:maps\.app\.goo\.gl|(?:www\.)?google\.[a-z.]+/maps)[^\s<>"\']*#i',
+      $text, $m, PREG_OFFSET_CAPTURE)) {
+    return '';
+  }
+
+  $links = $m[0];
+  foreach (array_reverse($links) as [$url, $offset]) {
+    $lead = substr($text, max(0, $offset - 220), min(220, $offset));
+    if (preg_match('/\b(final|directly|destination|reach at|end point)\b/i', $lead)) {
+      return db_event_clean_url($url);
+    }
+  }
+  return db_event_clean_url(end($links)[0]);
+}
+
+/** Trailing punctuation from prose ("… <link>, as it takes 45 mins"). */
+function db_event_clean_url($url) {
+  return rtrim($url, '.,;:)]');
 }
 
 add_action('rest_api_init', function() {
@@ -984,11 +1063,14 @@ add_action('rest_api_init', function() {
     'methods'             => 'GET',
     'permission_callback' => '__return_true',
     'callback'            => function(WP_REST_Request $request) {
-      $ttl = $request->get_param('scope') === 'past' ? 6 * HOUR_IN_SECONDS : HOUR_IN_SECONDS;
+      // A finished trip never changes, so past events can sit for hours;
+      // an upcoming one gets edited up to the morning of the walk.
+      $ttl = $request->get_param('scope') === 'past' ? 6 * HOUR_IN_SECONDS : 15 * MINUTE_IN_SECONDS;
       $res = db_proxy_fetch('/api/events', $request, ['scope'], $ttl);
       if (!empty($res['data']) && is_array($res['data'])) {
         foreach ($res['data'] as &$event) {
           $event['coordinators'] = db_event_coordinators($event['note'] ?? '');
+          $event['mapUrl']       = db_event_destination_map($event['note'] ?? '');
         }
         unset($event);
       }

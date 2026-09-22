@@ -40,9 +40,19 @@ function formatDate(dateStr) {
 
 // Calendar event titles come in as "Deccan Birders | 28-SEP-2026 | 0600 | Keesara" —
 // pull just the location out and present it as a readable field trip name.
+/**
+ * Calendar titles read "Deccan Birders | 27-SEP-2026 | 05:15 | Lakshimapur".
+ * The time is written differently each month — 0600, 05:15, 5.15 AM — so the
+ * pattern stays loose; what matters is the place at the end.
+ */
+function titlePlace(t) {
+  const m = String(t || '').match(/Deccan Birders\s*\|\s*[\d\-A-Z]+\s*\|\s*[\d.:\s]*(?:am|pm)?\s*\|\s*(.+)/i);
+  return m ? m[1].trim() : '';
+}
+
 function cleanTitle(t) {
-  const m = String(t || '').match(/Deccan Birders\s*\|\s*[\d\-A-Z]+\s*\|\s*\d+\s*\|\s*(.+)/i);
-  return m ? 'Field Trip — ' + m[1].trim() : t;
+  const place = titlePlace(t);
+  return place ? 'Field Trip — ' + place : t;
 }
 
 // The calendar's note field is raw HTML (mail-merge style). keepBreaks
@@ -162,6 +172,17 @@ function detailRow(label, value) {
  * opens when the card is activated.
  */
 /**
+ * Where the trip ends up, as a pin under the location name. The link comes
+ * from db_event_destination_map() in functions.php, which picks the final
+ * stop rather than the meeting point people convoy from.
+ */
+function mapLine(mapUrl) {
+  if (!mapUrl) return '';
+  return `<a class="event-map-link" href="${escapeHtml(mapUrl)}" target="_blank" rel="noopener">`
+    + `<span class="event-map-pin" aria-hidden="true">📍</span>View on map</a>`;
+}
+
+/**
  * Whom to ring about a trip, read out of the calendar invitation by
  * db_event_coordinators() in functions.php. It sits right under the trip
  * name — on the Events page and on the home page, which uses these same
@@ -213,8 +234,9 @@ function renderCard(kind, data, index, opts = {}) {
     </div>
     <div class="event-body">
       <div class="event-title">${escapeHtml(data.title)}</div>
-      ${kind === 'upcoming' ? coordinatorLine(data.coordinators) : ''}
       ${data.place ? `<div class="event-meta">${escapeHtml(data.place)}</div>` : ''}
+      ${kind === 'upcoming' ? mapLine(data.mapUrl) : ''}
+      ${kind === 'upcoming' ? coordinatorLine(data.coordinators) : ''}
       ${kind === 'upcoming' && data.time ? `<div class="event-meta">${escapeHtml(dayName)} · ${escapeHtml(data.time)}</div>` : ''}
       ${chips}
     </div>
@@ -240,7 +262,10 @@ function upcomingFields(e) {
     id:           e.id || '',
     title:        cleanTitle(e.title),
     date:         e.date,
-    place:        e.place || '',
+    // The title is updated every month; the calendar's own Location field
+    // is often left on the previous trip, so prefer the title's place.
+    place:        titlePlace(e.title) || e.place || '',
+    mapUrl:       e.mapUrl || '',
     time:         e.date ? new Date(e.date).toLocaleTimeString('en-IN', { hour: 'numeric', minute: '2-digit' }) : '',
     meetingPoint: '',
     leader:       '',

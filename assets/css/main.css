@@ -2374,8 +2374,23 @@ body.lightbox-open { overflow: hidden; }
 .home-sightings-scroller::-webkit-scrollbar-thumb { background: var(--border); border-radius: 999px; }
 .home-sightings-scroller::-webkit-scrollbar-thumb:hover { background: #C8D3CC; }
 
-/* Trip coordinators, directly under the trip name on an upcoming card
-   (Events page and home page alike): tappable phone links. */
+/* Map pin under the location name: where the trip actually ends up. */
+.event-map-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 6px;
+  font-size: 14.5px;
+  font-weight: 600;
+  color: var(--blue);
+  text-decoration: none;
+  border-bottom: 1px solid transparent;
+}
+.event-map-link:hover { border-bottom-color: currentColor; }
+.event-map-pin { font-size: 13px; line-height: 1; }
+
+/* Trip coordinators, under the map pin on an upcoming card (Events page
+   and home page alike): tappable phone links. */
 .event-coordinators {
   margin-top: 6px;
   font-size: 14.5px;
