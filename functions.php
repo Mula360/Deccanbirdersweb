@@ -1032,6 +1032,37 @@ function db_event_coordinators($description) {
 }
 
 /**
+ * The invitation as written, ready to show inside a card. Google Calendar
+ * gives us HTML, so it is run through wp_kses down to text markup and
+ * links — no styles, images or scripts — bare URLs are made clickable,
+ * and every link opens in a new tab. Invitations carry map links and the
+ * membership page, and those should be usable rather than plain text.
+ */
+function db_event_note_html($description) {
+  if (!$description) return '';
+
+  $allowed = [
+    'a'      => ['href' => true, 'title' => true],
+    'p'      => [],
+    'br'     => [],
+    'strong' => [], 'b' => [],
+    'em'     => [], 'i' => [], 'u' => [],
+    'ul'     => [], 'ol' => [], 'li' => [],
+    'span'   => [],
+    'div'    => [],
+  ];
+  $html = wp_kses((string) $description, $allowed);
+  $html = make_clickable($html);
+
+  // Every link leaves the site, so force the same treatment on all of
+  // them, whether they came from the calendar or from make_clickable().
+  $html = preg_replace('/\s(?:target|rel)="[^"]*"/i', '', $html);
+  $html = str_ireplace('<a ', '<a target="_blank" rel="noopener nofollow" ', $html);
+
+  return trim($html);
+}
+
+/**
  * The map link for where the trip actually ends up. Invitations often carry
  * two: a meeting point to convoy from, and the final stop for people joining
  * directly ("Those who wish to join directly at the final stop can reach at
@@ -1074,6 +1105,7 @@ add_action('rest_api_init', function() {
         foreach ($res['data'] as &$event) {
           $event['coordinators'] = db_event_coordinators($event['note'] ?? '');
           $event['mapUrl']       = db_event_destination_map($event['note'] ?? '');
+          $event['noteHtml']     = db_event_note_html($event['note'] ?? '');
         }
         unset($event);
       }

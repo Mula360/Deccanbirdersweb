@@ -172,6 +172,17 @@ function detailRow(label, value) {
  * opens when the card is activated.
  */
 /**
+ * The invitation itself. db_event_note_html() in functions.php has already
+ * cut it down to text markup and links and pointed every link at a new
+ * tab, so this is the one place the card trusts server HTML; anything
+ * without that treatment falls back to escaped plain text.
+ */
+function noteBlock(data) {
+  if (data.noteHtml) return `<div class="event-detail-notes is-rich">${data.noteHtml}</div>`;
+  return data.notes ? `<div class="event-detail-notes">${escapeHtml(data.notes)}</div>` : '';
+}
+
+/**
  * Where the trip ends up, as a pin under the location name. The link comes
  * from db_event_destination_map() in functions.php, which picks the final
  * stop rather than the meeting point people convoy from.
@@ -219,10 +230,12 @@ function renderCard(kind, data, index, opts = {}) {
   const details = kind === 'past'
     ? detailRow('Led by', data.leader) + detailRow('Pick of the day', data.pick) +
       (data.notes ? `<div class="event-detail-notes">${escapeHtml(data.notes)}</div>` : '')
-    : detailRow('Meeting point', data.meetingPoint) + detailRow('Starts', data.time) +
+    // The time and the coordinator are already in the header, so the panel
+    // is the invitation itself: as written, with its links usable.
+    : detailRow('Meeting point', data.meetingPoint) +
       detailRow('Led by', data.leader) + detailRow('Fee', data.fee ? `₹${data.fee}` : '') +
       (data.loanerBins ? detailRow('Binoculars', 'Loaner pairs available') : '') +
-      (data.notes ? `<div class="event-detail-notes">${escapeHtml(data.notes)}</div>` : '');
+      noteBlock(data);
 
   const hasDetails = details.trim() !== '';
 
@@ -266,6 +279,7 @@ function upcomingFields(e) {
     // is often left on the previous trip, so prefer the title's place.
     place:        titlePlace(e.title) || e.place || '',
     mapUrl:       e.mapUrl || '',
+    noteHtml:     e.noteHtml || '',
     time:         e.date ? new Date(e.date).toLocaleTimeString('en-IN', { hour: 'numeric', minute: '2-digit' }) : '',
     meetingPoint: '',
     leader:       '',

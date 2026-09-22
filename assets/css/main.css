@@ -469,6 +469,22 @@ a.event-toggle { display: inline-block; text-decoration: none; }
   color: #4E6B5C;
 }
 .event-detail-notes { font-size: 15px; line-height: 1.6; color: var(--text-body); white-space: pre-line; }
+/* The invitation as written: it brings its own paragraphs and lists, so
+   the pre-line whitespace that plain-text notes rely on is dropped. */
+.event-detail-notes.is-rich { white-space: normal; }
+.event-detail-notes.is-rich p { margin: 0 0 12px; }
+.event-detail-notes.is-rich p:last-child { margin-bottom: 0; }
+.event-detail-notes.is-rich ul,
+.event-detail-notes.is-rich ol { margin: 0 0 12px; padding-left: 20px; }
+.event-detail-notes.is-rich li { margin-bottom: 4px; }
+.event-detail-notes.is-rich a {
+  color: var(--blue);
+  font-weight: 600;
+  text-decoration: none;
+  border-bottom: 1px solid var(--border);
+  overflow-wrap: anywhere;
+}
+.event-detail-notes.is-rich a:hover { border-bottom-color: currentColor; }
 
 /* -------------------------------------------------------------------------
    Video card
