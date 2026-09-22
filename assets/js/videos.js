@@ -152,9 +152,7 @@ async function initVideos() {
   const grid = document.getElementById('videos-grid');
   if (!grid) return;
 
-  grid.innerHTML = `<div class="video-skeleton-grid">
-    ${Array(6).fill('<div class="video-skeleton"><div class="sk-block" style="width:100%;aspect-ratio:16/9;border-radius:8px 8px 0 0;height:auto"></div><div style="padding:14px"><div class="sk-block" style="width:80%;margin-bottom:6px"></div><div class="sk-block" style="width:50%"></div></div></div>').join('')}
-  </div>`;
+  if (window.DB && DB.showBirdLoader) DB.showBirdLoader(grid, 'Fetching films from the channel…');
 
   try {
     const res  = await fetch(`${API}/videos`);

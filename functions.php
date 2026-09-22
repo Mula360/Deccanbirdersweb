@@ -48,23 +48,25 @@ add_action('wp_enqueue_scripts', function() {
   wp_enqueue_style('db-vars', get_template_directory_uri() . '/assets/css/variables.css', [], $v);
   wp_enqueue_style('db-main', get_template_directory_uri() . '/assets/css/main.css', ['db-vars'], $v);
 
+  // The loading bird is shared by every script that waits on data.
+  wp_enqueue_script('db-bird-loader', get_template_directory_uri() . '/assets/js/bird-loader.js', [], $v, true);
   wp_enqueue_script('db-main', get_template_directory_uri() . '/assets/js/main.js', [], $v, true);
 
   // Sightings JS — load on sightings page and front page
   if (is_front_page() || is_page('sightings')) {
-    wp_enqueue_script('db-sightings', get_template_directory_uri() . '/assets/js/sightings.js', [], $v, true);
+    wp_enqueue_script('db-sightings', get_template_directory_uri() . '/assets/js/sightings.js', ['db-bird-loader'], $v, true);
   }
   // Events JS — load on events page and front page
   if (is_front_page() || is_page('events')) {
-    wp_enqueue_script('db-events', get_template_directory_uri() . '/assets/js/events.js', [], $v, true);
+    wp_enqueue_script('db-events', get_template_directory_uri() . '/assets/js/events.js', ['db-bird-loader'], $v, true);
   }
   // Videos JS — load on gallery page
   if (is_page('gallery')) {
-    wp_enqueue_script('db-videos', get_template_directory_uri() . '/assets/js/videos.js', [], $v, true);
+    wp_enqueue_script('db-videos', get_template_directory_uri() . '/assets/js/videos.js', ['db-bird-loader'], $v, true);
   }
   // PITTA search — load on archives page
   if (is_page('archives')) {
-    wp_enqueue_script('db-pitta-search', get_template_directory_uri() . '/assets/js/pitta-search.js', [], $v, true);
+    wp_enqueue_script('db-pitta-search', get_template_directory_uri() . '/assets/js/pitta-search.js', ['db-bird-loader'], $v, true);
   }
 
   // Pass config to all JS
@@ -76,6 +78,24 @@ add_action('wp_enqueue_scripts', function() {
     'rest_url' => esc_url_raw(rest_url('db/v1/')),
   ]);
 });
+
+/**
+ * The loading state, for markup rendered before any JavaScript runs — the
+ * same bird assets/js/bird-loader.js draws, so a page never flips from one
+ * kind of placeholder to another while it waits.
+ */
+function db_bird_loader($message = 'Loading…') {
+  printf(
+    '<div class="bird-loader" role="status" aria-live="polite">'
+    . '<div class="bird-loader-flight">'
+    . '<svg class="bird-loader-bird" viewBox="0 0 64 40" aria-hidden="true" focusable="false">'
+    . '<path class="bird-wing-up" d="M4 26c8 2 14-2 19-9 3-4 6-7 9-7s6 3 9 7c5 7 11 11 19 9-7 6-14 8-19 5-4-2-6-5-9-5s-5 3-9 5c-5 3-12 1-19-5Z"/>'
+    . '<path class="bird-wing-down" d="M4 12c8-2 14 2 19 9 3 4 6 7 9 7s6-3 9-7c5-7 11-11 19-9-7-6-14-8-19-5-4 2-6 5-9 5s-5-3-9-5c-5-3-12-1-19 5Z"/>'
+    . '</svg></div>'
+    . '<p class="bird-loader-text">%s</p></div>',
+    esc_html($message)
+  );
+}
 
 /**
  * Open the connections the page is about to need, during the wait for
@@ -150,6 +170,24 @@ add_action('init', function() {
     'rewrite'   => ['slug' => 'pitta'],
   ]);
 
+});
+
+/**
+ * Activities now live inside About, so the old page and its menu item
+ * step aside: anyone arriving at /activities — an old link, a search
+ * result, a bookmark — lands on that section of About instead.
+ */
+add_action('template_redirect', function() {
+  if (!is_page('activities')) return;
+  $about = get_page_by_path('about');
+  wp_safe_redirect(($about ? get_permalink($about) : home_url('/about/')) . '#activities', 301);
+  exit;
+});
+
+add_filter('wp_nav_menu_objects', function($items) {
+  return array_values(array_filter($items, function($item) {
+    return !preg_match('#/activities/?$#', (string) $item->url);
+  }));
 });
 
 /* -----------------------------------------------------------------------
@@ -1300,7 +1338,10 @@ add_action('rest_api_init', function() {
     'permission_callback' => '__return_true',
     'callback'            => function(WP_REST_Request $request) {
       $tab = $request->get_param('tab');
-      $ttl = in_array($tab, ['hotspots', 'hotspot_species', 'onthisday'], true) ? DAY_IN_SECONDS : 15 * MINUTE_IN_SECONDS;
+      // eBird checklists trickle in over days, not minutes, so six hours
+      // is fresh enough and keeps the page quick; the reference data
+      // (hotspots, species lists, this-day-in-history) holds for a day.
+      $ttl = in_array($tab, ['hotspots', 'hotspot_species', 'onthisday'], true) ? DAY_IN_SECONDS : 6 * HOUR_IN_SECONDS;
 
       // "Notable" here means IUCN Near Threatened or worse — a different
       // definition than eBird's own "notable" (locally rare/reviewed),
@@ -1490,6 +1531,22 @@ function db_pitta_special_name($edition) {
   $edition = trim((string) $edition);
   if ($edition === '' || strcasecmp($edition, 'Regular') === 0) return '';
   return preg_replace('/^special\s*[-–—:]\s*/i', '', $edition);
+}
+
+/**
+ * An issue is put together after its month has finished, so it appears
+ * about 45 days later — September's issue goes up in November. Until
+ * then a month is "coming soon" rather than missing, which is a
+ * different thing to tell a reader.
+ */
+function db_pitta_issue_due($year, $month) {
+  // 45 days after the last day of that month.
+  $end = mktime(0, 0, 0, (int) $month + 1, 1, (int) $year);
+  return $end + 45 * DAY_IN_SECONDS;
+}
+
+function db_pitta_is_awaited($year, $month) {
+  return current_time('timestamp') < db_pitta_issue_due($year, $month);
 }
 
 /**

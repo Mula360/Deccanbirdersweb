@@ -83,12 +83,7 @@ while (have_posts()) : the_post();
     <a href="/events" class="text-link">Full calendar →</a>
   </div>
   <div class="events-grid" id="home-events-grid">
-    <div class="event-card"><div class="event-date-block"><span class="sk-block" style="width:36px"></span></div>
-      <div class="event-body"><span class="sk-block" style="width:70%;margin-bottom:8px"></span><span class="sk-block" style="width:50%"></span></div></div>
-    <div class="event-card"><div class="event-date-block"><span class="sk-block" style="width:36px"></span></div>
-      <div class="event-body"><span class="sk-block" style="width:70%;margin-bottom:8px"></span><span class="sk-block" style="width:50%"></span></div></div>
-    <div class="event-card"><div class="event-date-block"><span class="sk-block" style="width:36px"></span></div>
-      <div class="event-body"><span class="sk-block" style="width:70%;margin-bottom:8px"></span><span class="sk-block" style="width:50%"></span></div></div>
+    <?php db_bird_loader('Checking the calendar…'); ?>
   </div>
 </section>
 
@@ -97,7 +92,7 @@ while (have_posts()) : the_post();
     <span class="eyebrow eyebrow--lede" style="color:var(--blue);">What we do</span>
     <h2 class="section-h2 section-h2--lg">An array of activities</h2>
     <p class="split-lede">Deccan Birders organizes field trips, lectures, film and slide shows, nature camps, treks, waterfowl counts, bird ringing, etc.</p>
-    <a href="/activities" class="text-link text-link--block">All activities →</a>
+    <a href="/about#activities" class="text-link text-link--block">All activities →</a>
   </div>
   <div class="activity-brief-grid">
     <div class="activity-brief"><span class="activity-brief-cadence">Every month</span><span class="activity-brief-title">Monthly Field Trips</span></div>
@@ -141,10 +136,7 @@ while (have_posts()) : the_post();
   <!-- Scrolls sideways: a longer run of records than four cells would fit. -->
   <div class="home-sightings-scroller">
     <div class="home-sightings" id="home-sightings-rows">
-      <div class="home-sighting-cell"><span class="sk-block" style="width:70%"></span></div>
-      <div class="home-sighting-cell"><span class="sk-block" style="width:70%"></span></div>
-      <div class="home-sighting-cell"><span class="sk-block" style="width:70%"></span></div>
-      <div class="home-sighting-cell"><span class="sk-block" style="width:70%"></span></div>
+      <?php db_bird_loader('Fetching the latest checklists…'); ?>
     </div>
   </div>
   <a href="/sightings" class="text-link text-link--block">Notable sightings and hotspots →</a>

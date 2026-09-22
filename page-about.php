@@ -2,10 +2,11 @@
 /**
  * Template for the About page — rendered directly in PHP (no Elementor).
  *
- * Mirrors the design exactly: heading, banner image, intro paragraph, and
- * the two card-links out to the Committee and Aims pages. The Executive
- * Committee grid deliberately does NOT live here — it is its own page
- * (page-committee.php), reached via the card-link below.
+ * Heading, banner image, intro paragraph, the two card-links out to the
+ * Committee and Aims pages, and then what the society actually does —
+ * the activities list, which used to be a page of its own (/activities
+ * now redirects here). The Executive Committee grid deliberately does NOT
+ * live here: it is its own page, reached via the card-link below.
  */
 get_header();
 while (have_posts()) : the_post();
@@ -53,6 +54,8 @@ while (have_posts()) : the_post();
     </div>
   </div>
 </section>
+
+<?php get_template_part('template-parts/activities-list'); ?>
 
 <?php get_template_part('template-parts/join-band'); ?>
 

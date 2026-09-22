@@ -1,17 +1,20 @@
 <?php
 /**
- * Template for the Activities page — rendered directly in PHP (no Elementor).
+ * The society's activities — the list that used to be its own page and now
+ * lives inside About. page-activities.php is gone; /activities redirects to
+ * the About page's #activities anchor (see functions.php).
  *
- * Design: each activity is one bordered card split into a text half and a
- * full-bleed photo half, alternating sides down the page.
+ * Content comes from the About page's own fields when set, falling back to
+ * the Activities page's if that content was entered there, and finally to
+ * the list below.
  */
-get_header();
-while (have_posts()) : the_post();
-  $id = get_the_ID();
-  $activities = get_field('activities', $id);
-  if (!$activities) {
-    $activities = [
-      ['activity_title' => 'Monthly Field Trips', 'activity_cadence' => 'Every month',
+
+$activities_page = get_page_by_path('activities');
+$activities = get_field('activities', get_the_ID())
+  ?: ($activities_page ? get_field('activities', $activities_page->ID) : null);
+if (!$activities) {
+  $activities = [
+    ['activity_title' => 'Monthly Field Trips', 'activity_cadence' => 'Every month',
         'activity_description' => '<ul><li>Visit to all the birding hot spots around Hyderabad</li><li>Mingle with the experts</li><li>Experience the joy of live bird sightings</li></ul>'],
       ['activity_title' => 'PITTA – Monthly Newsletter', 'activity_cadence' => 'Twelve issues a year',
         'activity_description' => '<ul><li>Trip reports by members with great details and pictures</li><li>Bird of the month column</li><li>Opportunity to print your articles</li></ul>'],
@@ -23,16 +26,15 @@ while (have_posts()) : the_post();
         'activity_description' => '<ul><li>Talks by eminent ornithologists</li><li>Network with the experts</li><li>Become aware of the latest developments</li></ul>'],
       ['activity_title' => 'Annual Nature Camps and Trekking', 'activity_cadence' => 'Once a year',
         'activity_description' => '<ul><li>National and International camps</li><li>Focus on the bird watching</li><li>Exclusive access to sanctuaries wherever possible</li></ul>'],
-    ];
-  }
+  ];
+}
 ?>
 
-<section class="activities-head">
+<section class="activities-head" id="activities">
   <span class="eyebrow" style="color:var(--blue);">Activities</span>
-  <h1 class="activities-title">An array of activities</h1>
+  <h2 class="activities-title">An array of activities</h2>
   <p class="activities-intro">Deccan Birders organizes field trips, lectures, film and slide shows, nature camps, treks, waterfowl counts, bird ringing, etc.</p>
 </section>
-
 <div class="activities-list">
   <?php foreach ($activities as $i => $a):
     // ACF may hand back either the image array or a bare attachment ID
@@ -57,7 +59,3 @@ while (have_posts()) : the_post();
   <?php endforeach; ?>
 </div>
 
-<?php get_template_part('template-parts/join-band'); ?>
-
-<?php endwhile;
-get_footer();

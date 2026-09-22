@@ -21,7 +21,7 @@ while (have_posts()) : the_post();
 </section>
 
 <div class="sightings-scope">
-  <div class="sightings-updated">Updated every 15 minutes</div>
+  <div class="sightings-updated">Updated every few hours</div>
 </div>
 
 <div class="sightings-tabs-wrap">

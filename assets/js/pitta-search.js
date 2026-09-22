@@ -212,7 +212,12 @@
       }
 
       expanded = false;
-      message('Searching every issue…', 'is-loading');
+      if (window.DB && DB.birdLoader) {
+        results.className = 'results show';
+        results.innerHTML = DB.birdLoader('Searching every issue…');
+      } else {
+        message('Searching every issue…', 'is-loading');
+      }
       controller = new AbortController();
       fetch(endpoint + '?q=' + encodeURIComponent(q), { signal: controller.signal })
         .then((res) => res.json().then((data) => ({ ok: res.ok, data })))

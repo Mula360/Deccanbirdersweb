@@ -788,6 +788,47 @@ body.modal-open { overflow: hidden; }
 .strip-error { color: var(--text-muted); padding: 12px 0; }
 
 /* -------------------------------------------------------------------------
+   Loading — a bird crossing the space the content will fill
+   ---------------------------------------------------------------------- */
+.bird-loader {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 40px 20px;
+  min-height: 140px;
+  text-align: center;
+}
+.bird-loader-flight {
+  width: min(280px, 70%);
+  display: flex;
+  justify-content: flex-start;
+  animation: bird-cross 2.6s ease-in-out infinite;
+}
+.bird-loader-bird { width: 46px; height: 29px; color: var(--green-dark); }
+.bird-loader-bird path { fill: currentColor; }
+/* Two wings, alternating: a flap without animating any geometry. */
+.bird-wing-down { display: none; }
+.bird-loader-bird { animation: bird-flap 0.42s steps(1, end) infinite; }
+.bird-loader-text { margin: 0; font-size: 14.5px; color: var(--text-muted); }
+
+@keyframes bird-cross {
+  0%   { transform: translateX(0) translateY(0); }
+  50%  { transform: translateX(calc(100% - 46px)) translateY(-8px); }
+  100% { transform: translateX(0) translateY(0); }
+}
+@keyframes bird-flap {
+  0%, 100% { transform: scaleY(1); }
+  50%      { transform: scaleY(-1); }
+}
+/* Stillness for anyone who asks for it: the bird stays put, the text stays. */
+@media (prefers-reduced-motion: reduce) {
+  .bird-loader-flight, .bird-loader-bird { animation: none; }
+  .bird-loader-flight { justify-content: center; }
+}
+
+/* -------------------------------------------------------------------------
    Events page — redesign: hero counts, pill tabs, trip cards, photo strip
    Follows the Events design on this site's tokens and Sora, not the
    mock's own font and hex values.
@@ -1726,21 +1767,12 @@ body.lightbox-open { overflow: hidden; }
 }
 .pitta-section .issue .cap { margin-top: 10px; font-family: var(--font-head); font-size: 14px; font-weight: 600; color: var(--text-muted); }
 .pitta-section .issue:hover .cap { color: var(--ink); }
-.pitta-section .gap .cover {
-  border: 1.5px dashed var(--border);
-  background: transparent;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-family: var(--font-body);
-  font-size: 13px;
-  color: #6B857A;
-  text-align: center;
-  padding: 12px;
-  aspect-ratio: 3 / 4;
-  border-radius: var(--radius-sm);
-}
-.pitta-section .gap .cap { color: #6B857A; }
+/* A month with no issue shows a plate instead of a cover: one for an
+   issue still to come, another for one that never appeared. */
+.pitta-section .gap .frame { border-style: dashed; background: var(--surface); }
+.pitta-section .gap--soon .frame { border-color: #C6D8CB; }
+.pitta-section .gap .cover { opacity: 0.92; }
+.pitta-section .gap .cap { color: #6B857A; font-weight: 500; }
 /* Dimmed while a search narrows the grid. */
 .pitta-section .dim { opacity: 0.35; }
 
@@ -2350,8 +2382,11 @@ body.lightbox-open { overflow: hidden; }
 /* Inner-page heading block. In the design this is just a max-width
    container sitting on the page background — not a white band — so it
    inherits body's --surface rather than painting its own background. */
-.hero-light { background: transparent; padding: clamp(40px, 6vw, 68px) 20px 0; }
-.hero-light-inner { max-width: var(--max-w); margin: 0 auto; }
+/* The inner box carries the side padding, so a page heading lines up with
+   the body content below it. With the padding on the section instead, every
+   hero sat 20px to the left of everything else on the page. */
+.hero-light { background: transparent; padding: clamp(40px, 6vw, 68px) 0 0; }
+.hero-light-inner { max-width: var(--max-w); margin: 0 auto; padding: 0 20px; }
 .hero-light .eyebrow { font-size: 12.5px; margin-bottom: 0; }
 .hero-standfirst { margin: 20px 0 0; max-width: 56ch; font-size: clamp(17px, 2.1vw, 20px); line-height: 1.55; color: var(--text-body); }
 .hero-light h1 {
@@ -2494,7 +2529,9 @@ body.lightbox-open { overflow: hidden; }
   font-size: 14px;
 }
 
-.two-col-60-40 { display: grid; grid-template-columns: 60% 40%; gap: 30px; }
+/* Fractions, not percentages: 60% + 40% + the gap overflowed the container
+   by exactly the gap, pushing the right-hand column past the page edge. */
+.two-col-60-40 { display: grid; grid-template-columns: minmax(0, 3fr) minmax(0, 2fr); gap: 30px; }
 .two-col-50-50 { display: grid; grid-template-columns: 1fr 1fr; gap: 30px; }
 
 /* =========================================================================

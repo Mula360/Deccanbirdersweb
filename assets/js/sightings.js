@@ -38,15 +38,11 @@ function timeAgo(dateStr) {
   return `${days}d ago`;
 }
 
-function showSkeleton(id, rows = 4) {
+function showSkeleton(id, message) {
+  // A bird crossing the panel, rather than grey bars: it says "waiting"
+  // without pretending to be the content that hasn't arrived.
   const el = document.getElementById(id);
-  if (!el) return;
-  el.innerHTML = Array(rows).fill(0).map(() => `
-    <div class="sighting-row sighting-skeleton">
-      <span class="sk-block" style="width:130px"></span>
-      <span class="sk-block" style="width:80px;margin-left:12px"></span>
-      <span class="sk-block" style="width:100px;margin-left:12px"></span>
-    </div>`).join('');
+  if (el && window.DB && DB.birdLoader) el.innerHTML = DB.birdLoader(message || 'Fetching the latest checklists…');
 }
 
 function escapeHtml(str) {
@@ -258,7 +254,7 @@ async function toggleHotspot(row) {
     return;
   }
 
-  panel.innerHTML = '<span class="hotspot-loading">Loading species…</span>';
+  panel.innerHTML = (window.DB && DB.birdLoader) ? DB.birdLoader('Listing the species seen here…') : '';
   const species = await fetchRecords('hotspot_species', { locId }, true);
 
   if (species === null) return; // aborted — leave whatever is showing
@@ -466,15 +462,15 @@ function initTabSwitching() {
 async function loadTab(tab) {
   switch (tab) {
     case 'notable':
-      showSkeleton('sightings-notable');
+      showSkeleton('sightings-notable', 'Looking for notable birds…');
       renderNotable(await fetchTab('notable', { page: 1, per_page: PAGE_SIZE }));
       break;
     case 'recent':
-      showSkeleton('sightings-recent');
+      showSkeleton('sightings-recent', 'Fetching the latest checklists…');
       renderRecent(await fetchTab('recent', { page: 1, per_page: PAGE_SIZE }));
       break;
     case 'hotspots':
-      showSkeleton('sightings-hotspots', 5);
+      showSkeleton('sightings-hotspots', 'Finding the best places nearby…');
       renderHotspots(await fetchRecords('hotspots'));
       break;
     case 'lookup':
@@ -525,7 +521,7 @@ async function loadOnThisDay() {
   const now = new Date();
   const m = String(now.getMonth() + 1).padStart(2, '0');
   const d = String(now.getDate()).padStart(2, '0');
-  showSkeleton('sightings-otd', 3);
+  showSkeleton('sightings-otd', 'Looking back through the years…');
 
   const groups = [];
   let painted = false;

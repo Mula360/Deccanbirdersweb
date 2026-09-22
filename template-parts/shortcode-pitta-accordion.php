@@ -39,8 +39,6 @@ foreach ($issues as $issue) {
 }
 krsort($by_year);
 
-$this_year  = (int) current_time('Y');
-$this_month = (int) current_time('n');
 $total      = count($issues);
 $first_year = min(array_keys($by_year));
 
@@ -110,12 +108,23 @@ $issue_data = function($issue) {
     <?php for ($m = 1; $m <= 12; $m++):
       $in_month = $year_months[$m] ?? [];
       if (!$in_month):
-        // Nothing published that month — or not published yet.
-        $future = $year > $this_year || ($year === $this_year && $m > $this_month);
+        // An issue lands about 45 days after its month ends, so a recent
+        // month is still to come rather than missing — two different
+        // things, each with its own plate.
+        $awaited = db_pitta_is_awaited($year, $m);
+        $plate   = $awaited ? 'pitta-coming-soon' : 'pitta-not-published';
+        $label   = $awaited ? __('Coming soon', 'deccan-birders') : __('Not published', 'deccan-birders');
       ?>
-        <div class="issue gap">
-          <div class="cover"><?php echo $future ? esc_html__('Coming soon', 'deccan-birders') : esc_html__('Not published', 'deccan-birders'); ?></div>
-          <div class="cap"><?php echo esc_html($months[$m]); ?></div>
+        <div class="issue gap<?php echo $awaited ? ' gap--soon' : ''; ?>">
+          <div class="frame">
+            <img class="cover" src="<?php echo esc_url(get_template_directory_uri() . '/assets/img/' . $plate . '.jpg'); ?>"
+                 alt="<?php echo esc_attr(sprintf(
+                   /* translators: 1: month, 2: year */
+                   $awaited ? __('%1$s %2$s — coming soon', 'deccan-birders') : __('%1$s %2$s — not published', 'deccan-birders'),
+                   $months[$m], $year)); ?>"
+                 loading="lazy" decoding="async" width="600" height="803">
+          </div>
+          <div class="cap"><?php echo esc_html($months[$m]); ?> · <?php echo esc_html($label); ?></div>
         </div>
       <?php else:
         foreach ($in_month as $issue):

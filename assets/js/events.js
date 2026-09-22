@@ -78,13 +78,14 @@ function stripHtml(h, keepBreaks) {
 async function initHomeEvents() {
   const grid = document.getElementById('home-events-grid');
   if (!grid) return;
+  if (window.DB && DB.showBirdLoader) DB.showBirdLoader(grid, 'Checking the calendar…');
   try {
     const res  = await fetch(`${API}/events`);
     const json = await res.json();
     if (json.error) throw new Error(json.message || 'Request failed');
     const data = json.data || [];
     if (!data.length) { grid.innerHTML = '<p>No upcoming trips. Check back soon.</p>'; return; }
-    grid.innerHTML = data.slice(0, 3).map((e, i) => renderCard('upcoming', upcomingFields(e), i, { linkToEvents: true })).join('');
+    grid.innerHTML = data.slice(0, 3).map((e, i) => renderEventCard('upcoming', upcomingFields(e), i, { linkToEvents: true })).join('');
   } catch (e) {
     grid.innerHTML = '<p>Could not load events.</p>';
   }
@@ -233,9 +234,14 @@ function factCell(label, value, link) {
  * any part the invitation doesn't mention is simply left out rather than
  * shown empty.
  */
-function renderEventCard(kind, data, index) {
+function renderEventCard(kind, data, index, opts = {}) {
   const { day, month, weekday, year } = formatDate(data.date);
   const id = `${kind}-${index}`;
+  // On the home page the write-up lives on the Events page, so the toggle
+  // becomes a link that opens that trip there, already expanded.
+  const detailsHref = opts.linkToEvents && data.id
+    ? `/events/#event-${encodeURIComponent(data.id)}`
+    : '';
   const coordinator = (data.coordinators || [])[0];
   const stops = data.stops || {};
   const past = kind === 'past';
@@ -302,7 +308,8 @@ function renderEventCard(kind, data, index) {
             <h2 class="ev-place">${escapeHtml(data.place || data.title)}</h2>
             ${past && data.where ? `<div class="ev-where">${escapeHtml(data.where)}</div>` : ''}
           </div>
-          ${hasPanel ? `<button type="button" class="ev-toggle${past ? ' ev-toggle--ghost' : ''}" aria-expanded="false" aria-controls="panel-${id}">
+          ${hasPanel && detailsHref ? `<a class="ev-toggle" href="${escapeHtml(detailsHref)}">View details</a>` : ''}
+          ${hasPanel && !detailsHref ? `<button type="button" class="ev-toggle${past ? ' ev-toggle--ghost' : ''}" aria-expanded="false" aria-controls="panel-${id}">
             <span class="ev-toggle-more">${past ? 'Read the invite' : 'View details'}</span>
             <span class="ev-toggle-less">${past ? 'Hide invite' : 'Hide details'}</span>
           </button>` : ''}
@@ -312,7 +319,7 @@ function renderEventCard(kind, data, index) {
         ${chips}
       </div>
     </div>
-    ${panel}
+    ${detailsHref ? '' : panel}
   </article>`;
 }
 
@@ -496,6 +503,7 @@ async function initHomePastEvents() {
 async function initEventsPage() {
   const upcoming = document.getElementById('events-upcoming');
   if (!upcoming) return;
+  if (window.DB && DB.showBirdLoader) DB.showBirdLoader(upcoming, 'Checking the calendar…');
 
   try {
     const res  = await fetch(`${API}/events`);
@@ -514,6 +522,7 @@ async function initEventsPage() {
 
   const past = document.getElementById('events-past');
   if (!past) return;
+  if (window.DB && DB.showBirdLoader) DB.showBirdLoader(past, 'Looking back over past walks…');
 
   const { merged, bothFailed } = await fetchMergedPastEvents();
 
