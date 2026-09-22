@@ -555,8 +555,63 @@ async function initHomeStrip() {
   const data = await fetchRecords('recent', { page: 1, per_page: 15 }, true);
   if (!data) { strip.innerHTML = '<p class="strip-error">Could not load sightings.</p>'; return; }
   strip.innerHTML = data.map(renderSightingRow).join('');
-  // Auto-refresh every 15 minutes
-  setTimeout(initHomeStrip, 15 * 60 * 1000);
+  initStripArrows();
+  // Fetched again a few hours on, in step with the server's own cache.
+  setTimeout(initHomeStrip, 6 * 60 * 60 * 1000);
+}
+
+/**
+ * The strip's arrows. It scrolls sideways but shows no scrollbar, so
+ * these are how it's moved with a mouse; a trackpad or a swipe still
+ * works directly. They hide themselves when everything already fits.
+ */
+function initStripArrows() {
+  const scroller = document.querySelector('.home-sightings-scroller');
+  const arrows = document.getElementById('home-sightings-arrows');
+  if (!scroller || !arrows) return;
+
+  const overflows = scroller.scrollWidth > scroller.clientWidth + 8;
+  arrows.hidden = !overflows;
+  if (!overflows) return;
+
+  const step = () => {
+    const cell = scroller.querySelector('.home-sighting-cell');
+    // Move by whole cells, so a record never sits half off the edge.
+    return cell ? Math.round(cell.getBoundingClientRect().width + 14) * 2 : 320;
+  };
+
+  const sync = () => {
+    const max = scroller.scrollWidth - scroller.clientWidth - 2;
+    arrows.querySelector('[data-step="-1"]').disabled = scroller.scrollLeft <= 2;
+    arrows.querySelector('[data-step="1"]').disabled = scroller.scrollLeft >= max;
+  };
+
+  arrows.querySelectorAll('.trip-arrow').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      // The easing is CSS's scroll-behavior, which also respects a
+      // reader's reduced-motion setting. Some environments ignore smooth
+      // scrolling altogether, and a dead arrow is worse than an abrupt
+      // one, so jump if nothing has moved shortly after.
+      const from = scroller.scrollLeft;
+      const by = step() * Number(btn.dataset.step);
+      scroller.scrollLeft = from + by;
+      setTimeout(() => {
+        if (scroller.scrollLeft === from) {
+          const easing = scroller.style.scrollBehavior;
+          scroller.style.scrollBehavior = 'auto';
+          scroller.scrollLeft = from + by;
+          scroller.style.scrollBehavior = easing;
+        }
+        // Don't wait for a scroll event to settle the arrows: a smooth
+        // scroll reports its final position late, and some environments
+        // don't fire the event at all.
+        sync();
+      }, 220);
+    });
+  });
+  scroller.addEventListener('scroll', sync, { passive: true });
+  window.addEventListener('resize', () => { arrows.hidden = scroller.scrollWidth <= scroller.clientWidth + 8; sync(); });
+  sync();
 }
 
 /* -------------------------------------------------------------------------

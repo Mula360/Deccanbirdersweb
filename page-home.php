@@ -132,8 +132,14 @@ while (have_posts()) : the_post();
       <span class="eyebrow eyebrow--lede" style="color:var(--blue);">Live from eBird</span>
       <h2 class="section-h2">What's being seen right now</h2>
     </div>
+    <!-- The strip runs longer than the screen, so it is moved with these
+         rather than a scrollbar. sightings.js wires them up and hides
+         them if everything happens to fit. -->
+    <div class="strip-arrows" id="home-sightings-arrows" hidden>
+      <button type="button" class="trip-arrow" data-step="-1" aria-label="Show earlier sightings">←</button>
+      <button type="button" class="trip-arrow trip-arrow--dark" data-step="1" aria-label="Show more sightings">→</button>
+    </div>
   </div>
-  <!-- Scrolls sideways: a longer run of records than four cells would fit. -->
   <div class="home-sightings-scroller">
     <div class="home-sightings" id="home-sightings-rows">
       <?php db_bird_loader('Fetching the latest checklists…'); ?>

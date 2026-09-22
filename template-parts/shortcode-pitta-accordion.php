@@ -4,7 +4,8 @@
  *
  * Issues are shown as their front covers: a row of year pills, then one
  * year at a time as a grid of twelve month slots (a cover where an issue
- * exists, a dashed placeholder where it doesn't), with Special issues
+ * exists, a plate where it doesn't — the plate itself says whether the
+ * issue is still to come or never appeared), with Special issues
  * following the twelve as wide cards. Covers come from
  * assets/pitta-covers/{catalog_key}.jpg (tools/pitta-index/build_covers.py).
  *
@@ -113,7 +114,6 @@ $issue_data = function($issue) {
         // things, each with its own plate.
         $awaited = db_pitta_is_awaited($year, $m);
         $plate   = $awaited ? 'pitta-coming-soon' : 'pitta-not-published';
-        $label   = $awaited ? __('Coming soon', 'deccan-birders') : __('Not published', 'deccan-birders');
       ?>
         <div class="issue gap<?php echo $awaited ? ' gap--soon' : ''; ?>">
           <div class="frame">
@@ -124,7 +124,7 @@ $issue_data = function($issue) {
                    $months[$m], $year)); ?>"
                  loading="lazy" decoding="async" width="600" height="803">
           </div>
-          <div class="cap"><?php echo esc_html($months[$m]); ?> · <?php echo esc_html($label); ?></div>
+          <div class="cap"><?php echo esc_html($months[$m]); ?></div>
         </div>
       <?php else:
         foreach ($in_month as $issue):

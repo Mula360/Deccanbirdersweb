@@ -1123,6 +1123,7 @@ body.modal-open { overflow: hidden; }
 .trip-gallery-count a { font-weight: 600; color: var(--blue); }
 @media (prefers-reduced-motion: reduce) {
   .trip-gallery-track { transition: none; }
+  .home-sightings-scroller { scroll-behavior: auto; }
 }
 
 /* -------------------------------------------------------------------------
@@ -2713,12 +2714,12 @@ body.lightbox-open { overflow: hidden; }
    carry a longer run of records than four cells would fit. */
 .home-sightings-scroller {
   overflow-x: auto;
+  scroll-behavior: smooth;
   overscroll-behavior-x: contain;
   scroll-snap-type: x proximity;
   -webkit-overflow-scrolling: touch;
   margin: 0 -20px;
   padding: 2px 20px 12px;
-  scrollbar-width: thin;
 }
 .home-sightings-scroller .home-sightings {
   flex-wrap: nowrap;
@@ -2728,9 +2729,13 @@ body.lightbox-open { overflow: hidden; }
   flex: 0 0 clamp(210px, 24vw, 260px);
   scroll-snap-align: start;
 }
-.home-sightings-scroller::-webkit-scrollbar { height: 8px; }
-.home-sightings-scroller::-webkit-scrollbar-thumb { background: var(--border); border-radius: 999px; }
-.home-sightings-scroller::-webkit-scrollbar-thumb:hover { background: #C8D3CC; }
+/* No scrollbar: the arrows in the section heading move the strip, and a
+   trackpad or a swipe still works as before. */
+.home-sightings-scroller { scrollbar-width: none; -ms-overflow-style: none; }
+.home-sightings-scroller::-webkit-scrollbar { display: none; }
+.strip-arrows { display: flex; gap: 10px; }
+.strip-arrows[hidden] { display: none; }
+.strip-arrows .trip-arrow:disabled { opacity: 0.35; cursor: default; }
 
 /* Map pin under the location name: where the trip actually ends up. */
 .event-map-link {
