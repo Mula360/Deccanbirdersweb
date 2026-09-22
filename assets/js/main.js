@@ -21,13 +21,16 @@
    * comes from the page HTML, which LiteSpeed caches — tokens expire
    * after 24 hours, so a cached page can carry a dead one and every
    * submission would fail with "Security check failed". Fetching it at
-   * submit time sidesteps that; DB_CONFIG is the fallback if the request
-   * fails (offline, say), since a stale token beats no token.
+   * submit time sidesteps that, from admin-ajax rather than the REST API
+   * so that signed-in editors get a token for themselves (see
+   * db_send_form_nonce). DB_CONFIG is the fallback if the request fails
+   * (offline, say), since a stale token beats no token.
    */
   async function freshNonce() {
-    const base = (typeof DB_CONFIG !== 'undefined' && DB_CONFIG.rest_url) || '/wp-json/db/v1/';
     try {
-      const res = await fetch(base + 'nonce', { cache: 'no-store' });
+      const body = new FormData();
+      body.append('action', 'db_nonce');
+      const res = await fetch(DB_CONFIG.ajax_url, { method: 'POST', body, cache: 'no-store' });
       const json = await res.json();
       return json.nonce || DB_CONFIG.nonce;
     } catch (e) {

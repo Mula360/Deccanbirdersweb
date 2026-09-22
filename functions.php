@@ -307,6 +307,24 @@ add_action('phpmailer_init', function($m) {
 /* -----------------------------------------------------------------------
  * 7. AJAX form handlers
  * ---------------------------------------------------------------------*/
+/**
+ * A security token for the forms, minted here rather than printed into
+ * the page: LiteSpeed can serve a page for longer than a token's 24-hour
+ * life, and a stale one fails every submission.
+ *
+ * It lives on admin-ajax, not the REST API, because REST treats a request
+ * carrying cookies but no REST token as logged out — so a signed-in
+ * committee member got a token for "anonymous" and then submitted as
+ * themselves, which never verified. admin-ajax sees the same identity on
+ * both trips, so the token matches for visitors and editors alike.
+ */
+add_action('wp_ajax_nopriv_db_nonce', 'db_send_form_nonce');
+add_action('wp_ajax_db_nonce', 'db_send_form_nonce');
+function db_send_form_nonce() {
+  nocache_headers();
+  wp_send_json(['nonce' => wp_create_nonce('db_contact_nonce')]);
+}
+
 add_action('wp_ajax_nopriv_db_contact', 'db_handle_contact');
 add_action('wp_ajax_db_contact', 'db_handle_contact');
 function db_handle_contact() {
@@ -1173,18 +1191,6 @@ add_action('rest_api_init', function() {
       // hotspot_species and the species lookup are already tied to one
       // place, so they pass straight through.
       return db_rest_no_cache(rest_ensure_response(db_proxy_fetch('/api/sightings', $request, ['region', 'tab', 'm', 'd', 'locId', 'speciesCode'], $ttl)));
-    },
-  ]);
-
-  // Forms read their security token from here rather than from the page,
-  // because a cached page can outlive the token baked into it (tokens
-  // last 24h; LiteSpeed may serve a page for longer). Same-origin only in
-  // practice: no CORS headers, so another site's script cannot read it.
-  register_rest_route('db/v1', '/nonce', [
-    'methods'             => 'GET',
-    'permission_callback' => '__return_true',
-    'callback'            => function() {
-      return db_rest_no_cache(rest_ensure_response(['nonce' => wp_create_nonce('db_contact_nonce')]));
     },
   ]);
 
