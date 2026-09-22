@@ -282,15 +282,25 @@ function db_settings_page() {
 /* -----------------------------------------------------------------------
  * 6. SMTP configuration
  * ---------------------------------------------------------------------*/
+/**
+ * Send through the society's mailbox — but only when a password is
+ * actually configured. Without DB_SMTP_PASS this used to switch WordPress
+ * to SMTP and then authenticate with an empty password, so every email on
+ * the site failed with "Could not authenticate" and nothing was sent,
+ * including submissions from the forms. With no password set we leave
+ * WordPress alone, so WP Mail SMTP (or the host's own mail) handles it.
+ */
 add_action('phpmailer_init', function($m) {
+  if (!defined('DB_SMTP_PASS') || !DB_SMTP_PASS) return;
+
   $m->isSMTP();
-  $m->Host       = 'smtp.hostinger.com';
+  $m->Host       = defined('DB_SMTP_HOST') ? DB_SMTP_HOST : 'smtp.hostinger.com';
   $m->SMTPAuth   = true;
-  $m->Port       = 587;
-  $m->Username   = 'info@deccanbirders.org';
-  $m->Password   = defined('DB_SMTP_PASS') ? DB_SMTP_PASS : '';
-  $m->SMTPSecure = 'tls';
-  $m->From       = 'info@deccanbirders.org';
+  $m->Port       = defined('DB_SMTP_PORT') ? (int) DB_SMTP_PORT : 587;
+  $m->Username   = defined('DB_SMTP_USER') ? DB_SMTP_USER : 'info@deccanbirders.org';
+  $m->Password   = DB_SMTP_PASS;
+  $m->SMTPSecure = $m->Port === 465 ? 'ssl' : 'tls';
+  $m->From       = $m->Username;
   $m->FromName   = 'Deccan Birders';
 });
 
