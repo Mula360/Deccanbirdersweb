@@ -123,6 +123,25 @@ add_action('init', function() {
     'rewrite'   => ['slug' => 'gallery'],
   ]);
 
+  // Photos from past trips, for the carousel at the foot of the Events
+  // page. Deliberately its own menu item rather than a field buried in a
+  // page, so "add the photos from Sunday" is one obvious place to go. The
+  // featured image is the photo; the title only describes it for screen
+  // readers.
+  register_post_type('db_trip_photo', [
+    'labels'    => [
+      'name'          => 'Trip Photos',
+      'singular_name' => 'Trip Photo',
+      'add_new_item'  => 'Add Trip Photo',
+      'edit_item'     => 'Edit Trip Photo',
+      'menu_name'     => 'Trip Photos',
+    ],
+    'public'    => false,
+    'show_ui'   => true,
+    'supports'  => ['title', 'thumbnail', 'page-attributes'],
+    'menu_icon' => 'dashicons-images-alt2',
+  ]);
+
   register_post_type('db_pitta', [
     'labels'    => ['name' => 'PITTA Archive', 'singular_name' => 'PITTA Issue', 'add_new_item' => 'Add New Issue'],
     'public'    => true,
@@ -1098,6 +1117,131 @@ function db_event_note_html($description) {
 }
 
 /**
+ * The invitation as one line of plain text, for the pattern matching
+ * below. Links are dropped: the calendar splits a URL across two anchors,
+ * so leaving them in breaks sentences mid-word.
+ */
+function db_event_prose($description) {
+  $text = db_event_text($description);
+  $text = preg_replace('#https?://\S*#i', ' ', $text);
+  return trim(preg_replace('/\s+/u', ' ', $text));
+}
+
+/**
+ * Birds the invitation says to expect, as a list. Written as a run-on
+ * sentence — "Birds to expect Whistling Ducks, Cotton-Pygmy goose, Jungle
+ * Bushquail…" — so this takes what follows the cue up to the full stop and
+ * splits it. Returns [] when the invitation doesn't list any, which is the
+ * point: a card shows the row only when there is something to put in it.
+ */
+function db_event_species($description) {
+  $text = db_event_prose($description);
+  if (!preg_match('/\b(?:birds?|species)\s+(?:to\s+expect|expected|one\s+can\s+expect|likely)\b[:,]?\s*(.+?)(?:\.\s|$)/iu', $text, $m)) {
+    return [];
+  }
+  $names = preg_split('/\s*(?:,|;|\band\b|&)\s*/iu', $m[1]);
+  $out = [];
+  foreach ($names as $name) {
+    $name = trim($name, " \t\n\r\0\x0B.-");
+    $name = preg_replace('/^(?:the|a|an)\s+/i', '', $name);
+    // A species name, not the sentence carrying on past the list: these
+    // usually trail off with "and other wetland and woodland birds".
+    if ($name === '' || str_word_count($name) > 5 || mb_strlen($name) > 46) continue;
+    if (!preg_match('/^[\p{L}][\p{L}\'\-\s\(\)]*$/u', $name)) continue;
+    if (preg_match('/^(?:other|various|many|several|etc|more)\b/i', $name)) break;
+    if (preg_match('/\b(?:birds|species|visitors|migrants)$/i', $name)) break;
+    $out[] = $name;
+    if (count($out) >= 20) break;
+  }
+  return $out;
+}
+
+/**
+ * Where people gather to travel together, and where the trip itself
+ * starts: "may meet at Taaza Tiffins, Thumkunta by 5:15 AM <link> … those
+ * who wish to join directly at the final stop can reach at Lakshimapur
+ * Lake by 6:00 AM <link>". Each comes back as name/time/map, with '' for
+ * anything the invitation doesn't say.
+ */
+function db_event_stops($description) {
+  $text = db_event_prose($description);
+  $maps = db_event_map_links($description);
+
+  $stop = function($pattern) use ($text) {
+    if (!preg_match($pattern, $text, $m)) return ['name' => '', 'time' => ''];
+    $name = trim(preg_replace('/\s+/u', ' ', $m['name'] ?? ''), " ,.-");
+    return [
+      'name' => mb_strlen($name) <= 70 ? $name : '',
+      'time' => isset($m['time']) ? db_event_tidy_time($m['time']) : '',
+    ];
+  };
+
+  $meet  = $stop('/\bmeet\s+at\s+(?<name>[^.]{3,70}?)\s+by\s+(?<time>\d{1,2}[:.]?\d{0,2}\s*(?:am|pm))/iu');
+  $final = $stop('/\b(?:final\s+stop|directly)\b[^.]{0,60}?\breach\s+at\s+(?<name>[^.]{3,70}?)\s+by\s+(?<time>\d{1,2}[:.]?\d{0,2}\s*(?:am|pm))/iu');
+
+  $meet['map']  = $maps ? reset($maps) : '';
+  $final['map'] = db_event_destination_map($description);
+  if ($final['map'] === $meet['map'] && count($maps) < 2) $meet['map'] = '';
+
+  return ['meet' => $meet, 'final' => $final];
+}
+
+function db_event_tidy_time($raw) {
+  $raw = strtolower(trim(preg_replace('/\s+/u', ' ', $raw)));
+  return str_replace(['.', ' am', ' pm'], [':', ' am', ' pm'], $raw);
+}
+
+/** Every map link in the invitation, in the order they appear. */
+function db_event_map_links($description) {
+  $text = db_event_text($description);
+  preg_match_all('#https?://(?:maps\.app\.goo\.gl|(?:www\.)?google\.[a-z.]+/maps)[^\s<>"\']*#i', $text, $m);
+  return array_values(array_unique(array_map('db_event_clean_url', $m[0])));
+}
+
+/**
+ * The practical details, for the "at a glance" panel: when to be where,
+ * what it costs a non-member, and what to bring. Each is only included
+ * when the invitation actually says it.
+ */
+function db_event_facts($description, $start_time = '') {
+  $text  = db_event_prose($description);
+  $stops = db_event_stops($description);
+  $facts = [];
+
+  if ($stops['meet']['name'] || $start_time) {
+    $facts[] = [
+      'label' => 'Starts',
+      'value' => $stops['meet']['time'] ?: $start_time,
+      'note'  => $stops['meet']['name'] ? 'Meet at ' . $stops['meet']['name'] : '',
+    ];
+  }
+  if ($stops['final']['name']) {
+    $facts[] = [
+      'label' => 'Joining at the site',
+      'value' => $stops['final']['time'],
+      'note'  => $stops['final']['name'],
+    ];
+  }
+  if (preg_match('/(?:Rs\.?|₹|INR)\s*(\d{2,5})\s*\/?-?\s*(per\s+head|per\s+person|each)?/iu', $text, $m)) {
+    $facts[] = [
+      'label' => 'Non-member contribution',
+      'value' => '₹' . $m[1] . (empty($m[2]) ? '' : ' ' . strtolower($m[2])),
+      'note'  => preg_match('/t-?shirts?|caps?/i', $text) ? 'Carry cash — T-shirts and caps on sale' : '',
+    ];
+  }
+  if (preg_match('/\bcarry\s+([^.]{3,60})/iu', $text, $m)) {
+    $bring = trim(preg_replace('/\s+/u', ' ', $m[1]));
+    $bring = preg_replace('/\s+(to|and enough|enough)\s+keep.*$/iu', '', $bring);
+    $facts[] = [
+      'label' => 'Bring',
+      'value' => ucfirst(rtrim($bring, ' ,')),
+      'note'  => preg_match('/half[\s-]day/i', $text) ? 'Half-day trip' : '',
+    ];
+  }
+  return $facts;
+}
+
+/**
  * The map link for where the trip actually ends up. Invitations often carry
  * two: a meeting point to convoy from, and the final stop for people joining
  * directly ("Those who wish to join directly at the final stop can reach at
@@ -1141,6 +1285,9 @@ add_action('rest_api_init', function() {
           $event['coordinators'] = db_event_coordinators($event['note'] ?? '');
           $event['mapUrl']       = db_event_destination_map($event['note'] ?? '');
           $event['noteHtml']     = db_event_note_html($event['note'] ?? '');
+          $event['species']      = db_event_species($event['note'] ?? '');
+          $event['stops']        = db_event_stops($event['note'] ?? '');
+          $event['facts']        = db_event_facts($event['note'] ?? '');
         }
         unset($event);
       }

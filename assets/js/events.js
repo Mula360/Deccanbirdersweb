@@ -32,9 +32,12 @@ function escapeHtml(str) {
 function formatDate(dateStr) {
   const d = new Date(dateStr);
   return {
-    day:     d.getDate(),
-    month:   d.toLocaleString('en-IN', { month: 'short' }),
-    dayName: d.toLocaleString('en-IN', { weekday: 'short' })
+    day:      d.getDate(),
+    month:    d.toLocaleString('en-IN', { month: 'short' }),
+    dayName:  d.toLocaleString('en-IN', { weekday: 'short' }),
+    // The Events page date block wants the fuller forms.
+    weekday:  d.toLocaleString('en-IN', { weekday: 'long' }),
+    year:     String(d.getFullYear()),
   };
 }
 
@@ -150,14 +153,17 @@ function pastEventFields(item) {
   }
   const e = item.event;
   return {
-    title:   cleanTitle(e.title),
-    date:    e.date,
-    place:   e.place || '',
-    leader:  '',
-    species: null,
-    turnout: null,
-    pick:    '',
-    notes:   stripHtml(e.note)
+    title:    cleanTitle(e.title),
+    date:     e.date,
+    place:    titlePlace(e.title) || e.place || '',
+    where:    e.place || '',
+    leader:   '',
+    species:  null,
+    turnout:  null,
+    pick:     '',
+    coordinators: e.coordinators || [],
+    noteHtml: e.noteHtml || '',
+    notes:    stripHtml(e.note)
   };
 }
 
@@ -209,6 +215,105 @@ function coordinatorLine(coordinators) {
       <span class="event-coordinators-label">${coordinators.length > 1 ? 'Coordinators' : 'Coordinator'}</span>
       ${people}
     </div>`;
+}
+
+/** "5:15 am" style label for the fact strip. */
+function factCell(label, value, link) {
+  if (!value && !link) return '';
+  return `<div class="ev-fact">
+      <span class="ev-fact-label">${escapeHtml(label)}</span>
+      ${value ? `<span class="ev-fact-value">${escapeHtml(value)}</span>` : ''}
+      ${link ? `<a class="ev-fact-link" href="${escapeHtml(link.href)}"${link.external ? ' target="_blank" rel="noopener"' : ''}>${escapeHtml(link.text)}</a>` : ''}
+    </div>`;
+}
+
+/**
+ * One trip on the Events page. Everything here comes out of the calendar
+ * invitation (see db_event_species/_stops/_facts in functions.php), and
+ * any part the invitation doesn't mention is simply left out rather than
+ * shown empty.
+ */
+function renderEventCard(kind, data, index) {
+  const { day, month, weekday, year } = formatDate(data.date);
+  const id = `${kind}-${index}`;
+  const coordinator = (data.coordinators || [])[0];
+  const stops = data.stops || {};
+  const past = kind === 'past';
+
+  const facts = past ? '' : `<div class="ev-facts">
+      ${factCell('Time', data.time, '')}
+      ${coordinator ? factCell('Trip coordinator', coordinator.name, { href: 'tel:' + coordinator.tel, text: coordinator.phone }) : ''}
+      ${factCell('Location', (stops.final && stops.final.name) || data.place,
+        data.mapUrl ? { href: data.mapUrl, text: 'View on map', external: true } : '')}
+    </div>`;
+
+  const species = (!past && data.species && data.species.length)
+    ? `<div class="ev-species">
+        <span class="ev-species-label">Possible species</span>
+        ${data.species.map((sp) => `<span class="ev-species-name">${escapeHtml(sp)}</span>`).join('')}
+      </div>`
+    : '';
+
+  const chips = past ? `<div class="ev-chips">
+      ${data.species != null && data.species !== '' ? `<span class="ev-chip"><span class="ev-dot"></span>${escapeHtml(String(data.species))} species</span>` : ''}
+      ${data.turnout != null && data.turnout !== '' ? `<span class="ev-chip"><span class="ev-dot ev-dot--amber"></span>${escapeHtml(String(data.turnout))} out</span>` : ''}
+      ${coordinator ? `<a class="ev-chip" href="tel:${escapeHtml(coordinator.tel)}"><span class="ev-dot ev-dot--amber"></span>${escapeHtml(coordinator.name)} · ${escapeHtml(coordinator.phone)}</a>` : ''}
+    </div>` : '';
+
+  const glanceFacts = (data.facts || []).map((f) => `<div class="ev-glance-fact">
+      <span class="ev-glance-label">${escapeHtml(f.label)}</span>
+      ${f.value ? `<span class="ev-glance-value">${escapeHtml(f.value)}</span>` : ''}
+      ${f.note ? `<span class="ev-glance-note">${escapeHtml(f.note)}</span>` : ''}
+    </div>`).join('');
+
+  const buttons = [
+    stops.meet && stops.meet.map ? `<a class="ev-btn ev-btn--blue" href="${escapeHtml(stops.meet.map)}" target="_blank" rel="noopener">Meeting point map</a>` : '',
+    coordinator ? `<a class="ev-btn" href="tel:${escapeHtml(coordinator.tel)}">Call coordinator</a>` : '',
+  ].join('');
+
+  const aside = (glanceFacts || buttons) ? `<aside class="ev-glance">
+      <span class="ev-panel-label">At a glance</span>
+      ${glanceFacts}
+      ${buttons ? `<div class="ev-btns">${buttons}</div>` : ''}
+    </aside>` : '';
+
+  const body = noteBlock(data);
+  const hasPanel = body.trim() !== '' || aside !== '';
+  const panel = hasPanel ? `<div class="ev-expand${aside ? '' : ' ev-expand--wide'}" id="panel-${id}" hidden>
+      <div class="ev-about">
+        <span class="ev-panel-label">${past ? 'Original invite' : 'About this trip'}</span>
+        ${body}
+      </div>
+      ${aside}
+    </div>` : '';
+
+  return `
+  <article class="ev-card${past ? ' ev-card--past' : ''}" data-card="${id}"${data.id ? ` data-event-id="${escapeHtml(data.id)}" id="event-${escapeHtml(data.id)}"` : ''}>
+    <div class="ev-main">
+      <div class="ev-date${past ? ' ev-date--past' : ''}">
+        <span class="ev-date-month">${escapeHtml(month)}</span>
+        <span class="ev-date-day">${day}</span>
+        <span class="ev-date-sub">${escapeHtml(past ? year : weekday)}</span>
+      </div>
+      <div class="ev-body">
+        <div class="ev-head">
+          <div>
+            <span class="ev-kind">${escapeHtml(data.kind || 'Field trip')}</span>
+            <h2 class="ev-place">${escapeHtml(data.place || data.title)}</h2>
+            ${past && data.where ? `<div class="ev-where">${escapeHtml(data.where)}</div>` : ''}
+          </div>
+          ${hasPanel ? `<button type="button" class="ev-toggle${past ? ' ev-toggle--ghost' : ''}" aria-expanded="false" aria-controls="panel-${id}">
+            <span class="ev-toggle-more">${past ? 'Read the invite' : 'View details'}</span>
+            <span class="ev-toggle-less">${past ? 'Hide invite' : 'Hide details'}</span>
+          </button>` : ''}
+        </div>
+        ${facts}
+        ${species}
+        ${chips}
+      </div>
+    </div>
+    ${panel}
+  </article>`;
 }
 
 function renderCard(kind, data, index, opts = {}) {
@@ -280,6 +385,9 @@ function upcomingFields(e) {
     place:        titlePlace(e.title) || e.place || '',
     mapUrl:       e.mapUrl || '',
     noteHtml:     e.noteHtml || '',
+    species:      e.species || [],
+    stops:        e.stops || {},
+    facts:        e.facts || [],
     time:         e.date ? new Date(e.date).toLocaleTimeString('en-IN', { hour: 'numeric', minute: '2-digit' }) : '',
     meetingPoint: '',
     leader:       '',
@@ -308,7 +416,7 @@ function paginate(container, kind, items, toFields, focusId = '') {
     const startIdx = (page - 1) * PAGE_SIZE;
     const slice = items.slice(startIdx, startIdx + PAGE_SIZE);
 
-    const cards = slice.map((it, i) => renderCard(kind, toFields(it), startIdx + i)).join('');
+    const cards = slice.map((it, i) => renderEventCard(kind, toFields(it), startIdx + i)).join('');
 
     const nav = pages > 1 ? `
       <nav class="events-pager" aria-label="${kind === 'past' ? 'Past events' : 'Upcoming events'} pages">
@@ -327,12 +435,12 @@ function paginate(container, kind, items, toFields, focusId = '') {
       });
     });
 
-    container.querySelectorAll('.event-toggle').forEach((btn) => {
+    container.querySelectorAll('.ev-toggle').forEach((btn) => {
       btn.addEventListener('click', () => {
         const panel = document.getElementById(btn.getAttribute('aria-controls'));
         const open = btn.getAttribute('aria-expanded') === 'true';
         btn.setAttribute('aria-expanded', String(!open));
-        btn.closest('.event-card').classList.toggle('is-open', !open);
+        btn.closest('.ev-card').classList.toggle('is-open', !open);
         if (panel) panel.hidden = open;
       });
     });
@@ -346,8 +454,8 @@ function paginate(container, kind, items, toFields, focusId = '') {
 function expandEvent(container, eventId) {
   const card = container.querySelector(`[data-event-id="${CSS.escape(eventId)}"]`);
   if (!card) return;
-  const btn = card.querySelector('.event-toggle');
-  const panel = card.querySelector('.event-details');
+  const btn = card.querySelector('.ev-toggle');
+  const panel = card.querySelector('.ev-expand');
   if (btn && panel && btn.getAttribute('aria-expanded') !== 'true') {
     btn.setAttribute('aria-expanded', 'true');
     card.classList.add('is-open');
@@ -398,6 +506,7 @@ async function initEventsPage() {
       upcoming.innerHTML = '<div class="events-empty"><p>No upcoming trips scheduled. We plan trips every month — check back soon.</p></div>';
     } else {
       paginate(upcoming, 'upcoming', data, upcomingFields, requestedEventId());
+      showHeroStats(data);
     }
   } catch (e) {
     upcoming.innerHTML = '<p>Could not load events.</p>';
@@ -416,14 +525,87 @@ async function initEventsPage() {
   paginate(past, 'past', merged, pastEventFields);
 }
 
+/** The two counts in the Events hero: how many trips, and how soon. */
+function showHeroStats(events) {
+  const stats = document.getElementById('events-stats');
+  if (!stats || !events.length) return;
+  const count = document.getElementById('events-stat-count');
+  const next = document.getElementById('events-stat-next');
+
+  const soonest = events
+    .map((e) => new Date(e.date))
+    .filter((d) => !isNaN(d))
+    .sort((a, b) => a - b)[0];
+
+  if (count) count.textContent = String(events.length);
+  if (next && soonest) {
+    const startOfToday = new Date();
+    startOfToday.setHours(0, 0, 0, 0);
+    const days = Math.max(0, Math.round((soonest - startOfToday) / 86400000));
+    next.textContent = days === 0 ? 'Today' : String(days);
+  }
+  stats.hidden = false;
+}
+
+/**
+ * The photos from past trips, one at a time. Arrows, dots and a nudge
+ * every few seconds — which stops as soon as somebody takes control, so
+ * it never fights the reader.
+ */
+function initTripGallery() {
+  const track = document.getElementById('trip-gallery-track');
+  if (!track) return;
+  const slides = Array.from(track.children);
+  if (!slides.length) return;
+
+  const dotsWrap = document.getElementById('trip-gallery-dots');
+  const counter = document.getElementById('trip-gallery-counter');
+  const arrows = Array.from(document.querySelectorAll('.trip-arrow'));
+  let index = 0;
+  let timer = null;
+
+  const dots = slides.map((_, i) => {
+    const dot = document.createElement('button');
+    dot.type = 'button';
+    dot.className = 'trip-dot';
+    dot.setAttribute('aria-label', `Photo ${i + 1}`);
+    dot.addEventListener('click', () => { stop(); show(i); });
+    if (dotsWrap) dotsWrap.appendChild(dot);
+    return dot;
+  });
+
+  function show(next) {
+    index = (next + slides.length) % slides.length;
+    track.style.transform = `translateX(-${index * 100}%)`;
+    dots.forEach((d, i) => d.classList.toggle('is-active', i === index));
+    slides.forEach((s, i) => s.setAttribute('aria-hidden', String(i !== index)));
+    if (counter) counter.textContent = `${index + 1} / ${slides.length}`;
+  }
+
+  function stop() {
+    if (timer) clearInterval(timer);
+    timer = null;
+  }
+
+  arrows.forEach((btn) => btn.addEventListener('click', () => {
+    stop();
+    show(index + Number(btn.dataset.step));
+  }));
+
+  show(0);
+  if (slides.length > 1 && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    timer = setInterval(() => show(index + 1), 6000);
+  }
+}
+
 /* -------------------------------------------------------------------------
  * Tab switching on events page
  * ---------------------------------------------------------------------- */
 
 function initEventsTabSwitching() {
-  document.querySelectorAll('.gallery-tab[data-tab]').forEach((btn) => {
+  document.querySelectorAll('.events-tab[data-tab]').forEach((btn) => {
     btn.addEventListener('click', () => {
-      document.querySelectorAll('.gallery-tab').forEach((b) => {
+      document.querySelectorAll('.events-tab').forEach((b) => {
         const on = b === btn;
         b.classList.toggle('is-active', on);
         b.setAttribute('aria-selected', on ? 'true' : 'false');
@@ -437,6 +619,7 @@ function initEventsTabSwitching() {
 
 document.addEventListener('DOMContentLoaded', () => {
   initEventsTabSwitching();
+  initTripGallery();
   initHomeEvents();
   initHomePastEvents();
   initEventsPage();

@@ -788,6 +788,303 @@ body.modal-open { overflow: hidden; }
 .strip-error { color: var(--text-muted); padding: 12px 0; }
 
 /* -------------------------------------------------------------------------
+   Events page — redesign: hero counts, pill tabs, trip cards, photo strip
+   Follows the Events design on this site's tokens and Sora, not the
+   mock's own font and hex values.
+   ---------------------------------------------------------------------- */
+.events-hero { max-width: var(--max-w); margin: 0 auto; padding: clamp(40px, 5vw, 64px) 20px 28px; }
+.events-hero-inner {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 32px;
+  align-items: end;
+}
+.events-hero h1 {
+  margin: 14px 0 20px;
+  font-family: var(--font-head);
+  font-size: clamp(40px, 6vw, 64px);
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: -0.03em;
+  color: var(--ink);
+}
+.events-stats { display: flex; gap: 12px; justify-self: end; flex-wrap: wrap; }
+.events-stats[hidden] { display: none; }
+.events-stat {
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-card);
+  padding: 16px 20px;
+  min-width: 124px;
+}
+.events-stat-num {
+  font-family: var(--font-head);
+  font-size: 30px;
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: -0.02em;
+  color: var(--ink);
+}
+.events-stat-label {
+  margin-top: 6px;
+  font-size: 12.5px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+/* Pill tabs */
+.events-tabs-wrap {
+  max-width: var(--max-w);
+  margin: 0 auto;
+  padding: 12px 20px 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+.events-tabs {
+  display: inline-flex;
+  background: #E6EBE9;
+  border-radius: var(--radius-btn);
+  padding: 4px;
+  font-family: var(--font-head);
+  font-weight: 600;
+  font-size: 15px;
+}
+.events-tab {
+  border: 0;
+  cursor: pointer;
+  font: inherit;
+  padding: 10px 20px;
+  border-radius: var(--radius-btn);
+  background: transparent;
+  color: var(--text-muted);
+  transition: background 150ms, color 150ms;
+}
+.events-tab.is-active { background: #fff; color: var(--ink); box-shadow: 0 1px 3px rgba(22, 36, 29, 0.12); }
+.events-tabs-note { margin: 0; font-size: 14px; color: var(--text-muted); }
+
+.events-panels { max-width: var(--max-w); margin: 0 auto; padding: 28px 20px clamp(60px, 8vw, 80px); }
+
+/* One trip */
+.ev-card {
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: 24px;
+  box-shadow: 0 1px 2px rgba(22, 36, 29, 0.04), 0 12px 32px -20px rgba(22, 36, 29, 0.25);
+  overflow: hidden;
+}
+.ev-card + .ev-card { margin-top: 20px; }
+.ev-card--past { box-shadow: none; }
+.ev-main { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 24px; padding: 24px; align-items: start; }
+
+.ev-date {
+  width: 88px;
+  height: 96px;
+  border-radius: 18px;
+  background: var(--ink);
+  color: #fff;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-head);
+  text-align: center;
+}
+.ev-date--past { background: var(--surface); color: var(--ink); }
+.ev-date-month { font-size: 12px; letter-spacing: 0.14em; font-weight: 600; text-transform: uppercase; color: #8FD3AD; }
+.ev-date--past .ev-date-month { color: var(--text-muted); }
+.ev-date-day { font-size: 40px; font-weight: 700; line-height: 1; letter-spacing: -0.03em; margin: 4px 0; }
+.ev-date-sub { font-size: 12px; font-weight: 600; color: #C8D3CE; }
+.ev-date--past .ev-date-sub { color: var(--text-muted); }
+
+.ev-body { min-width: 0; }
+.ev-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
+.ev-kind {
+  display: inline-block;
+  background: var(--green-light);
+  color: var(--green-dark);
+  font-family: var(--font-head);
+  font-weight: 600;
+  font-size: 11.5px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  padding: 5px 10px;
+  border-radius: var(--radius-btn);
+}
+.ev-card--past .ev-kind { background: var(--surface); color: var(--text-muted); }
+.ev-place {
+  margin: 10px 0 0;
+  font-family: var(--font-head);
+  font-size: clamp(22px, 2.6vw, 28px);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  line-height: 1.15;
+  color: var(--ink);
+}
+.ev-where { margin-top: 6px; font-size: 15px; color: var(--text-muted); }
+
+.ev-toggle {
+  background: var(--ink);
+  color: #fff;
+  border: 1px solid var(--ink);
+  cursor: pointer;
+  font-family: var(--font-head);
+  font-weight: 600;
+  font-size: 14px;
+  padding: 12px 20px;
+  border-radius: var(--radius-btn);
+  white-space: nowrap;
+}
+.ev-toggle--ghost { background: #fff; color: var(--ink); border-color: var(--border); }
+.ev-toggle-less { display: none; }
+.ev-card.is-open .ev-toggle-more { display: none; }
+.ev-card.is-open .ev-toggle-less { display: inline; }
+
+/* Time / coordinator / location strip: hairlines made of the gap. */
+.ev-facts {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 1px;
+  background: var(--border);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-card);
+  overflow: hidden;
+  margin-top: 22px;
+}
+.ev-fact { background: #fff; padding: 14px 18px; }
+.ev-fact-label {
+  display: block;
+  font-size: 11.5px;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  font-weight: 600;
+}
+.ev-fact-value {
+  display: block;
+  margin-top: 6px;
+  font-family: var(--font-head);
+  font-weight: 600;
+  font-size: 17px;
+  color: var(--ink);
+}
+.ev-fact-link { display: inline-block; margin-top: 2px; font-size: 14px; font-weight: 600; color: var(--blue); text-decoration: none; }
+.ev-fact-link:hover { text-decoration: underline; }
+
+.ev-species { margin-top: 18px; font-size: 15px; line-height: 1.6; color: var(--text-body); }
+.ev-species-label {
+  font-family: var(--font-head);
+  font-weight: 600;
+  font-size: 11.5px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  margin-right: 12px;
+}
+.ev-species-name:not(:last-child)::after { content: '·'; color: #B5C0BB; margin: 0 8px; }
+
+.ev-chips { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 18px; font-size: 15px; }
+.ev-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--surface);
+  border-radius: var(--radius-btn);
+  padding: 8px 14px;
+  color: var(--ink);
+  text-decoration: none;
+}
+.ev-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--green); }
+.ev-dot--amber { background: var(--yellow); }
+
+/* The invitation, and the at-a-glance panel beside it. */
+.ev-expand { border-top: 1px solid var(--border); display: grid; grid-template-columns: minmax(0, 2fr) minmax(260px, 1fr); }
+.ev-expand--wide { grid-template-columns: minmax(0, 1fr); }
+.ev-expand[hidden] { display: none; }
+.ev-about { padding: 28px 24px 32px; font-size: 16.5px; line-height: 1.65; color: var(--text-body); }
+.ev-panel-label {
+  display: block;
+  font-family: var(--font-head);
+  font-weight: 600;
+  font-size: 11.5px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  margin-bottom: 14px;
+}
+.ev-glance { background: var(--surface); padding: 28px 24px 32px; display: flex; flex-direction: column; gap: 20px; }
+.ev-glance .ev-panel-label { margin-bottom: 0; }
+.ev-glance-fact { display: grid; gap: 4px; }
+.ev-glance-label { font-size: 13px; color: var(--text-muted); font-weight: 600; }
+.ev-glance-value { font-family: var(--font-head); font-weight: 600; font-size: 16px; line-height: 1.3; color: var(--ink); }
+.ev-glance-note { font-size: 14px; color: var(--text-muted); }
+.ev-btns { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 4px; }
+.ev-btn {
+  background: #fff;
+  border: 1px solid var(--border);
+  color: var(--ink);
+  font-family: var(--font-head);
+  font-weight: 600;
+  font-size: 14px;
+  padding: 12px 18px;
+  border-radius: var(--radius-btn);
+  text-decoration: none;
+}
+.ev-btn--blue { background: var(--blue); border-color: var(--blue); color: #fff; }
+.ev-btn--blue:hover { background: var(--blue-dark); border-color: var(--blue-dark); }
+
+@media (max-width: 760px) {
+  .ev-main { grid-template-columns: 64px minmax(0, 1fr); gap: 16px; padding: 20px; }
+  .ev-date { width: 64px; height: 76px; border-radius: 14px; }
+  .ev-date-day { font-size: 30px; }
+  .ev-expand { grid-template-columns: minmax(0, 1fr); }
+  .ev-toggle { padding: 10px 16px; }
+}
+
+/* Photos from past trips */
+.trip-gallery { max-width: var(--max-w); margin: 0 auto; padding: 0 20px clamp(60px, 8vw, 80px); }
+.trip-gallery-head { display: flex; justify-content: space-between; align-items: flex-end; gap: 24px; flex-wrap: wrap; margin-bottom: 24px; }
+.trip-gallery-arrows { display: flex; gap: 10px; }
+.trip-arrow {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  border: 1px solid var(--border);
+  background: #fff;
+  color: var(--ink);
+  cursor: pointer;
+  font-size: 18px;
+  line-height: 1;
+}
+.trip-arrow--dark { background: var(--ink); color: #fff; border-color: var(--ink); }
+.trip-gallery-frame { overflow: hidden; border-radius: 24px; border: 1px solid var(--border); background: var(--surface); }
+.trip-gallery-track { display: flex; transition: transform 600ms cubic-bezier(0.4, 0, 0.2, 1); }
+.trip-slide { flex: 0 0 100%; min-width: 0; height: clamp(280px, 42vw, 520px); }
+.trip-slide img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.trip-gallery-foot { display: flex; justify-content: space-between; align-items: center; gap: 16px; margin-top: 18px; flex-wrap: wrap; }
+.trip-dots { display: flex; gap: 8px; }
+.trip-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: var(--radius-btn);
+  border: 0;
+  padding: 0;
+  cursor: pointer;
+  background: #CFD8D3;
+  transition: width 300ms, background 300ms;
+}
+.trip-dot.is-active { width: 28px; background: var(--ink); }
+.trip-gallery-count { margin: 0; font-size: 14px; color: var(--text-muted); }
+.trip-gallery-count a { font-weight: 600; color: var(--blue); }
+@media (prefers-reduced-motion: reduce) {
+  .trip-gallery-track { transition: none; }
+}
+
+/* -------------------------------------------------------------------------
    Events page — list and pagination
    ---------------------------------------------------------------------- */
 .events-empty { color: var(--text-muted); padding: 40px 0; text-align: center; }
