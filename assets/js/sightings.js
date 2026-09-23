@@ -64,12 +64,40 @@ function renderSightingRow(r) {
 }
 
 // Notable tab — bordered card with a yellow top rule.
+/* Hyderabad — the distances in the species lookup are measured from here. */
+const HYDERABAD = { lat: 17.3850, lng: 78.4867 };
+
+/**
+ * Great-circle distance in km. Good to a fraction of a percent at these
+ * ranges, which is far better than the "~" on the label implies.
+ */
+function distanceKm(lat, lng) {
+  if (typeof lat !== 'number' || typeof lng !== 'number') return null;
+  const R = 6371;
+  const toRad = (d) => (d * Math.PI) / 180;
+  const dLat = toRad(lat - HYDERABAD.lat);
+  const dLng = toRad(lng - HYDERABAD.lng);
+  const a = Math.sin(dLat / 2) ** 2 +
+            Math.cos(toRad(HYDERABAD.lat)) * Math.cos(toRad(lat)) * Math.sin(dLng / 2) ** 2;
+  return 2 * R * Math.asin(Math.sqrt(a));
+}
+
+// Rounded the way someone judging a drive would read it, not to the metre.
+function formatDistance(km) {
+  if (km == null) return '';
+  if (km < 1)  return 'under 1 km away';
+  if (km < 10) return `~${km.toFixed(1)} km away`;
+  return `~${Math.round(km)} km away`;
+}
+
 function renderSightingCard(r) {
+  const dist = r.distanceKm != null ? formatDistance(r.distanceKm) : '';
   return `<div class="sighting-card">
     <div class="sighting-species">${escapeHtml(r.species)}</div>
     <div class="sighting-sci">${escapeHtml(r.scientific)}</div>
     <div class="sighting-lines">
       <div>${escapeHtml(r.locality)}</div>
+      ${dist ? `<div class="sighting-distance">${escapeHtml(dist)}</div>` : ''}
       <div class="sighting-when">${timeAgo(r.when)}</div>
     </div>
     <div class="sighting-chips">
@@ -289,11 +317,32 @@ async function ensureLookupIndex() {
   const all = [...(notable || []), ...(recent || [])];
 
   lookupIndex = new Map();
+  // "Notable" is a filtered view of "recent", not a separate feed, so
+  // every notable record arrives twice. One observation is one species
+  // at one place at one moment.
+  const seen = new Set();
   all.forEach((r) => {
+    const key = `${r.species}|${r.locId}|${r.when}|${r.count}`;
+    if (seen.has(key)) return;
+    seen.add(key);
+
     if (!lookupIndex.has(r.species)) {
-      lookupIndex.set(r.species, { scientific: r.scientific, records: [] });
+      lookupIndex.set(r.species, { scientific: r.scientific, code: r.speciesCode || '', records: [] });
     }
-    lookupIndex.get(r.species).records.push(r);
+    const entry = lookupIndex.get(r.species);
+    if (!entry.code && r.speciesCode) entry.code = r.speciesCode;
+    entry.records.push({ ...r, distanceKm: distanceKm(r.lat, r.lng) });
+  });
+
+  // Nearest first — the question the card asks is "where can I see it",
+  // so a lake an hour away beats a better count three states over.
+  // Records with no coordinates sink to the bottom rather than vanish.
+  lookupIndex.forEach((entry) => {
+    entry.records.sort((a, b) => {
+      if (a.distanceKm == null) return 1;
+      if (b.distanceKm == null) return -1;
+      return a.distanceKm - b.distanceKm;
+    });
   });
   return lookupIndex;
 }
@@ -334,19 +383,38 @@ function renderSpeciesLookup() {
     });
   };
 
+  /**
+   * eBird's own page for a species: every record ever submitted, on a
+   * map. We only hold the last 30 days, so anything older is a question
+   * for eBird rather than one we can answer here.
+   */
+  const ebirdLink = (entry, species, label) => {
+    const href = entry && entry.code
+      ? `https://ebird.org/species/${encodeURIComponent(entry.code)}`
+      : `https://ebird.org/search?q=${encodeURIComponent(species)}`;
+    return `<a class="btn btn-ghost lookup-all" href="${href}" target="_blank" rel="noopener">${escapeHtml(label)}</a>`;
+  };
+
   const selectSpecies = (species) => {
     const entry = lookupIndex.get(species);
     closeDropdown();
     input.value = species;
 
     if (!entry || !entry.records.length) {
-      results.innerHTML = emptyState(`No recent locations found for ${species} nearby.`);
+      results.innerHTML = `
+        ${emptyState(`No records of ${species} in the last 30 days.`)}
+        ${ebirdLink(entry, species, 'View all records on eBird →')}
+      `;
       return;
     }
 
     results.innerHTML = `
-      <h3 class="lookup-heading">Where to see ${escapeHtml(species)} nearby</h3>
+      <h3 class="lookup-heading">Where to see ${escapeHtml(species)}, nearest first</h3>
       <div class="sighting-cards">${entry.records.map(renderSightingCard).join('')}</div>
+      <div class="lookup-foot">
+        <span class="lookup-count">${entry.records.length} record${entry.records.length === 1 ? '' : 's'} in the last 30 days</span>
+        ${ebirdLink(entry, species, 'View all records on eBird →')}
+      </div>
     `;
   };
 

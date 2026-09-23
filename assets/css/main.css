@@ -782,6 +782,21 @@ body.modal-open { overflow: hidden; }
    ---------------------------------------------------------------------- */
 .lookup-heading { font-family: var(--font-head); font-size: 18px; font-weight: 700; color: var(--ink); margin-bottom: 16px; }
 
+/* Distance carries the ordering, so it reads a shade stronger than the
+   date line beneath it. */
+.sighting-distance { color: var(--blue); font-weight: 600; }
+
+.lookup-foot {
+  margin-top: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+.lookup-count { font-size: 14.5px; color: var(--text-muted); }
+.lookup-all { white-space: nowrap; }
+
 /* -------------------------------------------------------------------------
    Homepage sightings strip error state
    ---------------------------------------------------------------------- */

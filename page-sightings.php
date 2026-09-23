@@ -48,7 +48,7 @@ while (have_posts()) : the_post();
   <div class="lookup-card" id="sightings-lookup">
     <span class="eyebrow" style="color:#1F5A93;">Where can I see it now?</span>
     <h2 class="lookup-title">Look up the nearest recent sighting of a species</h2>
-    <p class="lookup-intro">Type a species name. Results are the closest checklists in the last two weeks, with distance from Hyderabad.</p>
+    <p class="lookup-intro">Type a species name. Results are checklists from the last 30 days, nearest to Hyderabad first. For anything older, the species' own eBird page has every record.</p>
     <div class="autocomplete">
       <input type="search" id="species-search-input" class="autocomplete-input" placeholder="e.g. Indian Skimmer" autocomplete="off">
       <div class="autocomplete-dropdown" id="species-search-dropdown" hidden></div>
