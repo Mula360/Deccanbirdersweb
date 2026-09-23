@@ -26,12 +26,32 @@ function initActivities() {
 
   let current = 0;
   let timer = null;
+  // The second photograph is fetched up front so the first move is not
+  // the one that shows an empty frame.
+  let primed = false;
   // Someone who has picked an activity is reading it; the panel stops
   // moving rather than pulling the page out from under them.
   let surrendered = false;
 
+  /**
+   * Fetch a panel's photograph before it is shown.
+   *
+   * The figures are stacked and all but one are transparent, and a
+   * browser will not fetch a lazy image it considers invisible — so
+   * without this the frame is empty every time the panel moves on. The
+   * one being shown and the one after it are pulled in; the rest wait.
+   */
+  const preload = (i) => {
+    const img = figures[(i + figures.length) % figures.length]?.querySelector('img');
+    if (!img || img.complete && img.naturalWidth > 0) return;
+    img.loading = 'eager';
+    img.src = img.src; // eslint-disable-line no-self-assign -- forces the fetch
+  };
+
   const show = (next) => {
     current = (next + tabs.length) % tabs.length;
+    preload(current);
+    preload(current + 1);
     tabs.forEach((t, i) => {
       const on = i === current;
       t.classList.toggle('is-active', on);
@@ -48,6 +68,7 @@ function initActivities() {
   const stop  = () => { clearInterval(timer); timer = null; };
   const start = () => {
     if (timer || surrendered) return;
+    if (!primed) { primed = true; preload(1); }
     timer = setInterval(() => show(current + 1), INTERVAL);
   };
 
