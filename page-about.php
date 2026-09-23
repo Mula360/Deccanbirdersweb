@@ -34,19 +34,29 @@ while (have_posts()) : the_post();
 </section>
 
 <section class="section-white section-boxed about-links">
-  <a class="card-link" href="/committee">
-    <span class="card-link-title">Executive Committee →</span>
-    <span class="card-link-desc">The members who run the society.</span>
+  <a class="about-card about-card--green" href="/committee">
+    <span class="about-card-arrow" aria-hidden="true">→</span>
+    <span class="about-card-text">
+      <span class="about-card-title">Executive Committee</span>
+      <span class="about-card-desc">The members who run the society.</span>
+    </span>
   </a>
-  <a class="card-link" href="/aims">
-    <span class="card-link-title">Aims and Objectives →</span>
-    <span class="card-link-desc">What we set out to do, in eight points.</span>
+  <a class="about-card about-card--blue" href="/aims">
+    <span class="about-card-arrow" aria-hidden="true">→</span>
+    <span class="about-card-text">
+      <span class="about-card-title">Aims and Objectives</span>
+      <span class="about-card-desc">What we set out to do, in eight points.</span>
+    </span>
   </a>
   <div class="contact-note">
-    For more details, contact
-    <a href="mailto:secretary@deccanbirders.org">secretary@deccanbirders.org</a>,
-    <a href="mailto:president@deccanbirders.org">president@deccanbirders.org</a>, or
-    <a href="mailto:treasurer@deccanbirders.org">treasurer@deccanbirders.org</a>
+    <!-- One child, so the flex box lays out the paragraph rather than
+         each link separately. -->
+    <div>
+      For more details, contact
+      <a href="mailto:secretary@deccanbirders.org">secretary@deccanbirders.org</a>,
+      <a href="mailto:president@deccanbirders.org">president@deccanbirders.org</a>, or
+      <a href="mailto:treasurer@deccanbirders.org">treasurer@deccanbirders.org</a>
+    </div>
   </div>
 </section>
 

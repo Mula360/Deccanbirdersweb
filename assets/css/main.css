@@ -2067,9 +2067,42 @@ body.lightbox-open { overflow: hidden; }
   gap: 16px;
   align-items: stretch;
 }
+/* Two solid cards and a tinted panel, all the same height — the arrow
+   sits at the top and the wording at the foot, so the three line up. */
+.about-card {
+  min-height: 220px;
+  box-sizing: border-box;
+  border-radius: 20px;
+  padding: clamp(24px, 3vw, 32px);
+  color: #fff;
+  text-decoration: none;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 24px;
+  transition: background-color 150ms;
+}
+.about-card--green { background: var(--green); }
+.about-card--green:hover { background: var(--green-dark); }
+.about-card--blue { background: var(--blue); }
+.about-card--blue:hover { background: var(--blue-dark); }
+.about-card-arrow { font-size: 30px; line-height: 1; }
+.about-card-text { display: flex; flex-direction: column; gap: 6px; }
+.about-card-title {
+  font-family: var(--font-head);
+  font-weight: 700;
+  font-size: clamp(21px, 2.4vw, 26px);
+  line-height: 1.1;
+}
+.about-card-desc { font-size: 16px; line-height: 1.5; color: rgba(255, 255, 255, 0.85); }
+
 .about-links .contact-note {
-  align-self: center;
-  font-size: 15.5px;
+  background: var(--blue-light);
+  border-radius: 20px;
+  padding: clamp(24px, 3vw, 32px);
+  display: flex;
+  align-items: flex-end;
+  font-size: 16.5px;
   line-height: 1.6;
   overflow-wrap: anywhere;
 }
