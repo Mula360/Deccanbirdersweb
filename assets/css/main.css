@@ -2039,7 +2039,9 @@ body.lightbox-open { overflow: hidden; }
    About page — heading and photograph side by side, then the two
    card-links across the foot.
    ---------------------------------------------------------------------- */
-.about-top { background: #fff; }
+/* The design was drawn on a white page with a cream panel; every other
+   page here is cream, so the pair is inverted to keep the page
+   background matching the rest of the site. */
 /* The design lays this out as tiles on one gutter: the intro panel and
    the photograph, then the three link tiles — every gap 16px, every
    corner 20px. */
@@ -2057,7 +2059,7 @@ body.lightbox-open { overflow: hidden; }
   gap: 16px;
 }
 .about-panel {
-  background: var(--surface);
+  background: #fff;
   border-radius: 20px;
   padding: clamp(26px, 3.2vw, 40px);
   display: flex;
