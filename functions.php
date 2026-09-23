@@ -2129,11 +2129,32 @@ function db_committee_page_id() {
   return $about ? $about->ID : 0;
 }
 
-/** Rows as stored, straight from post meta rather than through ACF. */
+/**
+ * Rows as stored, straight from post meta rather than through ACF.
+ *
+ * There are two shapes to deal with. ACF PRO writes a repeater as a row
+ * count plus one meta key per value (committee_members_0_member_name);
+ * ACF free, which does not know the field type, stores whatever it was
+ * given as a single serialised array. This site holds the second, so
+ * both are read and the shape is reported back for saving.
+ */
 function db_committee_rows() {
   $id = db_committee_page_id();
-  if (!$id) return [];
-  $count = (int) get_post_meta($id, 'committee_members', true);
+  if (!$id) return ['shape' => 'none', 'rows' => []];
+
+  $raw = get_post_meta($id, 'committee_members', true);
+
+  if (is_array($raw)) {
+    $rows = [];
+    foreach (array_values($raw) as $i => $row) {
+      $out = ['index' => $i];
+      foreach (array_keys(DB_COMMITTEE_FIELDS) as $sub) $out[$sub] = $row[$sub] ?? '';
+      $rows[] = $out;
+    }
+    return ['shape' => 'array', 'rows' => $rows];
+  }
+
+  $count = (int) $raw;
   $rows = [];
   for ($i = 0; $i < $count; $i++) {
     $row = ['index' => $i];
@@ -2142,7 +2163,7 @@ function db_committee_rows() {
     }
     $rows[] = $row;
   }
-  return $rows;
+  return ['shape' => 'flat', 'rows' => $rows];
 }
 
 /**
@@ -2155,6 +2176,36 @@ function db_committee_set($index, $sub, $value) {
   if (!$id || !isset(DB_COMMITTEE_FIELDS[$sub])) return false;
   update_post_meta($id, "committee_members_{$index}_{$sub}", $value);
   update_post_meta($id, "_committee_members_{$index}_{$sub}", DB_COMMITTEE_FIELDS[$sub]);
+  return true;
+}
+
+/**
+ * Save every row back in the shape the page already uses, so nothing
+ * else that reads this field has to change. The submitted rows are
+ * matched to the stored ones by position.
+ */
+function db_committee_save(array $submitted) {
+  $id = db_committee_page_id();
+  if (!$id) return false;
+  $current = db_committee_rows();
+
+  if ($current['shape'] === 'flat') {
+    foreach ($submitted as $i => $row) {
+      foreach ($row as $sub => $value) db_committee_set((int) $i, $sub, $value);
+    }
+    return true;
+  }
+
+  // Serialised array: rewrite it whole, keeping any key we do not manage.
+  $raw = get_post_meta($id, 'committee_members', true);
+  $rows = is_array($raw) ? array_values($raw) : [];
+  foreach ($submitted as $i => $row) {
+    $i = (int) $i;
+    if (!isset($rows[$i])) $rows[$i] = [];
+    foreach ($row as $sub => $value) $rows[$i][$sub] = $value;
+  }
+  update_post_meta($id, 'committee_members', $rows);
+  update_post_meta($id, '_committee_members', 'field_about_committee_members');
   return true;
 }
 
@@ -2179,21 +2230,25 @@ function db_committee_page() {
   $saved = false;
 
   if (isset($_POST['db_committee_save']) && check_admin_referer('db_committee_save')) {
+    $clean = [];
     foreach ((array) ($_POST['member'] ?? []) as $i => $row) {
-      $i = (int) $i;
-      db_committee_set($i, 'member_name',  sanitize_text_field($row['member_name'] ?? ''));
-      db_committee_set($i, 'member_role',  sanitize_text_field($row['member_role'] ?? ''));
-      db_committee_set($i, 'member_email', sanitize_email($row['member_email'] ?? ''));
-      db_committee_set($i, 'member_photo', (int) ($row['member_photo'] ?? 0));
-      db_committee_set($i, 'member_display_order', (int) ($row['member_display_order'] ?? 99));
+      $clean[(int) $i] = [
+        'member_name'          => sanitize_text_field($row['member_name'] ?? ''),
+        'member_role'          => sanitize_text_field($row['member_role'] ?? ''),
+        'member_email'         => sanitize_email($row['member_email'] ?? ''),
+        'member_photo'         => (int) ($row['member_photo'] ?? 0),
+        'member_display_order' => (int) ($row['member_display_order'] ?? 99),
+      ];
     }
+    db_committee_save($clean);
     // The grid is rendered into cached pages, so the change only shows
     // once those are dropped.
     if (class_exists('LiteSpeed\Purge')) LiteSpeed\Purge::purge_all();
     $saved = true;
   }
 
-  $rows = db_committee_rows();
+  $stored = db_committee_rows();
+  $rows   = $stored['rows'];
   ?>
   <div class="wrap">
     <h1><?php esc_html_e('Committee members', 'deccan-birders'); ?></h1>
@@ -2209,6 +2264,10 @@ function db_committee_page() {
       esc_html__('These are the members shown on %s. Photographs look best square, about 800 x 800.', 'deccan-birders'),
       '<a href="' . esc_url(home_url('/committee')) . '" target="_blank" rel="noopener">' . esc_html__('the Executive Committee page', 'deccan-birders') . '</a>'
     ); ?></p>
+
+    <?php if (!$rows): ?>
+      <div class="notice notice-warning"><p><?php esc_html_e('No committee members are stored on the About page yet.', 'deccan-birders'); ?></p></div>
+    <?php endif; ?>
 
     <form method="post">
       <?php wp_nonce_field('db_committee_save'); ?>
