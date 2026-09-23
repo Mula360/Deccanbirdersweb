@@ -2035,98 +2035,166 @@ body.lightbox-open { overflow: hidden; }
    ---------------------------------------------------------------------- */
 /* Activities — one bordered card per activity, split text / photo,
    alternating which side the photo sits on. */
-.activities-head {
+/* -------------------------------------------------------------------------
+   About page — heading and photograph side by side, then the two
+   card-links across the foot.
+   ---------------------------------------------------------------------- */
+.about-hero-inner {
   max-width: var(--max-w);
   margin: 0 auto;
-  padding: clamp(40px, 6vw, 68px) 20px clamp(36px, 5vw, 56px);
+  padding: clamp(40px, 5vw, 64px) 20px clamp(28px, 3.5vw, 44px);
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 380px), 1fr));
+  gap: clamp(28px, 4vw, 48px);
+  align-items: center;
 }
-/* A section inside About now, not its own page, so it takes a section
-   heading's size rather than a page title's. */
-.activities-title {
-  margin: 14px 0 0;
-  max-width: 22ch;
-  font-family: var(--font-head);
-  font-size: clamp(28px, 3.6vw, 40px);
-  line-height: 1.04;
-  letter-spacing: -0.035em;
-  font-weight: 700;
-}
-.activities-intro {
-  margin: 18px 0 0;
+.about-hero-text h1 { margin: 12px 0 0; }
+.about-intro {
+  margin-top: 20px;
   max-width: 56ch;
-  font-size: clamp(17px, 2vw, 19px);
-  line-height: 1.55;
+  font-size: clamp(16.5px, 1.9vw, 18px);
+  line-height: 1.6;
   color: var(--text-body);
 }
+.about-hero-media img { border-radius: var(--radius-card); }
 
-.activities-list {
+/* .section-boxed sets its own padding further down the file, so this
+   needs the extra class to keep the space above the dark panel. */
+.section-boxed.about-links {
+  padding: 0 20px clamp(48px, 6vw, 68px);
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr));
+  gap: 16px;
+  align-items: stretch;
+}
+.about-links .contact-note {
+  align-self: center;
+  font-size: 15.5px;
+  line-height: 1.6;
+  overflow-wrap: anywhere;
+}
+
+/* -------------------------------------------------------------------------
+   Activities (About page) — a dark panel: the list on the left, the
+   selected activity's photograph and points on the right. It advances on
+   its own; assets/js/activities.js only moves .is-active around.
+   ---------------------------------------------------------------------- */
+.acts { background: var(--ink); color: #F4F2EC; }
+.acts-inner {
   max-width: var(--max-w);
   margin: 0 auto;
-  padding: 0 20px clamp(60px, 8vw, 96px);
-  display: grid;
-  gap: 20px;
-}
-.activity-card {
-  background: #fff;
-  border: 1px solid var(--border);
-  border-radius: 18px;
-  overflow: hidden;
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-}
-.activity-text {
-  padding: clamp(26px, 3.4vw, 44px);
+  padding: clamp(56px, 7vw, 88px) 20px;
   display: flex;
   flex-direction: column;
-  justify-content: center;
-  order: 1;
+  gap: clamp(34px, 4vw, 48px);
 }
-.activity-photo {
-  width: 100%;
-  height: 100%;
-  min-height: 260px;
-  object-fit: cover;
-  order: 2;
-  border-radius: 0;
+.acts-head {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 420px), 1fr));
+  gap: 32px;
+  align-items: end;
 }
-/* Alternate rows put the photo on the left. */
-.activity-card--flip .activity-text { order: 2; }
-.activity-card--flip .activity-photo { order: 1; }
+.acts-eyebrow { color: #7FC596; }
+.acts-title {
+  margin: 12px 0 0;
+  font-family: var(--font-head);
+  font-size: clamp(30px, 4.4vw, 48px);
+  line-height: 1.02;
+  letter-spacing: -0.03em;
+  font-weight: 700;
+}
+.acts-intro {
+  margin: 0;
+  max-width: 46ch;
+  font-size: clamp(16.5px, 1.8vw, 18px);
+  line-height: 1.55;
+  color: #CFD6CF;
+}
 
-.activity-cadence {
+.acts-body {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 380px), 1fr));
+  gap: clamp(32px, 4vw, 48px);
+}
+
+.acts-list { display: flex; flex-direction: column; }
+.acts-item {
+  all: unset;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 18px 0;
+  border-top: 1px solid #2D3D33;
+  transition: opacity .25s ease;
+}
+.acts-item:last-child { border-bottom: 1px solid #2D3D33; }
+.acts-when {
   font-family: var(--font-head);
   font-size: 11.5px;
   font-weight: 600;
-  letter-spacing: 0.09em;
+  letter-spacing: 0.14em;
   text-transform: uppercase;
-  color: #4E6B5C;
+  color: #7FC596;
 }
-.activity-title {
-  margin: 12px 0 0;
+.acts-name {
   font-family: var(--font-head);
-  font-size: clamp(24px, 3vw, 34px);
-  line-height: 1.12;
-  letter-spacing: -0.03em;
+  font-size: clamp(19px, 2.2vw, 25px);
   font-weight: 700;
-  color: var(--ink);
+  letter-spacing: -0.015em;
+  line-height: 1.15;
+  opacity: 0.45;
+  transition: opacity .25s ease;
 }
-.activity-points ul { margin: 20px 0 0; display: grid; gap: 11px; }
-.activity-points li {
-  display: flex;
-  gap: 12px;
-  align-items: flex-start;
-  font-size: 17px;
-  line-height: 1.5;
-  color: var(--text-body);
+.acts-item.is-active .acts-name,
+.acts-item:hover .acts-name { opacity: 1; }
+.acts-item:focus-visible { outline: 2px solid #7FC596; outline-offset: 3px; }
+
+.acts-detail { display: flex; flex-direction: column; gap: 26px; }
+.acts-media { position: relative; aspect-ratio: 4 / 3; width: 100%; }
+.acts-figure {
+  position: absolute;
+  inset: 0;
+  margin: 0;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity .45s ease;
 }
-.activity-points li::before {
-  content: '';
-  margin-top: 8px;
-  width: 6px;
-  height: 6px;
-  flex-shrink: 0;
-  border-radius: 99px;
-  background: var(--blue);
+.acts-figure.is-active { opacity: 1; pointer-events: auto; }
+.acts-figure img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: var(--radius-card);
+  display: block;
+}
+.acts-figure-empty {
+  display: grid;
+  place-items: center;
+  width: 100%;
+  height: 100%;
+  border: 1px dashed #2D3D33;
+  border-radius: var(--radius-card);
+  font-size: 14.5px;
+  color: #9AA69D;
+}
+
+.acts-points {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 160px), 1fr));
+  gap: 22px;
+  font-size: 16.5px;
+  line-height: 1.45;
+  color: #CFD6CF;
+}
+.acts-points[hidden] { display: none; }
+.acts-points li { border-top: 2px solid #7FC596; padding-top: 12px; }
+
+@media (prefers-reduced-motion: reduce) {
+  .acts-figure, .acts-name, .acts-item { transition: none; }
 }
 
 /* -------------------------------------------------------------------------
@@ -2603,9 +2671,6 @@ body.lightbox-open { overflow: hidden; }
    above; this covers layout that also needs to react at the same point) */
 @media (max-width: 860px) {
   .footer-inner { grid-template-columns: 1fr 1fr; }
-  /* Single column: text first on every card, whichever side it takes on desktop. */
-  .activity-card--flip .activity-text { order: 1; }
-  .activity-card--flip .activity-photo { order: 2; }
 }
 
 /* 640px — grid/layout stacking */

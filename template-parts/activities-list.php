@@ -4,6 +4,12 @@
  * lives inside About. page-activities.php is gone; /activities redirects to
  * the About page's #activities anchor (see functions.php).
  *
+ * A dark panel: the six activities as a list on the left, the selected
+ * one's photograph and points on the right. It advances on its own every
+ * few seconds (assets/js/activities.js) and can be steered by clicking a
+ * title. Every panel is in the HTML and the first is marked active, so
+ * without JavaScript the section still reads as one complete activity.
+ *
  * Content comes from the About page's own fields when set, falling back to
  * the Activities page's if that content was entered there, and finally to
  * the list below.
@@ -28,34 +34,79 @@ if (!$activities) {
         'activity_description' => '<ul><li>National and International camps</li><li>Focus on the bird watching</li><li>Exclusive access to sanctuaries wherever possible</li></ul>'],
   ];
 }
+
+/**
+ * The points shown beside the photograph. Editors write the description
+ * as a bulleted list, so the items are pulled out of it; anything that
+ * isn't a list is kept whole as a single point.
+ */
+$activity_points = function($html) {
+  if (preg_match_all('/<li[^>]*>(.*?)<\/li>/is', (string) $html, $m)) {
+    return array_values(array_filter(array_map(
+      fn($p) => trim(wp_strip_all_tags($p)),
+      $m[1]
+    )));
+  }
+  $plain = trim(wp_strip_all_tags((string) $html));
+  return $plain === '' ? [] : [$plain];
+};
 ?>
 
-<section class="activities-head" id="activities">
-  <span class="eyebrow" style="color:var(--blue);">Activities</span>
-  <h2 class="activities-title">An array of activities</h2>
-  <p class="activities-intro">Deccan Birders organizes field trips, lectures, film and slide shows, nature camps, treks, waterfowl counts, bird ringing, etc.</p>
-</section>
-<div class="activities-list">
-  <?php foreach ($activities as $i => $a):
-    // ACF may hand back either the image array or a bare attachment ID
-    // depending on how the row was written, so normalise both.
-    $img     = $a['activity_image'] ?? null;
-    $img_url = is_array($img) ? ($img['url'] ?? '') : ($img ? wp_get_attachment_image_url($img, 'large') : '');
-    $img_alt = is_array($img) && !empty($img['alt']) ? $img['alt'] : $a['activity_title'];
-    $flip    = ($i % 2 === 1); // alternate which side the photo sits on
-  ?>
-    <div class="activity-card<?php echo $flip ? ' activity-card--flip' : ''; ?>">
-      <div class="activity-text">
-        <span class="activity-cadence"><?php echo esc_html($a['activity_cadence']); ?></span>
-        <h2 class="activity-title"><?php echo esc_html($a['activity_title']); ?></h2>
-        <div class="activity-points"><?php echo wp_kses_post($a['activity_description']); ?></div>
+<section class="acts" id="activities">
+  <div class="acts-inner">
+    <div class="acts-head">
+      <div>
+        <span class="eyebrow acts-eyebrow">Activities</span>
+        <h2 class="acts-title">An array of activities</h2>
       </div>
-      <?php if ($img_url): ?>
-        <img class="activity-photo" src="<?php echo esc_url($img_url); ?>" alt="<?php echo esc_attr($img_alt); ?>" loading="lazy">
-      <?php else: ?>
-        <div class="activity-photo img-placeholder" aria-label="Photo coming soon"><span>Photo coming soon</span></div>
-      <?php endif; ?>
+      <p class="acts-intro">Deccan Birders organizes field trips, lectures, film and slide shows, nature camps, treks, waterfowl counts, bird ringing, etc.</p>
     </div>
-  <?php endforeach; ?>
-</div>
 
+    <div class="acts-body" id="acts">
+      <div class="acts-list" role="tablist" aria-label="<?php esc_attr_e('Society activities', 'deccan-birders'); ?>">
+        <?php foreach ($activities as $i => $a): ?>
+          <button type="button" class="acts-item<?php echo $i === 0 ? ' is-active' : ''; ?>"
+                  role="tab" id="acts-tab-<?php echo $i; ?>" aria-controls="acts-panel-<?php echo $i; ?>"
+                  aria-selected="<?php echo $i === 0 ? 'true' : 'false'; ?>"
+                  tabindex="<?php echo $i === 0 ? '0' : '-1'; ?>" data-index="<?php echo $i; ?>">
+            <span class="acts-when"><?php echo esc_html($a['activity_cadence'] ?? ''); ?></span>
+            <span class="acts-name"><?php echo esc_html($a['activity_title'] ?? ''); ?></span>
+          </button>
+        <?php endforeach; ?>
+      </div>
+
+      <div class="acts-detail">
+        <div class="acts-media">
+          <?php foreach ($activities as $i => $a):
+            // ACF may hand back either the image array or a bare attachment
+            // ID depending on how the row was written, so normalise both.
+            $img     = $a['activity_image'] ?? null;
+            $img_url = is_array($img) ? ($img['url'] ?? '') : ($img ? wp_get_attachment_image_url($img, 'large') : '');
+            $img_alt = is_array($img) && !empty($img['alt']) ? $img['alt'] : ($a['activity_title'] ?? '');
+          ?>
+            <figure class="acts-figure<?php echo $i === 0 ? ' is-active' : ''; ?>" data-index="<?php echo $i; ?>">
+              <?php if ($img_url): ?>
+                <img src="<?php echo esc_url($img_url); ?>" alt="<?php echo esc_attr($img_alt); ?>"
+                     loading="<?php echo $i === 0 ? 'eager' : 'lazy'; ?>" decoding="async">
+              <?php else: ?>
+                <span class="acts-figure-empty"><?php esc_html_e('Photo coming soon', 'deccan-birders'); ?></span>
+              <?php endif; ?>
+            </figure>
+          <?php endforeach; ?>
+        </div>
+
+        <?php foreach ($activities as $i => $a):
+          $points = $activity_points($a['activity_description'] ?? '');
+        ?>
+          <ul class="acts-points<?php echo $i === 0 ? ' is-active' : ''; ?>" data-index="<?php echo $i; ?>"
+              id="acts-panel-<?php echo $i; ?>" role="tabpanel" aria-labelledby="acts-tab-<?php echo $i; ?>"
+              <?php if ($i !== 0) echo 'hidden'; ?>>
+            <?php foreach ($points as $p): ?>
+              <li><?php echo esc_html($p); ?></li>
+            <?php endforeach; ?>
+          </ul>
+        <?php endforeach; ?>
+      </div>
+    </div>
+  </div>
+</section>

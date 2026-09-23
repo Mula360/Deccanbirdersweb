@@ -64,6 +64,10 @@ add_action('wp_enqueue_scripts', function() {
   if (is_page('gallery')) {
     wp_enqueue_script('db-videos', get_template_directory_uri() . '/assets/js/videos.js', ['db-bird-loader'], $v, true);
   }
+  // Activities panel — load on about page (and /activities, which redirects there)
+  if (is_page('about')) {
+    wp_enqueue_script('db-activities', get_template_directory_uri() . '/assets/js/activities.js', [], $v, true);
+  }
   // PITTA search — load on archives page
   if (is_page('archives')) {
     wp_enqueue_script('db-pitta-search', get_template_directory_uri() . '/assets/js/pitta-search.js', ['db-bird-loader'], $v, true);
