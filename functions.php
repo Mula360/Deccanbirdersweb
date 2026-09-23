@@ -272,6 +272,7 @@ function db_settings_fields() {
     'youtube_channel_id'    => ['YouTube channel ID', 'text', 'Starts with UC. YouTube Studio → Settings → Channel → Advanced.'],
     'youtube_api_key'       => ['YouTube API key', 'text', 'A YouTube Data API v3 key: lists every video on the Gallery. Without it only the newest 12 show. Can also be set as DB_YOUTUBE_API_KEY in wp-config.php.'],
     'db_api_base_url'       => ['Bird data API URL', 'url', 'The Vercel deployment used for eBird and Calendar data. No trailing slash.'],
+    'db_proxy_secret'       => ['Bird data API key', 'text', 'Must match DB_PROXY_SECRET in the Vercel project. Stops anyone else using our eBird quota.'],
     'db_member_count'       => ['Member count', 'text', ''],
     'db_founded_year'       => ['Founded year', 'text', 'Used to count the "Years …" figure on the home page, which works itself out from this. Defaults to 1980.'],
     'db_membership_form_url' => ['Membership form URL', 'url', ''],
@@ -819,6 +820,49 @@ function db_api_base() {
  * Fetch a Vercel API path, cached in a transient. $allowed_params whitelists
  * which query args from the incoming request are forwarded upstream.
  */
+/**
+ * A short-window cap on the db/v1 routes, applied per caller.
+ *
+ * These routes are where visitors' browsers actually arrive, so this is
+ * the place a per-IP limit means anything — the proxy behind them only
+ * ever sees this one server. A page view costs four to six calls, so 60
+ * a minute is about ten page loads from a single address: far above a
+ * reader, well below anyone harvesting the lot.
+ */
+function db_rest_rate_limited($max_per_minute = 60) {
+  $ip = $_SERVER['REMOTE_ADDR'] ?? '';
+  if (!$ip) return false;
+  $key = 'db_rest_' . md5($ip . '|' . floor(time() / MINUTE_IN_SECONDS));
+  $count = (int) get_transient($key);
+  if ($count >= $max_per_minute) return true;
+  set_transient($key, $count + 1, 2 * MINUTE_IN_SECONDS);
+  return false;
+}
+
+add_filter('rest_pre_dispatch', function($result, $server, WP_REST_Request $request) {
+  if (strpos($request->get_route(), '/db/v1/') !== 0) return $result;
+  if (!db_rest_rate_limited()) return $result;
+  return new WP_Error(
+    'db_too_many_requests',
+    __('Too many requests — please wait a moment and reload.', 'deccan-birders'),
+    ['status' => 429]
+  );
+}, 10, 3);
+
+/**
+ * The shared secret the proxy expects, sent on every request to it.
+ *
+ * The proxy holds our eBird key, and eBird holds us responsible for
+ * every call made with it. Only this server calls the proxy — browsers
+ * go to /wp-json/db/v1 instead — so a header nobody else knows is enough
+ * to keep the proxy ours. Empty until it is set in Site Settings, which
+ * leaves the proxy open exactly as it was.
+ */
+function db_proxy_headers() {
+  $secret = db_setting('db_proxy_secret');
+  return $secret ? ['x-db-key' => $secret] : [];
+}
+
 function db_proxy_fetch($path, WP_REST_Request $request, array $allowed_params, $ttl) {
   $query = [];
   foreach ($allowed_params as $param) {
@@ -835,7 +879,7 @@ function db_proxy_fetch($path, WP_REST_Request $request, array $allowed_params, 
   // Country-wide "recent" pulls (used as the base for the notable/IUCN
   // filter, see below) can return a large payload, so allow a bit more
   // time than a typical small proxied request.
-  $res = wp_remote_get($url, ['timeout' => 20]);
+  $res = wp_remote_get($url, ['timeout' => 20, 'headers' => db_proxy_headers()]);
 
   if (is_wp_error($res)) {
     return ['error' => true, 'message' => $res->get_error_message()];
