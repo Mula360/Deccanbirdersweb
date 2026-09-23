@@ -809,6 +809,9 @@ body.modal-open { overflow: hidden; }
   line-height: 1;
   text-decoration: none;
 }
+/* display:grid below would otherwise override [hidden]'s display:none
+   and leave the list showing while the button says it is closed. */
+.notable-others[hidden] { display: none; }
 .notable-others {
   margin: 12px 0 0;
   padding: 12px 0 0;
