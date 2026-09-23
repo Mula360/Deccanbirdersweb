@@ -88,6 +88,34 @@ add_action('wp_enqueue_scripts', function() {
  * same bird assets/js/bird-loader.js draws, so a page never flips from one
  * kind of placeholder to another while it waits.
  */
+/**
+ * Credit for eBird, wherever its data is shown.
+ *
+ * The eBird API terms require the source to be attributed "wherever it is
+ * used or displayed", with a link back to eBird.org, so every section
+ * drawing on the API carries this. $compact is the one-line version for
+ * a card or a section head; the full one adds the citation link.
+ */
+function db_ebird_credit($compact = false) {
+  $ebird = '<a href="https://ebird.org" target="_blank" rel="noopener">eBird</a>';
+  if ($compact) {
+    return '<p class="ebird-credit ebird-credit--compact">'
+      . sprintf(
+        /* translators: %s: link reading "eBird" */
+        esc_html__('Data from %s', 'deccan-birders'),
+        $ebird
+      ) . '</p>';
+  }
+  return '<p class="ebird-credit">'
+    . sprintf(
+      /* translators: 1: link reading "eBird", 2: link reading "how to cite" */
+      esc_html__('Data from %1$s, Cornell Lab of Ornithology — %2$s.', 'deccan-birders'),
+      $ebird,
+      '<a href="https://ebird.org/science/citation" target="_blank" rel="noopener">'
+        . esc_html__('how to cite', 'deccan-birders') . '</a>'
+    ) . '</p>';
+}
+
 function db_bird_loader($message = 'Loading…') {
   printf(
     '<div class="bird-loader" role="status" aria-live="polite">'

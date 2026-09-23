@@ -131,6 +131,7 @@ while (have_posts()) : the_post();
     <div>
       <span class="eyebrow eyebrow--lede" style="color:var(--blue);">Live from eBird</span>
       <h2 class="section-h2">What's being seen right now</h2>
+      <?php echo db_ebird_credit(true); ?>
     </div>
     <!-- The strip runs longer than the screen, so it is moved with these
          rather than a scrollbar. sightings.js wires them up and hides
@@ -159,6 +160,7 @@ while (have_posts()) : the_post();
     <div class="hide-card hide-card--otd">
       <span class="hide-card-label">On this day · <?php echo esc_html(date_i18n('j F')); ?></span>
       <div id="home-otd"></div>
+      <?php echo db_ebird_credit(true); ?>
       <div class="hide-card-spacer"></div>
       <a href="/archives" class="hide-card-link">More from the archive →</a>
     </div>

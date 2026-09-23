@@ -22,6 +22,7 @@ while (have_posts()) : the_post();
 
 <div class="sightings-scope">
   <div class="sightings-updated">Updated every few hours</div>
+  <?php echo db_ebird_credit(); ?>
 </div>
 
 <div class="sightings-tabs-wrap">

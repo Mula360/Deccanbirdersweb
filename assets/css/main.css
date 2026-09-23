@@ -680,6 +680,18 @@ body.modal-open { overflow: hidden; }
 .region-pill.is-active { background: var(--ink); color: #fff; }
 .sightings-updated { font-size: 14px; color: var(--text-muted); }
 
+/* Required wherever eBird data is shown — quiet, but always present and
+   always linked. See db_ebird_credit(). */
+.ebird-credit {
+  margin: 6px 0 0;
+  font-size: 13.5px;
+  line-height: 1.5;
+  color: var(--text-muted);
+}
+.ebird-credit a { color: inherit; text-decoration: underline; text-underline-offset: 2px; }
+.ebird-credit a:hover { color: var(--blue); }
+.ebird-credit--compact { margin-top: 8px; font-size: 13px; }
+
 .sightings-tabs-wrap { max-width: var(--max-w); margin: 0 auto; padding: 28px 20px 0; }
 .sightings-panels { max-width: var(--max-w); margin: 0 auto; padding: 28px 20px 0; }
 
