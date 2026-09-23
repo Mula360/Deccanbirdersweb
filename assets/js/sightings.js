@@ -473,9 +473,6 @@ async function loadTab(tab) {
       showSkeleton('sightings-hotspots', 'Finding the best places nearby…');
       renderHotspots(await fetchRecords('hotspots'));
       break;
-    case 'lookup':
-      renderSpeciesLookup();
-      break;
   }
 }
 
@@ -625,6 +622,11 @@ document.addEventListener('DOMContentLoaded', () => {
     // Full sightings page
     loadTab('notable');
     loadOnThisDay();
+  }
+  // The lookup card sits below the tabs rather than inside them, so it is
+  // wired up directly. Its index is only fetched once someone types.
+  if (document.getElementById('sightings-lookup')) {
+    renderSpeciesLookup();
   }
   if (document.getElementById('home-sightings-rows')) {
     initHomeStrip();
