@@ -2100,3 +2100,175 @@ add_action('init', function() {
 
   update_option('db_seeded_v1', true);
 });
+
+/* -----------------------------------------------------------------------
+ * 12. Committee members editor
+ *
+ * The committee list is an ACF repeater, and the Repeater field is a PRO
+ * feature: on ACF free the field renders as an empty box, so the rows
+ * cannot be edited in wp-admin even though the site displays them.
+ *
+ * The data itself is ordinary post meta — committee_members holds the row
+ * count, and each row is committee_members_{i}_{sub_field} — so reading
+ * and writing it needs nothing from PRO. This screen does exactly that:
+ * Committee → Edit members, one row per member, photograph chosen from
+ * the media library.
+ * -------------------------------------------------------------------- */
+
+const DB_COMMITTEE_FIELDS = [
+  'member_name'          => 'field_about_committee_members_member_name',
+  'member_role'          => 'field_about_committee_members_member_role',
+  'member_email'         => 'field_about_committee_members_member_email',
+  'member_photo'         => 'field_about_committee_members_member_photo',
+  'member_display_order' => 'field_about_committee_members_member_display_order',
+];
+
+/** The About page holds the committee repeater; everything reads it there. */
+function db_committee_page_id() {
+  $about = get_page_by_path('about');
+  return $about ? $about->ID : 0;
+}
+
+/** Rows as stored, straight from post meta rather than through ACF. */
+function db_committee_rows() {
+  $id = db_committee_page_id();
+  if (!$id) return [];
+  $count = (int) get_post_meta($id, 'committee_members', true);
+  $rows = [];
+  for ($i = 0; $i < $count; $i++) {
+    $row = ['index' => $i];
+    foreach (array_keys(DB_COMMITTEE_FIELDS) as $sub) {
+      $row[$sub] = get_post_meta($id, "committee_members_{$i}_{$sub}", true);
+    }
+    $rows[] = $row;
+  }
+  return $rows;
+}
+
+/**
+ * Write one row's value, and the paired _-prefixed key ACF uses to know
+ * which field a value belongs to. A value saved without it reads back as
+ * nothing, which is the trap in touching ACF's storage by hand.
+ */
+function db_committee_set($index, $sub, $value) {
+  $id = db_committee_page_id();
+  if (!$id || !isset(DB_COMMITTEE_FIELDS[$sub])) return false;
+  update_post_meta($id, "committee_members_{$index}_{$sub}", $value);
+  update_post_meta($id, "_committee_members_{$index}_{$sub}", DB_COMMITTEE_FIELDS[$sub]);
+  return true;
+}
+
+add_action('admin_menu', function() {
+  add_submenu_page(
+    'edit.php?post_type=page',
+    __('Committee members', 'deccan-birders'),
+    __('Committee members', 'deccan-birders'),
+    'manage_options',
+    'db-committee',
+    'db_committee_page'
+  );
+});
+
+add_action('admin_enqueue_scripts', function($hook) {
+  if (strpos($hook, 'db-committee') !== false) wp_enqueue_media();
+});
+
+function db_committee_page() {
+  if (!current_user_can('manage_options')) return;
+  $page_id = db_committee_page_id();
+  $saved = false;
+
+  if (isset($_POST['db_committee_save']) && check_admin_referer('db_committee_save')) {
+    foreach ((array) ($_POST['member'] ?? []) as $i => $row) {
+      $i = (int) $i;
+      db_committee_set($i, 'member_name',  sanitize_text_field($row['member_name'] ?? ''));
+      db_committee_set($i, 'member_role',  sanitize_text_field($row['member_role'] ?? ''));
+      db_committee_set($i, 'member_email', sanitize_email($row['member_email'] ?? ''));
+      db_committee_set($i, 'member_photo', (int) ($row['member_photo'] ?? 0));
+      db_committee_set($i, 'member_display_order', (int) ($row['member_display_order'] ?? 99));
+    }
+    // The grid is rendered into cached pages, so the change only shows
+    // once those are dropped.
+    if (class_exists('LiteSpeed\Purge')) LiteSpeed\Purge::purge_all();
+    $saved = true;
+  }
+
+  $rows = db_committee_rows();
+  ?>
+  <div class="wrap">
+    <h1><?php esc_html_e('Committee members', 'deccan-birders'); ?></h1>
+    <?php if ($saved): ?>
+      <div class="notice notice-success"><p><?php esc_html_e('Saved.', 'deccan-birders'); ?></p></div>
+    <?php endif; ?>
+    <?php if (!$page_id): ?>
+      <div class="notice notice-error"><p><?php esc_html_e('No About page found — the committee list is stored on it.', 'deccan-birders'); ?></p></div>
+      </div><?php return; endif; ?>
+
+    <p><?php printf(
+      /* translators: %s: link to the Executive Committee page */
+      esc_html__('These are the members shown on %s. Photographs look best square, about 800 x 800.', 'deccan-birders'),
+      '<a href="' . esc_url(home_url('/committee')) . '" target="_blank" rel="noopener">' . esc_html__('the Executive Committee page', 'deccan-birders') . '</a>'
+    ); ?></p>
+
+    <form method="post">
+      <?php wp_nonce_field('db_committee_save'); ?>
+      <table class="widefat striped" style="max-width:1100px">
+        <thead><tr>
+          <th style="width:110px"><?php esc_html_e('Photo', 'deccan-birders'); ?></th>
+          <th><?php esc_html_e('Name', 'deccan-birders'); ?></th>
+          <th><?php esc_html_e('Role', 'deccan-birders'); ?></th>
+          <th><?php esc_html_e('Email', 'deccan-birders'); ?></th>
+          <th style="width:90px"><?php esc_html_e('Order', 'deccan-birders'); ?></th>
+        </tr></thead>
+        <tbody>
+        <?php foreach ($rows as $row):
+          $i   = $row['index'];
+          $pid = (int) $row['member_photo'];
+          $src = $pid ? wp_get_attachment_image_url($pid, 'thumbnail') : '';
+        ?>
+          <tr>
+            <td>
+              <div class="db-photo-cell" data-index="<?php echo esc_attr($i); ?>">
+                <img src="<?php echo esc_url($src); ?>" alt=""
+                     style="width:80px;height:80px;object-fit:cover;border-radius:6px;background:#f0f0f1;<?php echo $src ? '' : 'display:none'; ?>">
+                <p style="margin:6px 0 0">
+                  <button type="button" class="button db-pick"><?php esc_html_e('Choose', 'deccan-birders'); ?></button>
+                  <button type="button" class="button-link db-clear" style="color:#b32d2e"><?php esc_html_e('Clear', 'deccan-birders'); ?></button>
+                </p>
+                <input type="hidden" name="member[<?php echo esc_attr($i); ?>][member_photo]" value="<?php echo esc_attr($pid); ?>">
+              </div>
+            </td>
+            <td><input type="text" class="regular-text" name="member[<?php echo esc_attr($i); ?>][member_name]" value="<?php echo esc_attr($row['member_name']); ?>"></td>
+            <td><input type="text" class="regular-text" name="member[<?php echo esc_attr($i); ?>][member_role]" value="<?php echo esc_attr($row['member_role']); ?>"></td>
+            <td><input type="email" class="regular-text" name="member[<?php echo esc_attr($i); ?>][member_email]" value="<?php echo esc_attr($row['member_email']); ?>"></td>
+            <td><input type="number" style="width:70px" name="member[<?php echo esc_attr($i); ?>][member_display_order]" value="<?php echo esc_attr($row['member_display_order']); ?>"></td>
+          </tr>
+        <?php endforeach; ?>
+        </tbody>
+      </table>
+      <p><button type="submit" name="db_committee_save" value="1" class="button button-primary"><?php esc_html_e('Save members', 'deccan-birders'); ?></button></p>
+    </form>
+  </div>
+
+  <script>
+  jQuery(function($){
+    $('.db-photo-cell').each(function(){
+      const cell = $(this), input = cell.find('input[type=hidden]'), img = cell.find('img');
+      let frame = null;
+      cell.find('.db-pick').on('click', function(){
+        if (!frame) {
+          frame = wp.media({ title: 'Choose a photograph', library: { type: 'image' }, multiple: false });
+          frame.on('select', function(){
+            const a = frame.state().get('selection').first().toJSON();
+            input.val(a.id);
+            img.attr('src', (a.sizes && a.sizes.thumbnail ? a.sizes.thumbnail.url : a.url)).show();
+          });
+        }
+        frame.open();
+      });
+      cell.find('.db-clear').on('click', function(){ input.val(''); img.hide(); });
+    });
+  });
+  </script>
+  <?php
+}
