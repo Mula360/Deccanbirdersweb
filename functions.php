@@ -937,6 +937,64 @@ function db_pitta_page_numbers(array $page_hits) {
  * the whole list comes back, so older callers keep working.
  * Returns ['data' => …, 'page' => n, 'pages' => n, 'total' => n].
  */
+/**
+ * One card per species for the Notable tab.
+ *
+ * A threatened bird at a well-watched lake can fill the page with the
+ * same species twenty times over. Each species is folded into a single
+ * record — its most recent sighting — carrying the other places it has
+ * been seen in 'others', which the page reveals behind a + button.
+ *
+ * Grouping happens before paging, so a page is twenty species rather
+ * than twenty observations of three.
+ */
+function db_group_notable_by_species(array $records, $days = 30) {
+  $cutoff = strtotime("-{$days} days");
+
+  $by_species = [];
+  $seen = [];
+  foreach ($records as $r) {
+    $when = strtotime((string) ($r['when'] ?? ''));
+    if (!$when || $when < $cutoff) continue;
+
+    // The same observation can arrive twice; one bird at one place at
+    // one moment is one record.
+    $key = ($r['species'] ?? '') . '|' . ($r['locId'] ?? '') . '|' . ($r['when'] ?? '') . '|' . ($r['count'] ?? '');
+    if (isset($seen[$key])) continue;
+    $seen[$key] = true;
+
+    $by_species[$r['species'] ?? ''][] = $r;
+  }
+
+  $grouped = [];
+  foreach ($by_species as $species => $sightings) {
+    // Newest first, so the card leads with the latest sighting.
+    usort($sightings, fn($a, $b) => strcmp((string) ($b['when'] ?? ''), (string) ($a['when'] ?? '')));
+
+    $primary = array_shift($sightings);
+
+    // The extra places, newest sighting of each kept.
+    $others = [];
+    foreach ($sightings as $s) {
+      $loc = $s['locId'] ?? $s['locality'] ?? '';
+      if ($loc === '' || $loc === ($primary['locId'] ?? '') || isset($others[$loc])) continue;
+      $others[$loc] = [
+        'locality' => $s['locality'] ?? '',
+        'when'     => $s['when'] ?? '',
+        'count'    => $s['count'] ?? '?',
+        'local'    => !empty($s['local']),
+      ];
+    }
+    $primary['others']      = array_values($others);
+    $primary['totalRecords'] = count($sightings) + 1;
+    $grouped[] = $primary;
+  }
+
+  // Most recently seen species first.
+  usort($grouped, fn($a, $b) => strcmp((string) ($b['when'] ?? ''), (string) ($a['when'] ?? '')));
+  return $grouped;
+}
+
 function db_sightings_page(WP_REST_Request $request, array $records) {
   $total = count($records);
   $per_page = (int) $request->get_param('per_page');
@@ -1364,7 +1422,8 @@ add_action('rest_api_init', function() {
         if ($tab === 'notable') {
           $recent = db_sightings_regional($request, 'recent', $ttl, ['region', 'tab']);
           if (!empty($recent['error'])) return db_rest_no_cache(rest_ensure_response($recent));
-          return db_rest_no_cache(rest_ensure_response(db_sightings_page($request, db_filter_notable_by_iucn($recent))));
+          $notable = db_group_notable_by_species(db_filter_notable_by_iucn($recent));
+          return db_rest_no_cache(rest_ensure_response(db_sightings_page($request, $notable)));
         }
 
         // Telangana and Andhra Pradesh first, then the rest of India.

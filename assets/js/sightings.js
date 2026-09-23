@@ -90,7 +90,8 @@ function formatDistance(km) {
   return `~${Math.round(km)} km away`;
 }
 
-function renderSightingCard(r) {
+/** `extra` is appended inside the card — the Notable tab's "+ more places". */
+function renderSightingCard(r, extra = '') {
   const dist = r.distanceKm != null ? formatDistance(r.distanceKm) : '';
   return `<div class="sighting-card">
     <div class="sighting-species">${escapeHtml(r.species)}</div>
@@ -104,6 +105,7 @@ function renderSightingCard(r) {
       <span class="chip chip-green">${escapeHtml(String(r.count))} birds</span>
       <span class="chip chip-blue">${escapeHtml(r.status)}</span>
     </div>
+    ${extra}
   </div>`;
 }
 
@@ -215,9 +217,49 @@ function renderPage(el, tab, res, renderItem, wrapClass, emptyMsg) {
   });
 }
 
+/**
+ * A notable card is one species, showing its latest sighting. Where the
+ * same bird has been seen elsewhere, a + button opens the other places
+ * rather than repeating the species down the page.
+ */
+function renderNotableCard(r) {
+  const others = Array.isArray(r.others) ? r.others : [];
+  if (!others.length) return renderSightingCard(r);
+
+  const id = `notable-others-${Math.random().toString(36).slice(2, 9)}`;
+  const rows = others.map((o) => `
+    <li>
+      <span class="notable-other-place">${escapeHtml(o.locality)}</span>
+      <span class="notable-other-meta">${escapeHtml(String(o.count))} · ${timeAgo(o.when)}</span>
+    </li>`).join('');
+
+  return renderSightingCard(r, `
+    <button type="button" class="notable-more" aria-expanded="false" aria-controls="${id}">
+      <span class="notable-more-sign" aria-hidden="true">+</span>
+      <span>${others.length} more ${others.length === 1 ? 'place' : 'places'}</span>
+    </button>
+    <ul class="notable-others" id="${id}" hidden>${rows}</ul>`);
+}
+
 function renderNotable(res) {
-  renderPage(document.getElementById('sightings-notable'), 'notable', res,
-    renderSightingCard, 'sighting-cards', 'No notable sightings reported recently.');
+  const el = document.getElementById('sightings-notable');
+  renderPage(el, 'notable', res,
+    renderNotableCard, 'sighting-cards', 'No notable sightings in the last 30 days.');
+
+  // Delegated, so it survives paging without rebinding per card.
+  if (el && !el.dataset.moreBound) {
+    el.dataset.moreBound = '1';
+    el.addEventListener('click', (e) => {
+      const btn = e.target.closest('.notable-more');
+      if (!btn) return;
+      const list = document.getElementById(btn.getAttribute('aria-controls'));
+      if (!list) return;
+      const open = !list.hidden;
+      list.hidden = open;
+      btn.setAttribute('aria-expanded', String(!open));
+      btn.querySelector('.notable-more-sign').textContent = open ? '+' : '−';
+    });
+  }
 }
 
 function renderRecent(res) {

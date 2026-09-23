@@ -782,6 +782,46 @@ body.modal-open { overflow: hidden; }
    ---------------------------------------------------------------------- */
 .lookup-heading { font-family: var(--font-head); font-size: 18px; font-weight: 700; color: var(--ink); margin-bottom: 16px; }
 
+/* Notable: the other places one species has been seen. */
+.notable-more {
+  margin-top: 14px;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: pointer;
+  font-family: var(--font-head);
+  font-size: 14.5px;
+  font-weight: 600;
+  color: var(--blue);
+}
+.notable-more:hover { text-decoration: underline; }
+.notable-more-sign {
+  display: inline-grid;
+  place-items: center;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  border: 1px solid currentColor;
+  font-size: 15px;
+  line-height: 1;
+  text-decoration: none;
+}
+.notable-others {
+  margin: 12px 0 0;
+  padding: 12px 0 0;
+  list-style: none;
+  border-top: 1px solid var(--border-light);
+  display: grid;
+  gap: 9px;
+  font-size: 14.5px;
+}
+.notable-others li { display: flex; justify-content: space-between; gap: 12px; }
+.notable-other-place { color: var(--text-body); }
+.notable-other-meta { color: var(--text-muted); white-space: nowrap; }
+
 /* Distance carries the ordering, so it reads a shade stronger than the
    date line beneath it. */
 .sighting-distance { color: var(--blue); font-weight: 600; }
