@@ -334,6 +334,23 @@ async function ensureLookupIndex() {
     entry.records.push({ ...r, distanceKm: distanceKm(r.lat, r.lng) });
   });
 
+  // Every Indian species, so that a bird with no recent records is still
+  // findable and can be answered honestly rather than with "no matching
+  // species". Recent records win the entry; the rest come in name-only.
+  const taxonomy = await fetchRecords('taxonomy', {}, true);
+  (taxonomy || []).forEach((t) => {
+    if (lookupIndex.has(t.species)) {
+      const entry = lookupIndex.get(t.species);
+      if (!entry.code) entry.code = t.speciesCode || '';
+      return;
+    }
+    lookupIndex.set(t.species, {
+      scientific: t.scientific || '',
+      code: t.speciesCode || '',
+      records: [],
+    });
+  });
+
   // Nearest first — the question the card asks is "where can I see it",
   // so a lake an hour away beats a better count three states over.
   // Records with no coordinates sink to the bottom rather than vanish.
@@ -433,6 +450,19 @@ function renderSpeciesLookup() {
       const q = value.toLowerCase();
       const matches = [...lookupIndex.keys()]
         .filter((name) => name.toLowerCase().includes(q) || lookupIndex.get(name).scientific.toLowerCase().includes(q))
+        // Birds actually being seen come first, then a name that starts
+        // with what was typed, then the rest alphabetically — so "pai"
+        // offers Painted Stork before Greater Painted-Snipe.
+        .sort((a, b) => {
+          const ca = lookupIndex.get(a).records.length;
+          const cb = lookupIndex.get(b).records.length;
+          if ((ca > 0) !== (cb > 0)) return ca > 0 ? -1 : 1;
+          const sa = a.toLowerCase().startsWith(q);
+          const sb = b.toLowerCase().startsWith(q);
+          if (sa !== sb) return sa ? -1 : 1;
+          if (ca !== cb) return cb - ca;
+          return a.localeCompare(b);
+        })
         .slice(0, 8);
       openDropdown(matches);
     }, 300);

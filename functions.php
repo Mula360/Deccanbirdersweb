@@ -1341,7 +1341,9 @@ add_action('rest_api_init', function() {
       // eBird checklists trickle in over days, not minutes, so six hours
       // is fresh enough and keeps the page quick; the reference data
       // (hotspots, species lists, this-day-in-history) holds for a day.
-      $ttl = in_array($tab, ['hotspots', 'hotspot_species', 'onthisday'], true) ? DAY_IN_SECONDS : 6 * HOUR_IN_SECONDS;
+      // The taxonomy is the species list itself, which changes once a
+      // year at most, so it sits with the other reference data.
+      $ttl = in_array($tab, ['hotspots', 'hotspot_species', 'onthisday', 'taxonomy'], true) ? DAY_IN_SECONDS : 6 * HOUR_IN_SECONDS;
 
       // "Notable" here means IUCN Near Threatened or worse — a different
       // definition than eBird's own "notable" (locally rare/reviewed),
