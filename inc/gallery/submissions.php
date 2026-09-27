@@ -212,10 +212,6 @@ function db_handle_photo_submit() {
   }
   $cap = db_species_cap_status((int) $species->id);
 
-  require_once ABSPATH . 'wp-admin/includes/file.php';
-  require_once ABSPATH . 'wp-admin/includes/media.php';
-  require_once ABSPATH . 'wp-admin/includes/image.php';
-
   $post_id = wp_insert_post([
     'post_type'   => 'db_gallery_photo',
     'post_title'  => $species->common_name . ' — ' . $location,
@@ -225,10 +221,9 @@ function db_handle_photo_submit() {
     $release();
     db_photo_reply(false, 'Something went wrong saving your photograph. Please try again later.');
   }
-  $attachment_id = media_handle_upload('photo', $post_id, ['post_title' => $species->common_name], [
-    'test_form' => false,
-    'mimes'     => DB_PHOTO_TYPES,
-  ]);
+  // Resized, recompressed and stripped of its location before it is
+  // stored; the upload itself is never kept (inc/gallery/images.php).
+  $attachment_id = db_photo_store($file['tmp_name'], $post_id, $species->common_name);
   if (is_wp_error($attachment_id)) {
     wp_delete_post($post_id, true);
     $release();

@@ -531,6 +531,7 @@ add_action('admin_notices', function() {
 require_once __DIR__ . '/inc/gallery/setup.php';
 require_once __DIR__ . '/inc/gallery/member-emails.php';
 require_once __DIR__ . '/inc/gallery/species.php';
+require_once __DIR__ . '/inc/gallery/images.php';
 require_once __DIR__ . '/inc/gallery/submissions.php';
 
 /* -----------------------------------------------------------------------
