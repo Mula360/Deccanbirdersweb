@@ -13,7 +13,7 @@ while (have_posts()) : the_post();
   $hero_badge    = get_field('hero_badge', $id) ?: 'Founded 1980 · Hyderabad';
   $hero_title    = get_field('hero_title', $id) ?: 'Spreading the message of bird conservation';
   $hero_subtitle = get_field('hero_subtitle', $id) ?: 'Since 1980, the Deccan Birders have documented the birds of the Deccan Plateau through field trips, citizen science, and the monthly PITTA bulletin.';
-  $stats         = get_field('stats', $id);
+  $stats         = db_list('stats', $id);
   if (!$stats) {
     $stats = [
       ['stat_number' => '1980', 'stat_label' => 'Founded, as the Birdwatchers Society of Andhra Pradesh'],

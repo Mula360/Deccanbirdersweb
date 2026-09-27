@@ -16,7 +16,7 @@ if (!$page_id) return;
 
 $apply_online_url = get_field('apply_online_url', $page_id);
 $apply_pdf_url    = get_field('apply_pdf_url', $page_id);
-$benefits         = get_field('benefits', $page_id);
+$benefits         = db_list('benefits', $page_id);
 ?>
 <div class="apply-options">
   <div class="apply-option apply-option--primary">

@@ -10,7 +10,7 @@
  */
 
 $home_id = get_page_by_path('home')?->ID;
-$jokes   = $home_id ? get_field('birding_jokes', $home_id) : [];
+$jokes   = $home_id ? db_list('birding_jokes', $home_id) : [];
 if (!$jokes) return;
 
 $week = floor(time() / 604800) % count($jokes);

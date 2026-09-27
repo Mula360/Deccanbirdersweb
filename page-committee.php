@@ -11,7 +11,7 @@ get_header();
 while (have_posts()) : the_post();
   $id        = get_the_ID();
   $about_id  = get_page_by_path('about')?->ID;
-  $committee = $about_id ? get_field('committee_members', $about_id) : [];
+  $committee = $about_id ? db_list('committee_members', $about_id) : [];
 ?>
 
 <section class="hero-light">

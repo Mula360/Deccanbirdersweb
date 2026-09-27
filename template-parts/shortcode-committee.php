@@ -9,10 +9,10 @@
  */
 
 $page_id = get_page_by_path('about')?->ID;
-$members = $page_id ? get_field('committee_members', $page_id) : [];
+$members = $page_id ? db_list('committee_members', $page_id) : [];
 if (!$members) return;
 
-usort($members, fn($a, $b) => ($a['member_display_order'] ?? 99) - ($b['member_display_order'] ?? 99));
+usort($members, fn($a, $b) => ((int) ($a['member_display_order'] ?? 0) ?: 99) - ((int) ($b['member_display_order'] ?? 0) ?: 99));
 ?>
 <div class="committee-grid">
   <?php foreach ($members as $m):

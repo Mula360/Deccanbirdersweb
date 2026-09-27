@@ -5,7 +5,7 @@
  */
 
 $page_id    = get_page_by_path('about')?->ID;
-$milestones = $page_id ? get_field('milestones', $page_id) : [];
+$milestones = $page_id ? db_list('milestones', $page_id) : [];
 if (!$milestones) return;
 ?>
 <div class="milestone-timeline">

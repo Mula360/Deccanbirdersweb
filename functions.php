@@ -2102,217 +2102,427 @@ add_action('init', function() {
 });
 
 /* -----------------------------------------------------------------------
- * 12. Committee members editor
+ * 12. Field groups follow the page slug, not its ID
  *
- * The committee list is an ACF repeater, and the Repeater field is a PRO
- * feature: on ACF free the field renders as an empty box, so the rows
- * cannot be edited in wp-admin even though the site displays them.
+ * The field groups in acf-json used to be tied to page IDs (about = 16,
+ * aims = 17 …) from the site they were built on. A fresh install numbers
+ * its pages differently, so the fields never appeared in the editor.
+ * They now match on the page's slug, which is what the templates go by
+ * anyway (page-about.php, get_page_by_path('about') …).
+ * -------------------------------------------------------------------- */
+add_action('acf/init', function() {
+  if (!function_exists('acf_register_location_type') || !class_exists('ACF_Location')) return;
+  if (class_exists('DB_ACF_Location_Page_Slug')) return;
+
+  class DB_ACF_Location_Page_Slug extends ACF_Location {
+    public function initialize() {
+      $this->name        = 'db_page_slug';
+      $this->label       = 'Page slug';
+      $this->category    = 'page';
+      $this->object_type = 'post';
+    }
+
+    public function match($rule, $screen, $field_group) {
+      $post = empty($screen['post_id']) ? null : get_post((int) $screen['post_id']);
+      if (!$post || $post->post_type !== 'page') return false;
+      return $this->compare_to_rule($post->post_name, $rule);
+    }
+
+    public function get_values($rule) {
+      $values = [];
+      foreach (get_pages(['post_status' => 'publish,draft,private']) as $p) {
+        $values[$p->post_name] = $p->post_title . ' (' . $p->post_name . ')';
+      }
+      return $values;
+    }
+  }
+
+  acf_register_location_type('DB_ACF_Location_Page_Slug');
+});
+
+/* -----------------------------------------------------------------------
+ * 13. Page lists editor
  *
- * The data itself is ordinary post meta — committee_members holds the row
- * count, and each row is committee_members_{i}_{sub_field} — so reading
- * and writing it needs nothing from PRO. This screen does exactly that:
- * Committee → Edit members, one row per member, photograph chosen from
- * the media library.
+ * Every list on the site — committee, milestones, activities, aims,
+ * membership benefits, the home stats, bird facts and jokes — is an ACF
+ * repeater, and the Repeater field is a PRO feature. On ACF free the
+ * field renders as an empty box, so the rows cannot be edited in the
+ * page editor even though the site displays them.
+ *
+ * The data itself is ordinary post meta, so reading and writing it needs
+ * nothing from PRO. Pages → Page lists edits each list: add, remove,
+ * reorder rows, photographs chosen from the media library. Rows are
+ * saved as one serialised array under the field's name, which is what
+ * get_field() hands the templates on ACF free.
  * -------------------------------------------------------------------- */
 
-const DB_COMMITTEE_FIELDS = [
-  'member_name'          => 'field_about_committee_members_member_name',
-  'member_role'          => 'field_about_committee_members_member_role',
-  'member_email'         => 'field_about_committee_members_member_email',
-  'member_photo'         => 'field_about_committee_members_member_photo',
-  'member_display_order' => 'field_about_committee_members_member_display_order',
-];
+/**
+ * The lists: meta name => where it lives and what a row holds. Each
+ * sub-field's ACF key is the list's key plus "_<sub name>".
+ * 'legacy' is a page the list used to live on, read until the first save.
+ */
+function db_page_lists() {
+  return [
+    'committee_members' => [
+      'label' => 'Committee members', 'page' => 'about', 'key' => 'field_about_committee_members',
+      'hint'  => 'Shown on the Executive Committee page. Photographs look best square, about 800 x 800.',
+      'subs'  => [
+        'member_photo'         => ['Photo', 'image'],
+        'member_name'          => ['Name', 'text'],
+        'member_role'          => ['Role', 'text'],
+        'member_email'         => ['Email', 'email'],
+        'member_display_order' => ['Order', 'number'],
+      ],
+    ],
+    'milestones' => [
+      'label' => 'Milestones', 'page' => 'about', 'key' => 'field_about_milestones',
+      'hint'  => 'The timeline on the About page.',
+      'subs'  => [
+        'milestone_year' => ['Year', 'number'],
+        'milestone_text' => ['Milestone', 'text'],
+      ],
+    ],
+    'activities' => [
+      'label' => 'Activities', 'page' => 'about', 'legacy' => 'activities', 'key' => 'field_activities_activities',
+      'hint'  => 'The activities panel on the About page. Write the description as a bulleted list (<ul><li>…</li></ul>); each point shows beside the photograph. Photographs about 1200 x 800, landscape.',
+      'subs'  => [
+        'activity_image'       => ['Photo', 'image'],
+        'activity_title'       => ['Title', 'text'],
+        'activity_cadence'     => ['How often', 'text'],
+        'activity_description' => ['Description', 'wysiwyg'],
+      ],
+    ],
+    'aims' => [
+      'label' => 'Aims', 'page' => 'aims', 'key' => 'field_aims_aims',
+      'hint'  => 'The society\'s aims, in order.',
+      'subs'  => ['aim_text' => ['Aim', 'textarea']],
+    ],
+    'benefits' => [
+      'label' => 'Membership benefits', 'page' => 'membership', 'key' => 'field_membership_benefits',
+      'hint'  => 'The benefits listed on the Membership page.',
+      'subs'  => ['benefit_text' => ['Benefit', 'text']],
+    ],
+    'stats' => [
+      'label' => 'Home stats', 'page' => 'home', 'key' => 'field_home_stats',
+      'hint'  => 'The figures in the band under the home page photograph.',
+      'subs'  => [
+        'stat_number' => ['Figure', 'text'],
+        'stat_label'  => ['Label', 'text'],
+      ],
+    ],
+    'bird_facts' => [
+      'label' => 'Bird facts', 'page' => 'home', 'key' => 'field_home_bird_facts',
+      'hint'  => 'One is picked at random on the home page.',
+      'subs'  => [
+        'bird_name' => ['Bird', 'text'],
+        'fact_text' => ['Fact', 'textarea'],
+      ],
+    ],
+    'birding_jokes' => [
+      'label' => 'Birding jokes', 'page' => 'home', 'key' => 'field_home_birding_jokes',
+      'hint'  => 'One is picked at random on the home page.',
+      'subs'  => ['joke_text' => ['Joke', 'textarea']],
+    ],
+  ];
+}
 
-/** The About page holds the committee repeater; everything reads it there. */
-function db_committee_page_id() {
-  $about = get_page_by_path('about');
-  return $about ? $about->ID : 0;
+/** ACF PRO edits repeaters itself; everything below stands down for it. */
+function db_has_acf_repeater() {
+  return class_exists('acf_field_repeater');
+}
+
+function db_page_id($slug) {
+  $page = get_page_by_path($slug);
+  return $page ? $page->ID : 0;
 }
 
 /**
  * Rows as stored, straight from post meta rather than through ACF.
  *
- * There are two shapes to deal with. ACF PRO writes a repeater as a row
- * count plus one meta key per value (committee_members_0_member_name);
- * ACF free, which does not know the field type, stores whatever it was
- * given as a single serialised array. This site holds the second, so
- * both are read and the shape is reported back for saving.
+ * Two shapes turn up. ACF PRO writes a repeater as a row count plus one
+ * meta key per value (committee_members_0_member_name); ACF free, which
+ * does not know the field type, stores a single serialised array, whose
+ * rows may be keyed by sub-field name or by field key.
  */
-function db_committee_rows() {
-  $id = db_committee_page_id();
-  if (!$id) return ['shape' => 'none', 'rows' => []];
-
-  $raw = get_post_meta($id, 'committee_members', true);
+function db_list_read($post_id, $name, array $list) {
+  if (!$post_id) return [];
+  $raw  = get_post_meta($post_id, $name, true);
+  $subs = array_keys($list['subs']);
 
   if (is_array($raw)) {
     $rows = [];
-    foreach (array_values($raw) as $i => $row) {
-      $out = ['index' => $i];
-      foreach (array_keys(DB_COMMITTEE_FIELDS) as $sub) $out[$sub] = $row[$sub] ?? '';
+    foreach (array_values($raw) as $row) {
+      if (!is_array($row)) continue;
+      $out = [];
+      foreach ($subs as $sub) {
+        $out[$sub] = $row[$sub] ?? $row[$list['key'] . '_' . $sub] ?? '';
+      }
       $rows[] = $out;
     }
-    return ['shape' => 'array', 'rows' => $rows];
+    return $rows;
   }
 
-  $count = (int) $raw;
   $rows = [];
-  for ($i = 0; $i < $count; $i++) {
-    $row = ['index' => $i];
-    foreach (array_keys(DB_COMMITTEE_FIELDS) as $sub) {
-      $row[$sub] = get_post_meta($id, "committee_members_{$i}_{$sub}", true);
-    }
+  for ($i = 0, $count = (int) $raw; $i < $count; $i++) {
+    $row = [];
+    foreach ($subs as $sub) $row[$sub] = get_post_meta($post_id, "{$name}_{$i}_{$sub}", true);
     $rows[] = $row;
   }
-  return ['shape' => 'flat', 'rows' => $rows];
+  return $rows;
+}
+
+/** Where the list lives now, and its rows — from the legacy page until first saved. */
+function db_list_rows($name) {
+  $list = db_page_lists()[$name];
+  $id   = db_page_id($list['page']);
+  $rows = db_list_read($id, $name, $list);
+  if (!$rows && !empty($list['legacy']) && !metadata_exists('post', $id, $name)) {
+    $rows = db_list_read(db_page_id($list['legacy']), $name, $list);
+  }
+  return $rows;
 }
 
 /**
- * Write one row's value, and the paired _-prefixed key ACF uses to know
- * which field a value belongs to. A value saved without it reads back as
- * nothing, which is the trap in touching ACF's storage by hand.
+ * A list for the templates, whichever shape it was saved in. get_field()
+ * cannot be used for these on ACF free: it does not know the Repeater
+ * field, so it hands back the raw meta, which for rows saved one value
+ * per key is just the row count.
  */
-function db_committee_set($index, $sub, $value) {
-  $id = db_committee_page_id();
-  if (!$id || !isset(DB_COMMITTEE_FIELDS[$sub])) return false;
-  update_post_meta($id, "committee_members_{$index}_{$sub}", $value);
-  update_post_meta($id, "_committee_members_{$index}_{$sub}", DB_COMMITTEE_FIELDS[$sub]);
-  return true;
+function db_list($name, $post_id) {
+  $lists = db_page_lists();
+  return isset($lists[$name]) ? db_list_read((int) $post_id, $name, $lists[$name]) : [];
 }
 
 /**
- * Save every row back in the shape the page already uses, so nothing
- * else that reads this field has to change. The submitted rows are
- * matched to the stored ones by position.
+ * Save the whole list as one serialised array, with the _-prefixed key
+ * ACF uses to know which field the value belongs to. Any row-per-key
+ * values left from the other shape are removed so they cannot resurface.
  */
-function db_committee_save(array $submitted) {
-  $id = db_committee_page_id();
+function db_list_save($name, array $rows) {
+  $list = db_page_lists()[$name];
+  $id   = db_page_id($list['page']);
   if (!$id) return false;
-  $current = db_committee_rows();
 
-  if ($current['shape'] === 'flat') {
-    foreach ($submitted as $i => $row) {
-      foreach ($row as $sub => $value) db_committee_set((int) $i, $sub, $value);
+  $old = get_post_meta($id, $name, true);
+  if (!is_array($old)) {
+    for ($i = 0, $count = (int) $old; $i < $count; $i++) {
+      foreach (array_keys($list['subs']) as $sub) {
+        delete_post_meta($id, "{$name}_{$i}_{$sub}");
+        delete_post_meta($id, "_{$name}_{$i}_{$sub}");
+      }
     }
-    return true;
   }
 
-  // Serialised array: rewrite it whole, keeping any key we do not manage.
-  $raw = get_post_meta($id, 'committee_members', true);
-  $rows = is_array($raw) ? array_values($raw) : [];
-  foreach ($submitted as $i => $row) {
-    $i = (int) $i;
-    if (!isset($rows[$i])) $rows[$i] = [];
-    foreach ($row as $sub => $value) $rows[$i][$sub] = $value;
-  }
-  update_post_meta($id, 'committee_members', $rows);
-  update_post_meta($id, '_committee_members', 'field_about_committee_members');
+  // update_post_meta() unslashes what it is given.
+  update_post_meta($id, $name, wp_slash(array_values($rows)));
+  update_post_meta($id, '_' . $name, $list['key']);
+  if (function_exists('acf_flush_value_cache')) acf_flush_value_cache($id, $name);
   return true;
 }
+
+/** One submitted value, cleaned for its field type. */
+function db_list_clean($type, $value) {
+  $value = is_string($value) ? wp_unslash($value) : '';
+  switch ($type) {
+    case 'image':    return (int) $value ?: '';
+    case 'number':   return is_numeric(trim($value)) ? 0 + trim($value) : '';
+    case 'email':    return sanitize_email($value);
+    case 'textarea': return sanitize_textarea_field($value);
+    case 'wysiwyg':  return wp_kses_post(trim($value));
+    default:         return sanitize_text_field($value);
+  }
+}
+
+// In the page editor the repeater is an empty box on ACF free; point to
+// where the list is edited instead.
+add_action('acf/init', function() {
+  if (db_has_acf_repeater()) return;
+  foreach (db_page_lists() as $name => $list) {
+    add_filter('acf/prepare_field/key=' . $list['key'], function($field) use ($name, $list) {
+      $field['type']      = 'message';
+      $field['new_lines'] = '';
+      $field['esc_html']  = 0;
+      $field['message']   = sprintf(
+        'Edit this list under <a href="%s">Pages → Page lists → %s</a>.',
+        esc_url(admin_url('edit.php?post_type=page&page=db-lists&list=' . $name)),
+        esc_html($list['label'])
+      );
+      return $field;
+    });
+  }
+});
 
 add_action('admin_menu', function() {
+  if (db_has_acf_repeater()) return;
   add_submenu_page(
     'edit.php?post_type=page',
-    __('Committee members', 'deccan-birders'),
-    __('Committee members', 'deccan-birders'),
-    'manage_options',
-    'db-committee',
-    'db_committee_page'
+    __('Page lists', 'deccan-birders'),
+    __('Page lists', 'deccan-birders'),
+    'edit_pages',
+    'db-lists',
+    'db_lists_page'
   );
 });
 
-add_action('admin_enqueue_scripts', function($hook) {
-  if (strpos($hook, 'db-committee') !== false) wp_enqueue_media();
+// The old Committee members screen lived at page=db-committee. WordPress
+// refuses an unregistered admin page before admin_init, so catch it there.
+add_action('admin_page_access_denied', function() {
+  if (($_GET['page'] ?? '') === 'db-committee') {
+    wp_safe_redirect(admin_url('edit.php?post_type=page&page=db-lists&list=committee_members'));
+    exit;
+  }
 });
 
-function db_committee_page() {
-  if (!current_user_can('manage_options')) return;
-  $page_id = db_committee_page_id();
-  $saved = false;
+add_action('admin_enqueue_scripts', function($hook) {
+  if (strpos($hook, 'db-lists') !== false) wp_enqueue_media();
+});
 
-  if (isset($_POST['db_committee_save']) && check_admin_referer('db_committee_save')) {
-    $clean = [];
-    foreach ((array) ($_POST['member'] ?? []) as $i => $row) {
-      $clean[(int) $i] = [
-        'member_name'          => sanitize_text_field($row['member_name'] ?? ''),
-        'member_role'          => sanitize_text_field($row['member_role'] ?? ''),
-        'member_email'         => sanitize_email($row['member_email'] ?? ''),
-        'member_photo'         => (int) ($row['member_photo'] ?? 0),
-        'member_display_order' => (int) ($row['member_display_order'] ?? 99),
-      ];
+/** One input for one sub-field; $index is the row's key in the form. */
+function db_list_input($sub, array $spec, $index, $value) {
+  [$label, $type] = $spec;
+  $n = 'rows[' . $index . '][' . $sub . ']';
+  switch ($type) {
+    case 'image':
+      $pid = (int) $value;
+      $src = $pid ? wp_get_attachment_image_url($pid, 'thumbnail') : '';
+      ?>
+      <div class="db-photo-cell">
+        <img src="<?php echo esc_url($src); ?>" alt=""
+             style="width:80px;height:80px;object-fit:cover;border-radius:6px;background:#f0f0f1;<?php echo $src ? '' : 'display:none'; ?>">
+        <p style="margin:6px 0 0">
+          <button type="button" class="button db-pick"><?php esc_html_e('Choose', 'deccan-birders'); ?></button>
+          <button type="button" class="button-link db-clear" style="color:#b32d2e"><?php esc_html_e('Clear', 'deccan-birders'); ?></button>
+        </p>
+        <input type="hidden" name="<?php echo esc_attr($n); ?>" value="<?php echo esc_attr($pid ?: ''); ?>">
+      </div>
+      <?php
+      return;
+    case 'textarea':
+    case 'wysiwyg':
+      printf('<textarea name="%s" rows="%d" class="large-text" aria-label="%s">%s</textarea>',
+        esc_attr($n), $type === 'wysiwyg' ? 5 : 3, esc_attr($label), esc_textarea((string) $value));
+      return;
+    default:
+      printf('<input type="%s" name="%s" value="%s" aria-label="%s" %s>',
+        $type === 'number' ? 'number' : ($type === 'email' ? 'email' : 'text'),
+        esc_attr($n), esc_attr((string) $value), esc_attr($label),
+        $type === 'number' ? 'style="width:90px"' : 'class="regular-text" style="width:100%"');
+  }
+}
+
+function db_lists_page() {
+  $lists = db_page_lists();
+  $name  = sanitize_key($_GET['list'] ?? '');
+  if (!isset($lists[$name])) $name = array_key_first($lists);
+  $list    = $lists[$name];
+  $page_id = db_page_id($list['page']);
+
+  if (!current_user_can('edit_pages') || ($page_id && !current_user_can('edit_post', $page_id))) {
+    wp_die(esc_html__('You cannot edit this list.', 'deccan-birders'));
+  }
+
+  $saved = false;
+  if ($page_id && isset($_POST['db_lists_save']) && check_admin_referer('db_lists_save_' . $name)) {
+    $rows = [];
+    foreach ((array) ($_POST['rows'] ?? []) as $row) {
+      $clean = [];
+      foreach ($list['subs'] as $sub => [, $type]) $clean[$sub] = db_list_clean($type, $row[$sub] ?? '');
+      if (implode('', array_map('strval', $clean)) === '') continue; // an empty row added by mistake
+      $rows[] = $clean;
     }
-    db_committee_save($clean);
-    // The grid is rendered into cached pages, so the change only shows
+    db_list_save($name, $rows);
+    // The lists are rendered into cached pages, so a change only shows
     // once those are dropped.
     if (class_exists('LiteSpeed\Purge')) LiteSpeed\Purge::purge_all();
     $saved = true;
   }
 
-  $stored = db_committee_rows();
-  $rows   = $stored['rows'];
+  $rows = db_list_rows($name);
+  $base = admin_url('edit.php?post_type=page&page=db-lists');
   ?>
   <div class="wrap">
-    <h1><?php esc_html_e('Committee members', 'deccan-birders'); ?></h1>
+    <h1><?php esc_html_e('Page lists', 'deccan-birders'); ?></h1>
+
+    <nav class="nav-tab-wrapper" style="margin-bottom:16px">
+      <?php foreach ($lists as $key => $l): ?>
+        <a href="<?php echo esc_url(add_query_arg('list', $key, $base)); ?>"
+           class="nav-tab<?php echo $key === $name ? ' nav-tab-active' : ''; ?>"><?php echo esc_html($l['label']); ?></a>
+      <?php endforeach; ?>
+    </nav>
+
     <?php if ($saved): ?>
       <div class="notice notice-success"><p><?php esc_html_e('Saved.', 'deccan-birders'); ?></p></div>
     <?php endif; ?>
+
     <?php if (!$page_id): ?>
-      <div class="notice notice-error"><p><?php esc_html_e('No About page found — the committee list is stored on it.', 'deccan-birders'); ?></p></div>
+      <div class="notice notice-error"><p><?php printf(
+        /* translators: %s: page slug */
+        esc_html__('There is no page with the slug "%s" yet — this list is stored on it. Create that page first.', 'deccan-birders'),
+        esc_html($list['page'])
+      ); ?></p></div>
       </div><?php return; endif; ?>
 
-    <p><?php printf(
-      /* translators: %s: link to the Executive Committee page */
-      esc_html__('These are the members shown on %s. Photographs look best square, about 800 x 800.', 'deccan-birders'),
-      '<a href="' . esc_url(home_url('/committee')) . '" target="_blank" rel="noopener">' . esc_html__('the Executive Committee page', 'deccan-birders') . '</a>'
-    ); ?></p>
-
+    <p><?php echo esc_html($list['hint']); ?>
+      <a href="<?php echo esc_url(get_permalink($page_id)); ?>" target="_blank" rel="noopener"><?php esc_html_e('View the page', 'deccan-birders'); ?></a></p>
     <?php if (!$rows): ?>
-      <div class="notice notice-warning"><p><?php esc_html_e('No committee members are stored on the About page yet.', 'deccan-birders'); ?></p></div>
+      <p><em><?php esc_html_e('Nothing saved yet, so the page shows its built-in list. Add rows to replace it.', 'deccan-birders'); ?></em></p>
     <?php endif; ?>
 
     <form method="post">
-      <?php wp_nonce_field('db_committee_save'); ?>
-      <table class="widefat striped" style="max-width:1100px">
+      <?php wp_nonce_field('db_lists_save_' . $name); ?>
+      <table class="widefat striped db-list" style="max-width:1200px">
         <thead><tr>
-          <th style="width:110px"><?php esc_html_e('Photo', 'deccan-birders'); ?></th>
-          <th><?php esc_html_e('Name', 'deccan-birders'); ?></th>
-          <th><?php esc_html_e('Role', 'deccan-birders'); ?></th>
-          <th><?php esc_html_e('Email', 'deccan-birders'); ?></th>
-          <th style="width:90px"><?php esc_html_e('Order', 'deccan-birders'); ?></th>
+          <?php foreach ($list['subs'] as [$label, $type]): ?>
+            <th<?php echo $type === 'image' ? ' style="width:110px"' : ($type === 'number' ? ' style="width:100px"' : ''); ?>><?php echo esc_html($label); ?></th>
+          <?php endforeach; ?>
+          <th style="width:120px"><span class="screen-reader-text"><?php esc_html_e('Move or remove', 'deccan-birders'); ?></span></th>
         </tr></thead>
         <tbody>
-        <?php foreach ($rows as $row):
-          $i   = $row['index'];
-          $pid = (int) $row['member_photo'];
-          $src = $pid ? wp_get_attachment_image_url($pid, 'thumbnail') : '';
-        ?>
+        <?php foreach ($rows as $i => $row): ?>
           <tr>
-            <td>
-              <div class="db-photo-cell" data-index="<?php echo esc_attr($i); ?>">
-                <img src="<?php echo esc_url($src); ?>" alt=""
-                     style="width:80px;height:80px;object-fit:cover;border-radius:6px;background:#f0f0f1;<?php echo $src ? '' : 'display:none'; ?>">
-                <p style="margin:6px 0 0">
-                  <button type="button" class="button db-pick"><?php esc_html_e('Choose', 'deccan-birders'); ?></button>
-                  <button type="button" class="button-link db-clear" style="color:#b32d2e"><?php esc_html_e('Clear', 'deccan-birders'); ?></button>
-                </p>
-                <input type="hidden" name="member[<?php echo esc_attr($i); ?>][member_photo]" value="<?php echo esc_attr($pid); ?>">
-              </div>
+            <?php foreach ($list['subs'] as $sub => $spec): ?>
+              <td><?php db_list_input($sub, $spec, $i, $row[$sub] ?? ''); ?></td>
+            <?php endforeach; ?>
+            <td class="db-row-tools">
+              <button type="button" class="button db-up" aria-label="<?php esc_attr_e('Move up', 'deccan-birders'); ?>">↑</button>
+              <button type="button" class="button db-down" aria-label="<?php esc_attr_e('Move down', 'deccan-birders'); ?>">↓</button>
+              <button type="button" class="button-link db-remove" style="color:#b32d2e"><?php esc_html_e('Remove', 'deccan-birders'); ?></button>
             </td>
-            <td><input type="text" class="regular-text" name="member[<?php echo esc_attr($i); ?>][member_name]" value="<?php echo esc_attr($row['member_name']); ?>"></td>
-            <td><input type="text" class="regular-text" name="member[<?php echo esc_attr($i); ?>][member_role]" value="<?php echo esc_attr($row['member_role']); ?>"></td>
-            <td><input type="email" class="regular-text" name="member[<?php echo esc_attr($i); ?>][member_email]" value="<?php echo esc_attr($row['member_email']); ?>"></td>
-            <td><input type="number" style="width:70px" name="member[<?php echo esc_attr($i); ?>][member_display_order]" value="<?php echo esc_attr($row['member_display_order']); ?>"></td>
           </tr>
         <?php endforeach; ?>
         </tbody>
       </table>
-      <p><button type="submit" name="db_committee_save" value="1" class="button button-primary"><?php esc_html_e('Save members', 'deccan-birders'); ?></button></p>
+
+      <template id="db-row-template">
+        <tr>
+          <?php foreach ($list['subs'] as $sub => $spec): ?>
+            <td><?php db_list_input($sub, $spec, '__i__', ''); ?></td>
+          <?php endforeach; ?>
+          <td class="db-row-tools">
+            <button type="button" class="button db-up" aria-label="<?php esc_attr_e('Move up', 'deccan-birders'); ?>">↑</button>
+            <button type="button" class="button db-down" aria-label="<?php esc_attr_e('Move down', 'deccan-birders'); ?>">↓</button>
+            <button type="button" class="button-link db-remove" style="color:#b32d2e"><?php esc_html_e('Remove', 'deccan-birders'); ?></button>
+          </td>
+        </tr>
+      </template>
+
+      <p>
+        <button type="button" class="button db-add"><?php esc_html_e('Add row', 'deccan-birders'); ?></button>
+        <button type="submit" name="db_lists_save" value="1" class="button button-primary"><?php
+          /* translators: %s: list name */
+          printf(esc_html__('Save %s', 'deccan-birders'), esc_html(strtolower($list['label'])));
+        ?></button>
+      </p>
     </form>
   </div>
 
   <script>
   jQuery(function($){
-    $('.db-photo-cell').each(function(){
-      const cell = $(this), input = cell.find('input[type=hidden]'), img = cell.find('img');
+    const body = $('.db-list tbody');
+    let added = 0;
+
+    function wirePhoto(cell){
+      const input = cell.find('input[type=hidden]'), img = cell.find('img');
       let frame = null;
       cell.find('.db-pick').on('click', function(){
         if (!frame) {
@@ -2326,6 +2536,20 @@ function db_committee_page() {
         frame.open();
       });
       cell.find('.db-clear').on('click', function(){ input.val(''); img.hide(); });
+    }
+    $('.db-photo-cell').each(function(){ wirePhoto($(this)); });
+
+    // Rows are posted in the order they sit in the table, so moving one
+    // needs nothing more than moving it.
+    body.on('click', '.db-up', function(){ const r = $(this).closest('tr'); r.prev().before(r); });
+    body.on('click', '.db-down', function(){ const r = $(this).closest('tr'); r.next().after(r); });
+    body.on('click', '.db-remove', function(){ $(this).closest('tr').remove(); });
+
+    $('.db-add').on('click', function(){
+      const html = $('#db-row-template').html().replace(/__i__/g, 'new' + (added++)).trim();
+      const row = $(html).appendTo(body);
+      row.find('.db-photo-cell').each(function(){ wirePhoto($(this)); });
+      row.find('input, textarea').first().trigger('focus');
     });
   });
   </script>

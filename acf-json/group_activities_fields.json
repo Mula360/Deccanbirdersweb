@@ -145,9 +145,16 @@
     "location": [
         [
             {
-                "param": "page",
+                "param": "db_page_slug",
                 "operator": "==",
-                "value": "18"
+                "value": "about"
+            }
+        ],
+        [
+            {
+                "param": "db_page_slug",
+                "operator": "==",
+                "value": "activities"
             }
         ]
     ],
@@ -160,5 +167,5 @@
     "active": true,
     "description": "Location rule (Page == a specific page) is a placeholder for the page with slug \"activities\" — ACF has no native slug-matching rule, so once that page exists, open this field group and reselect it in Location so the stored ID matches.",
     "show_in_rest": 0,
-    "modified": 1789257600
+    "modified": 1790488305
 }

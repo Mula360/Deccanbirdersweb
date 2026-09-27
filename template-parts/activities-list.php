@@ -16,8 +16,8 @@
  */
 
 $activities_page = get_page_by_path('activities');
-$activities = get_field('activities', get_the_ID())
-  ?: ($activities_page ? get_field('activities', $activities_page->ID) : null);
+$activities = db_list('activities', get_the_ID())
+  ?: ($activities_page ? db_list('activities', $activities_page->ID) : null);
 if (!$activities) {
   $activities = [
     ['activity_title' => 'Monthly Field Trips', 'activity_cadence' => 'Every month',

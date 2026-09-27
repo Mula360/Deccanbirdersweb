@@ -413,16 +413,9 @@
     "location": [
         [
             {
-                "param": "page_template",
+                "param": "db_page_slug",
                 "operator": "==",
-                "value": "front-page.php"
-            }
-        ],
-        [
-            {
-                "param": "page",
-                "operator": "==",
-                "value": "15"
+                "value": "home"
             }
         ]
     ],
@@ -435,5 +428,5 @@
     "active": true,
     "description": "Second location rule (Page == a specific page) is a placeholder for the page with slug \"home\" — ACF has no native slug-matching rule, so once that page exists, open this field group and reselect it in Location so the stored ID matches.",
     "show_in_rest": 0,
-    "modified": 1789257600
+    "modified": 1790488305
 }

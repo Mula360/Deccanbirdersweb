@@ -31,9 +31,9 @@
     "location": [
         [
             {
-                "param": "page",
+                "param": "db_page_slug",
                 "operator": "==",
-                "value": "22"
+                "value": "archives"
             }
         ]
     ],
@@ -46,5 +46,5 @@
     "active": true,
     "description": "Archives page (\"archives\" slug, post 22).",
     "show_in_rest": 0,
-    "modified": 1789430000
+    "modified": 1790488305
 }

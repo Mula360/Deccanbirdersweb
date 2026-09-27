@@ -8,7 +8,7 @@
  */
 
 $page_id = get_page_by_path('aims')?->ID;
-$aims    = $page_id ? get_field('aims', $page_id) : [];
+$aims    = $page_id ? db_list('aims', $page_id) : [];
 if (!$aims) return;
 ?>
 <ol class="aims-list">

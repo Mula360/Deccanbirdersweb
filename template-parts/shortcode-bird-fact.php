@@ -7,7 +7,7 @@
  */
 
 $home_id = get_page_by_path('home')?->ID;
-$facts   = $home_id ? get_field('bird_facts', $home_id) : [];
+$facts   = $home_id ? db_list('bird_facts', $home_id) : [];
 if (!$facts) return;
 
 $week = floor(time() / 604800) % count($facts);

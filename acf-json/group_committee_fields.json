@@ -31,9 +31,9 @@
     "location": [
         [
             {
-                "param": "page",
+                "param": "db_page_slug",
                 "operator": "==",
-                "value": "159"
+                "value": "committee"
             }
         ]
     ],
@@ -46,5 +46,5 @@
     "active": true,
     "description": "Committee page (\"committee\" slug, post 159). Member data itself lives in the About page's committee_members repeater.",
     "show_in_rest": 0,
-    "modified": 1789430000
+    "modified": 1790488305
 }
