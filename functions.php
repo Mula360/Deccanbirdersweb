@@ -515,6 +515,7 @@ require_once __DIR__ . '/inc/gallery/species.php';
 require_once __DIR__ . '/inc/gallery/images.php';
 require_once __DIR__ . '/inc/gallery/mail.php';
 require_once __DIR__ . '/inc/gallery/review.php';
+require_once __DIR__ . '/inc/gallery/queue.php';
 require_once __DIR__ . '/inc/gallery/submissions.php';
 
 /* -----------------------------------------------------------------------

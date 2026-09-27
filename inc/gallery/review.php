@@ -217,7 +217,7 @@ function db_photo_notify_reviewers($post_id) {
       . '<p>' . db_email_button(db_review_url($token, 'approve'), 'Approve', '#17924C') . ' &nbsp; '
       . db_email_button(db_review_url($token, 'reject'), 'Reject', '#B3261E') . '</p>'
       . '<p style="font-size:13px;color:#5C6B63">Each button opens a page to confirm — nothing happens until you do. These links are yours alone, work once, and expire in '
-      . (int) $days . ' days. You can also <a href="' . esc_url(admin_url('post.php?post=' . $post_id . '&action=edit')) . '">review it in wp-admin</a>.</p>'
+      . (int) $days . ' days. You can also <a href="' . esc_url(db_queue_url(['status' => 'pending']) . '#photo-' . $post_id) . '">review it in the Photo review queue</a>.</p>'
       . '</div>';
 
     db_mail_with_images(
@@ -258,7 +258,7 @@ add_action('template_redirect', function() {
     $state = ['kind' => 'message', 'title' => 'Already decided', 'text' => 'This submission was ' . db_photo_decision_text($post->ID) . '.'];
   } elseif (strtotime($row->expires_at . ' UTC') < time()) {
     $state = ['kind' => 'message', 'title' => 'This link has expired', 'text' => 'Review links last ' . db_gallery_setting('link_expiry_days') . ' days; this one expired on '
-      . wp_date('j F Y, g:i a', strtotime($row->expires_at . ' UTC')) . '. The submission is still waiting: review it in wp-admin.'];
+      . wp_date('j F Y, g:i a', strtotime($row->expires_at . ' UTC')) . '. The submission is still waiting: review it in the Photo review queue in wp-admin.'];
   } elseif ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $action = sanitize_key($_POST['db_action'] ?? '');
     if (!wp_verify_nonce($_POST['_db_nonce'] ?? '', 'db_review_' . $row->id) || !in_array($action, ['approve', 'reject'], true)) {
@@ -302,7 +302,7 @@ function db_review_render(array $state, $row, $post, $user) {
       <p><?php echo esc_html($state['text']); ?></p>
       <?php if (!empty($state['link'])): ?><p><a class="btn btn-primary" href="<?php echo esc_url($state['link']); ?>">See the gallery</a></p><?php endif; ?>
       <?php if ($post && $state['title'] !== 'Approved' && $state['title'] !== 'Rejected'): ?>
-        <p class="db-review-small"><a href="<?php echo esc_url(admin_url('post.php?post=' . $post->ID . '&action=edit')); ?>">Open in wp-admin</a></p>
+        <p class="db-review-small"><a href="<?php echo esc_url(db_queue_url(['status' => get_post_status($post)]) . '#photo-' . $post->ID); ?>">Open the Photo review queue</a></p>
       <?php endif; ?>
     <?php else:
       $facts = db_photo_facts($post->ID);
