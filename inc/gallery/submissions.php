@@ -256,48 +256,17 @@ function db_handle_photo_submit() {
   $release();
 
   db_photo_notify_reviewers($post_id);
-  wp_mail(
+  db_mail(
     $email,
     'We received your photograph — Deccan Birders',
     '<p>Hi ' . esc_html($name) . ',</p><p>Thank you for sending us your photograph of the '
     . esc_html($species->common_name) . '. A committee member will review it, usually within a week, and you will hear back either way.</p>'
     . '<p>— Deccan Birders</p>',
-    ['Content-Type: text/html; charset=UTF-8']
+    ['Content-Type: text/html; charset=UTF-8'],
+    'receipt'
   );
 
   db_photo_reply(true, 'Thank you — your photograph has been sent for review. You will hear back within about a week.', [
     'species_note' => $cap['reached'] ? db_species_cap_message($cap) : '',
   ]);
-}
-
-/**
- * The reviewers' email for a new submission. Phase 4 replaces this with
- * the full version (photo inline, approve / reject buttons); for now it
- * carries the same facts with a link to the entry in wp-admin.
- */
-function db_photo_notify_reviewers($post_id) {
-  $email   = get_post_meta($post_id, '_db_submitter_email', true);
-  $name    = get_field('photographer', $post_id);
-  $species = get_field('species_name', $post_id) . ' (' . get_field('scientific_name', $post_id) . ')';
-  $flags   = (array) get_post_meta($post_id, '_db_flags', true);
-  $to      = wp_list_pluck(db_photo_reviewers(), 'user_email') ?: db_notify_email('photos');
-
-  $rows = [
-    'Photographer'   => $name,
-    'Email'          => $email,
-    'Member'         => get_post_meta($post_id, '_db_is_member', true) ? 'Yes — on the Member Emails list' : 'No',
-    'Species'        => $species,
-    'Where and when' => get_field('photo_location', $post_id),
-  ];
-  $body = ($flags ? '<p style="background:#FFF4D6;padding:10px 12px;border-radius:6px"><strong>Flagged:</strong> ' . esc_html(implode('; ', $flags)) . '</p>' : '')
-    . '<table cellpadding="4">';
-  foreach ($rows as $k => $v) $body .= '<tr><td><strong>' . esc_html($k) . '</strong></td><td>' . esc_html($v) . '</td></tr>';
-  $body .= '</table><p><a href="' . esc_url(admin_url('post.php?post=' . $post_id . '&action=edit')) . '">Review this submission</a></p>';
-
-  wp_mail(
-    $to,
-    ($flags ? '[Flagged] ' : '') . 'Photograph submitted: ' . get_field('species_name', $post_id),
-    $body,
-    ['Content-Type: text/html; charset=UTF-8', 'Reply-To: ' . $name . ' <' . $email . '>']
-  );
 }

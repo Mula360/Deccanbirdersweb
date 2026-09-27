@@ -10,7 +10,7 @@
 
 if (!defined('ABSPATH')) exit;
 
-const DB_GALLERY_DB_VERSION = 2;
+const DB_GALLERY_DB_VERSION = 3;
 const DB_REVIEW_CAP = 'db_review_photos';
 
 /* -----------------------------------------------------------------------
@@ -84,6 +84,34 @@ function db_gallery_install() {
   KEY post_id (post_id)
 ) $charset;");
   db_photo_log_backfill();
+
+  dbDelta('CREATE TABLE ' . db_mail_log_table() . " (
+  id bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  sent_at datetime NOT NULL,
+  recipients varchar(500) NOT NULL DEFAULT '',
+  subject varchar(255) NOT NULL DEFAULT '',
+  context varchar(40) NOT NULL DEFAULT '',
+  ok tinyint(1) NOT NULL DEFAULT 0,
+  error varchar(500) NOT NULL DEFAULT '',
+  PRIMARY KEY  (id),
+  KEY sent_at (sent_at),
+  KEY ok (ok)
+) $charset;");
+
+  // Review links: only a keyed hash of each token is kept.
+  dbDelta('CREATE TABLE ' . db_review_tokens_table() . " (
+  id bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  token_hash char(64) NOT NULL,
+  post_id bigint(20) unsigned NOT NULL,
+  user_id bigint(20) unsigned NOT NULL,
+  created_at datetime NOT NULL,
+  expires_at datetime NOT NULL,
+  used_at datetime DEFAULT NULL,
+  used_action varchar(10) NOT NULL DEFAULT '',
+  PRIMARY KEY  (id),
+  UNIQUE KEY token_hash (token_hash),
+  KEY post_id (post_id)
+) $charset;");
 
   update_option('db_gallery_db_version', DB_GALLERY_DB_VERSION);
 }

@@ -372,27 +372,8 @@ function db_settings_page() {
 /* -----------------------------------------------------------------------
  * 6. SMTP configuration
  * ---------------------------------------------------------------------*/
-/**
- * Send through the society's mailbox — but only when a password is
- * actually configured. Without DB_SMTP_PASS this used to switch WordPress
- * to SMTP and then authenticate with an empty password, so every email on
- * the site failed with "Could not authenticate" and nothing was sent,
- * including submissions from the forms. With no password set we leave
- * WordPress alone, so WP Mail SMTP (or the host's own mail) handles it.
- */
-add_action('phpmailer_init', function($m) {
-  if (!defined('DB_SMTP_PASS') || !DB_SMTP_PASS) return;
-
-  $m->isSMTP();
-  $m->Host       = defined('DB_SMTP_HOST') ? DB_SMTP_HOST : 'smtp.hostinger.com';
-  $m->SMTPAuth   = true;
-  $m->Port       = defined('DB_SMTP_PORT') ? (int) DB_SMTP_PORT : 587;
-  $m->Username   = defined('DB_SMTP_USER') ? DB_SMTP_USER : 'info@deccanbirders.org';
-  $m->Password   = DB_SMTP_PASS;
-  $m->SMTPSecure = $m->Port === 465 ? 'ssl' : 'tls';
-  $m->From       = $m->Username;
-  $m->FromName   = 'Deccan Birders';
-});
+// Now in inc/gallery/mail.php: SMTP from Gallery → Email & mail log, with the
+// password from wp-config.php (DB_SMTP_PASS).
 
 /* -----------------------------------------------------------------------
  * 7. AJAX form handlers
@@ -532,15 +513,17 @@ require_once __DIR__ . '/inc/gallery/setup.php';
 require_once __DIR__ . '/inc/gallery/member-emails.php';
 require_once __DIR__ . '/inc/gallery/species.php';
 require_once __DIR__ . '/inc/gallery/images.php';
+require_once __DIR__ . '/inc/gallery/mail.php';
+require_once __DIR__ . '/inc/gallery/review.php';
 require_once __DIR__ . '/inc/gallery/submissions.php';
 
 /* -----------------------------------------------------------------------
  * 7b. Photograph submissions
  *
  * The form's handler, limits and species cap live in
- * inc/gallery/submissions.php. What stays here is the throttle the other
- * public forms share, and the notes to the photographer when a
- * submission is published or declined.
+ * inc/gallery/submissions.php, and reviewing (the emails, approve and
+ * reject) in inc/gallery/review.php. What stays here is the throttle the
+ * other public forms share, and the "Submitted by" column.
  * ---------------------------------------------------------------------*/
 /** Crude per-visitor throttle: true when this one has had enough. */
 function db_rate_limited($action, $max_per_hour) {
@@ -553,33 +536,6 @@ function db_rate_limited($action, $max_per_hour) {
   return false;
 }
 
-/**
- * Tell the photographer what happened to their submission: published, or
- * declined. Only fires for entries that came through the form (they are
- * the ones carrying a submitter address).
- */
-add_action('transition_post_status', function($new_status, $old_status, $post) {
-  if ($post->post_type !== 'db_gallery_photo' || $new_status === $old_status) return;
-  $email = get_post_meta($post->ID, '_db_submitter_email', true);
-  if (!$email || !is_email($email)) return;
-  $name = get_field('photographer', $post->ID) ?: 'there';
-  $headers = ['Content-Type: text/html; charset=UTF-8'];
-
-  if ($new_status === 'publish' && !get_post_meta($post->ID, '_db_published_notified', true)) {
-    update_post_meta($post->ID, '_db_published_notified', 1);
-    wp_mail($email, 'Your photograph is in the gallery — Deccan Birders',
-      '<p>Hi ' . esc_html($name) . ',</p><p>Your photograph is now in the Deccan Birders gallery, credited to you: '
-      . '<a href="' . esc_url(home_url('/gallery/')) . '">see it here</a>.</p><p>Thank you for sharing it.</p><p>— Deccan Birders</p>',
-      $headers);
-  }
-
-  if ($new_status === 'trash' && $old_status === 'pending') {
-    wp_mail($email, 'About the photograph you sent — Deccan Birders',
-      '<p>Hi ' . esc_html($name) . ',</p><p>Thank you for sending us your photograph. On this occasion the committee '
-      . 'has not taken it for the gallery. Please do keep sending them — we would like to see more.</p><p>— Deccan Birders</p>',
-      $headers);
-  }
-}, 10, 3);
 
 /** Who sent it, in the Gallery list, so pending entries are reviewable at a glance. */
 add_filter('manage_db_gallery_photo_posts_columns', function($cols) {
