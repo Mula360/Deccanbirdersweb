@@ -38,13 +38,15 @@ while (have_posts()) : the_post();
   <div class="photo-submit-wrap">
     <div class="photo-submit-card">
       <div>
-        <span class="eyebrow" style="color:var(--blue);">Members only</span>
+        <span class="eyebrow" style="color:var(--blue);">Share your photographs</span>
         <h2 class="card-heading card-heading--xl">Submit a photograph</h2>
-        <p class="card-intro card-intro--flush">Your entry goes to <a href="mailto:photos@deccanbirders.org"><strong>photos@deccanbirders.org</strong></a> for review. Once a committee member approves it, the photograph appears in the gallery credited to you by name.</p>
+        <p class="card-intro card-intro--flush">Every photograph is reviewed by the committee before it appears in the gallery, credited to you by name. Questions: <a href="mailto:photos@deccanbirders.org"><strong>photos@deccanbirders.org</strong></a>.</p>
         <ul class="submit-notes">
-          <li>Tell us the name you would like the credit to read.</li>
-          <li>One bird per frame, no baiting, no nest photography during breeding.</li>
-          <li>Approvals usually take a week; you'll hear back either way.</li>
+          <li><span><strong>No nest photography.</strong> We do not accept photographs of nests, eggs, or chicks at the nest, at any time of year.</span></li>
+          <li><span><strong>Never disturb a bird for a picture.</strong> No baiting, no call playback, no flushing, no clearing vegetation; keep your distance and move away if the bird is uneasy.</span></li>
+          <li><span>One photograph per submission: JPG, PNG or WebP, up to <?php echo (int) db_gallery_setting('max_upload_mb'); ?> MB. Location data (GPS) is removed before it is published.</span></li>
+          <li><span>Members can send <?php echo (int) db_gallery_setting('member_limit'); ?> photographs every <?php echo (int) db_gallery_setting('limit_window_days'); ?> days, and everyone else <?php echo (int) db_gallery_setting('nonmember_limit'); ?>.</span></li>
+          <li><span>Approvals usually take a week; you'll hear back either way.</span></li>
         </ul>
       </div>
       <form id="db-photo-submit-form" class="stacked-form" novalidate enctype="multipart/form-data">
@@ -55,34 +57,44 @@ while (have_posts()) : the_post();
         <div class="field-row">
           <label class="stacked-field">
             <span class="stacked-label">Photographer name</span>
-            <input type="text" name="name" placeholder="As it should be credited" required>
+            <input type="text" name="name" placeholder="As it should be credited" autocomplete="name" required>
           </label>
           <label class="stacked-field">
             <span class="stacked-label">Email</span>
-            <input type="email" name="email" placeholder="you@example.com" required>
+            <input type="email" name="email" placeholder="you@example.com" autocomplete="email" required>
           </label>
         </div>
-        <div class="field-row">
-          <label class="stacked-field">
-            <span class="stacked-label">Species</span>
-            <input type="text" name="species" placeholder="e.g. Indian Roller" required>
-          </label>
-          <label class="stacked-field">
-            <span class="stacked-label">Where and when</span>
-            <input type="text" name="location" placeholder="Ameenpur Lake, Sep 2026" required>
-          </label>
+        <div class="stacked-field species-field">
+          <label class="stacked-label" for="db-species-input">Species</label>
+          <div class="species-combo">
+            <input id="db-species-input" type="text" role="combobox" autocomplete="off" spellcheck="false"
+                   aria-autocomplete="list" aria-expanded="false" aria-controls="db-species-list"
+                   aria-describedby="db-species-note" placeholder="Common or scientific name, e.g. Indian Roller" required>
+            <ul id="db-species-list" class="species-list" role="listbox" aria-label="Species" hidden></ul>
+          </div>
+          <input type="hidden" name="species_id" value="">
+          <span id="db-species-note" class="species-note" aria-live="polite"></span>
         </div>
+        <label class="stacked-field">
+          <span class="stacked-label">Where and when</span>
+          <input type="text" name="location" placeholder="Ameenpur Lake, Sep 2026" required>
+          <span class="form-hint">Shown with the photograph in the gallery.</span>
+        </label>
         <label class="stacked-field">
           <span class="stacked-label">Photograph</span>
           <div class="dropzone">
-            <div>Drop a JPEG here, or browse</div>
-            <div class="form-hint">Up to 10 MB. Please keep the EXIF data intact.</div>
-            <input type="file" name="photo" accept="image/jpeg" required>
+            <div class="dropzone-label">Drop a photograph here, or browse</div>
+            <div class="form-hint">JPG, PNG or WebP, up to <?php echo (int) db_gallery_setting('max_upload_mb'); ?> MB.</div>
+            <input type="file" name="photo" accept="image/jpeg,image/png,image/webp,.jpg,.jpeg,.png,.webp" required>
           </div>
         </label>
         <label class="form-checkbox">
-          <input type="checkbox" name="consent" required>
-          I took this photograph and allow Deccan Birders to publish it with my credit.
+          <input type="checkbox" name="no_nest" value="1" required>
+          <span>This is not a nest photograph and the bird was not disturbed.</span>
+        </label>
+        <label class="form-checkbox">
+          <input type="checkbox" name="consent" value="1" required>
+          <span>I took this photograph, it is mine, and I permit Deccan Birders to display it with my credit.</span>
         </label>
         <button type="submit" class="btn btn-primary">Send for approval</button>
       </form>

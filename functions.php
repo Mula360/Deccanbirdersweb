@@ -531,20 +531,16 @@ add_action('admin_notices', function() {
 require_once __DIR__ . '/inc/gallery/setup.php';
 require_once __DIR__ . '/inc/gallery/member-emails.php';
 require_once __DIR__ . '/inc/gallery/species.php';
+require_once __DIR__ . '/inc/gallery/submissions.php';
 
 /* -----------------------------------------------------------------------
  * 7b. Photograph submissions
  *
- * A public upload form, so it is deliberately cautious: nonce, a hidden
- * honeypot field, a few submissions per hour per address, JPEG only, a
- * size cap, and the file is verified to be a real image before it is
- * accepted. Submissions land as a PENDING Gallery entry — approving one
- * is just pressing Publish in wp-admin — and never appear on the site
- * until a committee member does that.
+ * The form's handler, limits and species cap live in
+ * inc/gallery/submissions.php. What stays here is the throttle the other
+ * public forms share, and the notes to the photographer when a
+ * submission is published or declined.
  * ---------------------------------------------------------------------*/
-const DB_PHOTO_MAX_BYTES = 10 * MB_IN_BYTES;
-const DB_PHOTO_MAX_PER_HOUR = 3;
-
 /** Crude per-visitor throttle: true when this one has had enough. */
 function db_rate_limited($action, $max_per_hour) {
   $ip = $_SERVER['REMOTE_ADDR'] ?? '';
@@ -554,101 +550,6 @@ function db_rate_limited($action, $max_per_hour) {
   if ($count >= $max_per_hour) return true;
   set_transient($key, $count + 1, HOUR_IN_SECONDS);
   return false;
-}
-
-add_action('wp_ajax_nopriv_db_photo_submit', 'db_handle_photo_submit');
-add_action('wp_ajax_db_photo_submit', 'db_handle_photo_submit');
-function db_handle_photo_submit() {
-  if (!wp_verify_nonce($_POST['nonce'] ?? '', 'db_contact_nonce')) {
-    wp_send_json(['success' => false, 'message' => 'Security check failed. Please reload the page and try again.']);
-  }
-  // Honeypot: a field hidden from people, filled in only by bots.
-  if (!empty($_POST['website'])) {
-    wp_send_json(['success' => true]); // silently drop
-  }
-  if (db_rate_limited('photo', DB_PHOTO_MAX_PER_HOUR)) {
-    wp_send_json(['success' => false, 'message' => 'That is a few submissions in a short time — please try again in an hour.']);
-  }
-
-  $name     = sanitize_text_field($_POST['name'] ?? '');
-  $email    = sanitize_email($_POST['email'] ?? '');
-  $species  = sanitize_text_field($_POST['species'] ?? '');
-  $location = sanitize_text_field($_POST['location'] ?? '');
-  $consent  = !empty($_POST['consent']);
-
-  if (!$name || !$email || !$species || !$location) {
-    wp_send_json(['success' => false, 'message' => 'Please fill in every field.']);
-  }
-  if (!is_email($email)) {
-    wp_send_json(['success' => false, 'message' => 'That email address does not look right.']);
-  }
-  if (!$consent) {
-    wp_send_json(['success' => false, 'message' => 'Please confirm the photograph is yours to publish.']);
-  }
-
-  $file = $_FILES['photo'] ?? null;
-  if (!$file || ($file['error'] ?? UPLOAD_ERR_NO_FILE) !== UPLOAD_ERR_OK) {
-    wp_send_json(['success' => false, 'message' => 'Please attach a JPEG photograph.']);
-  }
-  if ($file['size'] > DB_PHOTO_MAX_BYTES) {
-    wp_send_json(['success' => false, 'message' => 'That file is over 10 MB. Please send a smaller JPEG.']);
-  }
-  // Extension, declared type and actual content must all say JPEG.
-  $check = wp_check_filetype_and_ext($file['tmp_name'], $file['name'], ['jpg|jpeg' => 'image/jpeg']);
-  $size = @getimagesize($file['tmp_name']);
-  if (empty($check['type']) || $check['type'] !== 'image/jpeg' || !$size || $size[2] !== IMAGETYPE_JPEG) {
-    wp_send_json(['success' => false, 'message' => 'Please send a JPEG photograph (.jpg).']);
-  }
-
-  require_once ABSPATH . 'wp-admin/includes/file.php';
-  require_once ABSPATH . 'wp-admin/includes/media.php';
-  require_once ABSPATH . 'wp-admin/includes/image.php';
-
-  $post_id = wp_insert_post([
-    'post_type'   => 'db_gallery_photo',
-    'post_title'  => $species . ($location ? ' — ' . $location : ''),
-    'post_status' => 'pending',
-  ], true);
-  if (is_wp_error($post_id)) {
-    wp_send_json(['success' => false, 'message' => 'Something went wrong saving your photograph. Please try again later.']);
-  }
-
-  $attachment_id = media_handle_upload('photo', $post_id, ['post_title' => $species]);
-  if (is_wp_error($attachment_id)) {
-    wp_delete_post($post_id, true);
-    wp_send_json(['success' => false, 'message' => 'That photograph could not be read. Please try another JPEG.']);
-  }
-
-  update_field('field_gallery_photo', $attachment_id, $post_id);
-  update_field('field_gallery_species_name', $species, $post_id);
-  update_field('field_gallery_photo_location', $location, $post_id);
-  update_field('field_gallery_photographer', $name, $post_id);
-  // Kept out of the ACF fields: only for replying to the submitter.
-  update_post_meta($post_id, '_db_submitter_email', $email);
-  update_post_meta($post_id, '_db_submitted_at', current_time('mysql'));
-
-  $edit_link = admin_url('post.php?post=' . $post_id . '&action=edit');
-  $headers = ['Content-Type: text/html; charset=UTF-8', "Reply-To: $name <$email>"];
-  wp_mail(
-    db_notify_email('photos'),
-    'Photograph submitted: ' . $species,
-    '<p><strong>' . esc_html($species) . '</strong> by ' . esc_html($name) . ' (' . esc_html($email) . ')</p>'
-    . '<p><strong>Where and when:</strong> ' . esc_html($location) . '</p>'
-    . '<p>It is waiting as a pending Gallery entry. Publishing it puts it on the site and tells the photographer; '
-    . 'moving it to Trash declines it, also with a note to them.</p>'
-    . '<p><a href="' . esc_url($edit_link) . '">Review this submission</a></p>',
-    $headers
-  );
-  wp_mail(
-    $email,
-    'We received your photograph — Deccan Birders',
-    '<p>Hi ' . esc_html($name) . ',</p><p>Thank you for sending us your photograph of the '
-    . esc_html($species) . '. A committee member will review it, usually within a week, and you will hear back either way.</p>'
-    . '<p>— Deccan Birders</p>',
-    ['Content-Type: text/html; charset=UTF-8']
-  );
-
-  wp_send_json(['success' => true]);
 }
 
 /**

@@ -2384,6 +2384,25 @@ body.lightbox-open { overflow: hidden; }
   grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
   gap: clamp(28px, 4vw, 48px);
 }
+/* Submit a photograph: the checkboxes, and the species picker — a text
+   box with a list of matches under it (assets/js/photo-submit.js). */
+.stacked-form .form-checkbox { display: flex; align-items: flex-start; gap: 10px; font-size: 15px; line-height: 1.45; color: var(--text-body); cursor: pointer; }
+.stacked-form .form-checkbox input { width: 18px; height: 18px; margin-top: 2px; flex-shrink: 0; accent-color: var(--blue); }
+.species-combo { position: relative; }
+.species-list {
+  position: absolute; z-index: 20; top: calc(100% + 4px); left: 0; right: 0;
+  max-height: 280px; overflow-y: auto; margin: 0; padding: 4px; list-style: none;
+  background: #fff; border: 2px solid var(--border); border-radius: var(--radius-sm);
+  box-shadow: 0 10px 24px rgba(22, 36, 29, 0.12);
+}
+.species-list li { padding: 8px 12px; border-radius: 6px; cursor: pointer; line-height: 1.3; }
+.species-list li[aria-selected="true"], .species-list li:hover { background: var(--blue-light); }
+.species-list .species-sci { display: block; font-size: 13px; font-style: italic; color: var(--text-muted); }
+.species-list .species-empty { cursor: default; color: var(--text-muted); background: none; }
+.species-note { font-size: 14px; line-height: 1.4; color: var(--text-muted); min-height: 0; }
+.species-note--cap { display: block; padding: 8px 12px; border-radius: var(--radius-sm); background: #FFF4D6; color: #6B4E00; }
+.form-success .species-note--cap { margin-top: 12px; text-align: left; }
+
 .submit-notes { display: grid; gap: 10px; margin-top: 16px; }
 .submit-notes li {
   display: flex;

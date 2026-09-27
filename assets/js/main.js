@@ -2,7 +2,7 @@
  * Hamburger nav + AJAX forms: contact (#db-contact-form → wp_ajax db_contact),
  * volunteer (#db-volunteer-form → wp_ajax db_volunteer), report-a-sighting
  * (#db-sighting-report-form → wp_ajax db_sighting_report) and photograph
- * submission (#db-photo-submit-form → wp_ajax db_photo_submit).
+ * submission — now in photo-submit.js.
  * DB_CONFIG (api_base, ajax_url, nonce, region) is localized by functions.php.
  */
 (function () {
@@ -13,7 +13,6 @@
     initContactForm();
     initVolunteerForm();
     initSightingReportForm();
-    initPhotoSubmitForm();
   });
 
   /**
@@ -37,6 +36,8 @@
       return DB_CONFIG.nonce;
     }
   }
+  // The photo form has its own script (photo-submit.js), and needs this too.
+  window.dbFreshNonce = freshNonce;
 
   function initHamburger() {
     const ham = document.querySelector('.hamburger');
@@ -167,81 +168,6 @@
         if (globalError) globalError.textContent = 'Network error. Please try again or email info@deccanbirders.org';
         btn.disabled = false;
         btn.textContent = 'Submit';
-      }
-    });
-  }
-
-  /**
-   * Photograph submission. Sends the file with the rest of the fields;
-   * the server stores it as a pending Gallery entry for a committee
-   * member to publish. The dropzone shows the chosen filename so people
-   * can tell the upload took.
-   */
-  function initPhotoSubmitForm() {
-    const form = document.querySelector('#db-photo-submit-form');
-    if (!form || typeof DB_CONFIG === 'undefined') return;
-
-    const fileInput = form.querySelector('input[type=file]');
-    const dropzone = form.querySelector('.dropzone');
-    const MAX_BYTES = 10 * 1024 * 1024;
-
-    if (fileInput && dropzone) {
-      const label = dropzone.querySelector('div');
-      fileInput.addEventListener('change', () => {
-        const file = fileInput.files[0];
-        if (label) label.textContent = file ? file.name : 'Drop a JPEG here, or browse';
-      });
-    }
-
-    function showError(message) {
-      let el = form.querySelector('.form-error-global');
-      if (!el) {
-        el = document.createElement('p');
-        el.className = 'form-error-global field-error';
-        form.insertBefore(el, form.querySelector('[type=submit]'));
-      }
-      el.textContent = message;
-    }
-
-    form.addEventListener('submit', async (e) => {
-      e.preventDefault();
-      const btn = form.querySelector('[type=submit]');
-      showError('');
-
-      const file = fileInput && fileInput.files[0];
-      if (!file) { showError('Please choose a JPEG photograph.'); return; }
-      if (!/\.jpe?g$/i.test(file.name) || (file.type && file.type !== 'image/jpeg')) {
-        showError('Please choose a JPEG (.jpg) photograph.');
-        return;
-      }
-      if (file.size > MAX_BYTES) { showError('That file is over 10 MB. Please send a smaller JPEG.'); return; }
-      if (!form.querySelector('[name=consent]').checked) {
-        showError('Please confirm the photograph is yours to publish.');
-        return;
-      }
-
-      btn.disabled = true;
-      btn.textContent = 'Sending…';
-
-      const data = new FormData(form);
-      data.append('action', 'db_photo_submit');
-      data.append('nonce', await freshNonce());
-
-      try {
-        const res = await fetch(DB_CONFIG.ajax_url, { method: 'POST', body: data });
-        const json = await res.json();
-        if (json.success) {
-          form.innerHTML = '<div class="form-success"><p>Thank you — your photograph has been sent for review. ' +
-            'You will hear back within about a week.</p></div>';
-        } else {
-          showError(json.message || 'Something went wrong. Please email photos@deccanbirders.org');
-          btn.disabled = false;
-          btn.textContent = 'Send for approval';
-        }
-      } catch (err) {
-        showError('Network error. Please try again, or email photos@deccanbirders.org');
-        btn.disabled = false;
-        btn.textContent = 'Send for approval';
       }
     });
   }

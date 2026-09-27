@@ -10,7 +10,7 @@
 
 if (!defined('ABSPATH')) exit;
 
-const DB_GALLERY_DB_VERSION = 1;
+const DB_GALLERY_DB_VERSION = 2;
 const DB_REVIEW_CAP = 'db_review_photos';
 
 /* -----------------------------------------------------------------------
@@ -25,6 +25,11 @@ function db_member_emails_table() {
 function db_species_table() {
   global $wpdb;
   return $wpdb->prefix . 'db_species';
+}
+
+function db_photo_log_table() {
+  global $wpdb;
+  return $wpdb->prefix . 'db_photo_log';
 }
 
 /**
@@ -62,6 +67,23 @@ function db_gallery_install() {
   KEY common_name (common_name),
   KEY species_code (species_code)
 ) $charset;");
+
+  // One row per submission, kept when the photo is rejected or deleted:
+  // the submission limits count every submission, whatever became of it.
+  dbDelta('CREATE TABLE ' . db_photo_log_table() . " (
+  id bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  post_id bigint(20) unsigned NOT NULL DEFAULT 0,
+  email varchar(191) NOT NULL,
+  species_id bigint(20) unsigned NOT NULL DEFAULT 0,
+  is_member tinyint(1) NOT NULL DEFAULT 0,
+  species_cap_reached tinyint(1) NOT NULL DEFAULT 0,
+  submitted_at datetime NOT NULL,
+  PRIMARY KEY  (id),
+  KEY email_time (email,submitted_at),
+  KEY species_time (species_id,submitted_at),
+  KEY post_id (post_id)
+) $charset;");
+  db_photo_log_backfill();
 
   update_option('db_gallery_db_version', DB_GALLERY_DB_VERSION);
 }
@@ -215,7 +237,9 @@ function db_gallery_settings_page() {
   <div class="wrap">
     <h1>Submission settings</h1>
     <p>The rules for the "Submit a photograph" form on the Gallery page.</p>
-    <?php settings_errors('db_gallery_settings'); ?>
+    <?php // All slugs: WordPress files its "Settings saved." under 'general',
+    // and only shows it by itself on the Settings menu's own pages.
+    settings_errors(); ?>
     <form method="post" action="options.php">
       <?php settings_fields('db_gallery_settings'); ?>
       <table class="form-table" role="presentation">
