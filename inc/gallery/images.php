@@ -18,6 +18,18 @@
 if (!defined('ABSPATH')) exit;
 
 /**
+ * Record a step of a run being traced (the Photo processing screen traces
+ * each photo it reprocesses). Saved as it goes, so if a request dies the
+ * screen can show the last step it reached.
+ */
+function db_photo_step($label) {
+  global $db_photo_trace;
+  if (!is_array($db_photo_trace)) return;
+  $db_photo_trace['steps'][] = [$label, round((microtime(true) - $db_photo_trace['t0']) * 1000)];
+  update_option('db_photo_last_run', $db_photo_trace, false);
+}
+
+/**
  * Process one image file into $dest_dir. Returns ['path', 'name', 'mime',
  * 'report'] or a WP_Error. The report records the before and after.
  */
@@ -25,6 +37,10 @@ function db_photo_process($src, $dest_dir) {
   $max_edge = db_gallery_setting('max_edge_px');
   $quality  = db_gallery_setting('image_quality');
   $name     = 'db-photo-' . bin2hex(random_bytes(8));
+
+  // One thread: multi-threaded ImageMagick is a known cause of hung
+  // requests under PHP on shared hosting.
+  if (extension_loaded('imagick')) Imagick::setResourceLimit(Imagick::RESOURCETYPE_THREAD, 1);
 
   try {
     $result = extension_loaded('imagick')
@@ -34,6 +50,7 @@ function db_photo_process($src, $dest_dir) {
     return new WP_Error('image', 'That photograph could not be processed: ' . $e->getMessage());
   }
   if (is_wp_error($result)) return $result;
+  db_photo_step('image processed');
 
   // Belt and braces: never keep a file that still carries a location.
   if (db_photo_has_location($result['path'])) {
@@ -76,6 +93,7 @@ function db_photo_orient(Imagick $im) {
 
 function db_photo_process_imagick($src, $dest_dir, $name, $max_edge, $quality) {
   $im = new Imagick($src);
+  db_photo_step('original read');
   if ($im->getNumberImages() > 1) { // an animated WebP/PNG: keep the first frame
     $im->setIteratorIndex(0);
     $im = $im->getImage();
@@ -137,6 +155,7 @@ function db_photo_process_imagick($src, $dest_dir, $name, $max_edge, $quality) {
   $ext  = $out === 'webp' ? 'webp' : 'jpg';
   $path = trailingslashit($dest_dir) . $name . '.' . $ext;
   $im->writeImage($path);
+  db_photo_step('processed copy written');
   $after = ['bytes' => filesize($path), 'width' => $im->getImageWidth(), 'height' => $im->getImageHeight(), 'format' => strtoupper($out)];
   $im->clear();
 
@@ -210,6 +229,7 @@ function db_photo_store($src, $post_id, $title) {
 
   $done = db_photo_process($src, get_temp_dir());
   if (is_wp_error($done)) return $done;
+  db_photo_step('location check passed');
 
   // Sideload moves the processed file into uploads/ and makes the sizes.
   $attachment_id = media_handle_sideload(['name' => $done['name'], 'tmp_name' => $done['path']], $post_id, $title);
@@ -217,6 +237,7 @@ function db_photo_store($src, $post_id, $title) {
     @unlink($done['path']);
     return $attachment_id;
   }
+  db_photo_step('added to media library, sizes made');
   update_post_meta($attachment_id, '_db_processed', $done['report']);
   update_post_meta($post_id, '_db_image', $done['report']);
   return $attachment_id;
@@ -243,32 +264,42 @@ function db_photo_unprocessed() {
   }));
 }
 
-function db_photo_process_existing() {
-  $rows = [];
-  foreach (db_photo_unprocessed() as $p) {
-    $old  = (int) get_post_meta($p->ID, 'photo', true);
-    $file = function_exists('wp_get_original_image_path') ? wp_get_original_image_path($old) : get_attached_file($old);
-    if (!$file || !file_exists($file)) {
-      $rows[] = ['post' => $p, 'error' => 'the file is missing'];
-      continue;
-    }
-    // Work on a copy: the sideload moves its input, and the original
-    // goes with its attachment below.
-    $copy = wp_tempnam(basename($file));
-    copy($file, $copy);
-    $new = db_photo_store($copy, $p->ID, get_the_title($old) ?: get_field('species_name', $p->ID));
-    @unlink($copy);
-    if (is_wp_error($new)) {
-      $rows[] = ['post' => $p, 'error' => $new->get_error_message()];
-      continue;
-    }
-    update_field('field_gallery_photo', $new, $p->ID);
-    if (get_post_thumbnail_id($p->ID) === $old) set_post_thumbnail($p->ID, $new);
-    wp_delete_attachment($old, true);
-    $rows[] = ['post' => $p, 'report' => get_post_meta($new, '_db_processed', true)];
+/**
+ * Replace one photo stored before processing with a processed copy, and
+ * delete the original with all its sizes. One per request, traced, so a
+ * slow or failing photo is found on its own.
+ */
+function db_photo_process_one(WP_Post $p) {
+  global $db_photo_trace;
+  @set_time_limit(120);
+  $db_photo_trace = ['post' => $p->ID, 'title' => get_the_title($p), 'started' => current_time('mysql'), 't0' => microtime(true), 'steps' => [], 'finished' => false];
+  db_photo_step('started');
+
+  $old  = (int) get_post_meta($p->ID, 'photo', true);
+  $file = function_exists('wp_get_original_image_path') ? wp_get_original_image_path($old) : get_attached_file($old);
+  if (!$old || !$file || !file_exists($file)) return ['post' => $p, 'error' => 'the file is missing'];
+
+  // Work on a copy: the sideload moves its input, and the original goes
+  // with its attachment below.
+  $copy = wp_tempnam(basename($file));
+  copy($file, $copy);
+  db_photo_step('original copied (' . db_bytes(filesize($copy)) . ')');
+  $new = db_photo_store($copy, $p->ID, get_the_title($old) ?: get_field('species_name', $p->ID));
+  @unlink($copy);
+  if (is_wp_error($new)) {
+    db_photo_step('failed: ' . $new->get_error_message());
+    return ['post' => $p, 'error' => $new->get_error_message()];
   }
+
+  update_field('field_gallery_photo', $new, $p->ID);
+  if (get_post_thumbnail_id($p->ID) === $old) set_post_thumbnail($p->ID, $new);
+  wp_delete_attachment($old, true);
+  db_photo_step('original and its sizes deleted');
   if (class_exists('LiteSpeed\Purge')) LiteSpeed\Purge::purge_all();
-  return $rows;
+
+  $db_photo_trace['finished'] = true;
+  db_photo_step('done');
+  return ['post' => $p, 'report' => get_post_meta($new, '_db_processed', true)];
 }
 
 add_action('admin_menu', function() {
@@ -285,10 +316,12 @@ add_action('admin_menu', function() {
 function db_photo_processing_page() {
   if (!current_user_can('manage_options')) return;
   $rows = null;
-  if (isset($_POST['db_process_existing']) && check_admin_referer('db_process_existing')) {
-    $rows = db_photo_process_existing();
+  if (isset($_POST['db_process_one']) && check_admin_referer('db_process_one')) {
+    $post = get_post((int) $_POST['db_process_one']);
+    if ($post && $post->post_type === 'db_gallery_photo') $rows = [db_photo_process_one($post)];
   }
   $pending = db_photo_unprocessed();
+  $last    = get_option('db_photo_last_run');
   ?>
   <div class="wrap">
     <h1>Photo processing</h1>
@@ -302,6 +335,16 @@ function db_photo_processing_page() {
       <?php db_photo_report_table($rows); ?>
     <?php endif; ?>
 
+    <?php if (is_array($last) && !empty($last['steps'])): ?>
+      <div class="notice notice-<?php echo $last['finished'] ? 'info' : 'warning'; ?> inline" style="margin:16px 0">
+        <p><strong>Last run:</strong> <?php echo esc_html($last['title']); ?>, started <?php echo esc_html($last['started']); ?> —
+          <?php echo $last['finished'] ? 'finished.' : '<strong>did not finish</strong>; it stopped after the last step below.'; ?></p>
+        <ol style="margin-left:20px"><?php foreach ($last['steps'] as [$label, $ms]): ?>
+          <li><?php echo esc_html($label); ?> <span class="description">(<?php echo esc_html(number_format($ms / 1000, 1)); ?> s)</span></li>
+        <?php endforeach; ?></ol>
+      </div>
+    <?php endif; ?>
+
     <h2>Photos stored before processing</h2>
     <?php if (!$pending): ?>
       <p>None — every gallery photo has been processed.</p>
@@ -309,10 +352,26 @@ function db_photo_processing_page() {
       <p><?php echo esc_html(sprintf(
         _n('%d photo was stored as uploaded: full size, with its metadata.', '%d photos were stored as uploaded: full size, with their metadata.', count($pending)),
         count($pending)
-      )); ?> Processing replaces each with a processed copy and deletes the original.</p>
+      )); ?> Processing replaces one with a processed copy and deletes the original. One photo at a time.</p>
       <form method="post">
-        <?php wp_nonce_field('db_process_existing'); ?>
-        <button class="button button-primary" name="db_process_existing" value="1">Process <?php echo count($pending); ?> photo<?php echo count($pending) === 1 ? '' : 's'; ?></button>
+        <?php wp_nonce_field('db_process_one'); ?>
+        <table class="widefat striped" style="max-width:900px">
+          <thead><tr><th>Photo</th><th>Stored file</th><th></th></tr></thead>
+          <tbody>
+          <?php foreach ($pending as $p):
+            $att  = (int) get_post_meta($p->ID, 'photo', true);
+            $file = function_exists('wp_get_original_image_path') ? wp_get_original_image_path($att) : get_attached_file($att);
+            $meta = wp_get_attachment_metadata($att); ?>
+            <tr>
+              <td><a href="<?php echo esc_url(get_edit_post_link($p)); ?>"><?php echo esc_html(get_the_title($p)); ?></a></td>
+              <td><?php echo $file && file_exists($file)
+                ? esc_html(sprintf('%s · %d×%d · %s', basename($file), $meta['width'] ?? 0, $meta['height'] ?? 0, db_bytes(filesize($file))))
+                : '<span style="color:#b32d2e">file missing</span>'; ?></td>
+              <td><button class="button" name="db_process_one" value="<?php echo (int) $p->ID; ?>">Process</button></td>
+            </tr>
+          <?php endforeach; ?>
+          </tbody>
+        </table>
       </form>
     <?php endif; ?>
 
