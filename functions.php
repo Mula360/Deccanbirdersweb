@@ -222,6 +222,30 @@ add_filter('wp_nav_menu_objects', function($items) {
   }));
 });
 
+/**
+ * Addresses from the site this theme replaced, so old links, bookmarks
+ * and search results land somewhere sensible instead of a 404. Pages that
+ * moved go to their new home; the old site's field trip and bird race
+ * posts, and its category archives, go to Events. Only a request that
+ * would otherwise 404 is redirected.
+ */
+add_action('template_redirect', function() {
+  if (!is_404()) return;
+  $path = trim((string) parse_url($_SERVER['REQUEST_URI'] ?? '', PHP_URL_PATH), '/');
+  $moved = [
+    '46-2'                => '/about/',
+    'about-us'            => '/about/',
+    'aims-and-objectives' => '/aims/',
+    'executive-committee' => '/committee/',
+    'activities'          => '/about/#activities',
+  ];
+  if (isset($moved[$path])) $to = $moved[$path];
+  elseif (preg_match('#^(category/|[a-z0-9-]*(field-trip|bird-race|outstation-trip)[a-z0-9-]*$)#', $path)) $to = '/events/';
+  else return;
+  wp_safe_redirect(home_url($to), 301);
+  exit;
+});
+
 /* -----------------------------------------------------------------------
  * 5. ACF options page
  * ---------------------------------------------------------------------*/
