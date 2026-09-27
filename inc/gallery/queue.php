@@ -103,6 +103,7 @@ function db_queue_act($post_id, $action, $reason = '', $note = '') {
 
 function db_queue_handle_post() {
   if ($_SERVER['REQUEST_METHOD'] !== 'POST' || !current_user_can(DB_REVIEW_CAP)) return [];
+  if (isset($_POST['db_expiry_run'])) return []; // the expiry box handles its own form
   check_admin_referer('db_queue');
   $notices = [];
 
@@ -126,6 +127,7 @@ function db_queue_handle_post() {
 
 function db_queue_page() {
   if (!current_user_can(DB_REVIEW_CAP)) return;
+  $expiry  = db_expiry_handle_post();
   $notices = db_queue_handle_post();
 
   $tabs = ['pending' => 'Pending', 'publish' => 'Published', 'db_rejected' => 'Rejected', 'db_archived' => 'Archived'];
@@ -144,6 +146,7 @@ function db_queue_page() {
   ?>
   <div class="wrap db-queue">
     <h1>Photo review</h1>
+    <?php db_expiry_status_box($expiry); ?>
     <?php foreach ($notices as [$kind, $msg]): ?>
       <div class="notice notice-<?php echo esc_attr($kind); ?> is-dismissible"><p><?php echo esc_html($msg); ?></p></div>
     <?php endforeach; ?>
@@ -190,8 +193,10 @@ function db_queue_page() {
               <?php endforeach; ?>
               <?php if ($status !== 'pending'): ?><tr><th>Decision</th><td><?php echo esc_html(ucfirst(db_photo_decision_text($id))); ?>
                 <?php if (is_array($d) && !empty($d['reason'])): ?><br><em><?php echo esc_html($d['reason']); ?></em><?php endif; ?></td></tr><?php endif; ?>
-              <?php if ($exp): ?><tr><th>Leaves the gallery</th><td><?php echo esc_html(wp_date('j F Y', $exp)); ?>
-                (<?php echo esc_html(max(0, (int) ceil(($exp - current_time('timestamp')) / DAY_IN_SECONDS))); ?> days)</td></tr><?php endif; ?>
+              <?php if ($exp): $left = (int) ceil(($exp - current_time('timestamp')) / DAY_IN_SECONDS); ?><tr><th>Leaves the gallery</th><td>
+                <?php echo $left > 0
+                  ? esc_html(wp_date('j F Y', $exp) . ' (' . sprintf(_n('%d day', '%d days', $left), $left) . ')')
+                  : 'At the next daily check (its time was up on ' . esc_html(wp_date('j F Y', $exp)) . ')'; ?></td></tr><?php endif; ?>
               <?php if (is_array($arch)): ?><tr><th>Archived</th><td><?php echo esc_html(($arch['why'] === 'expired' ? 'Expired' : 'Removed by ' . (get_userdata((int) $arch['user'])->display_name ?? 'a reviewer')) . ' on ' . mysql2date('j F Y', $arch['at'])); ?></td></tr><?php endif; ?>
             </table>
 

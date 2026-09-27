@@ -10,7 +10,7 @@
 
 if (!defined('ABSPATH')) exit;
 
-const DB_GALLERY_DB_VERSION = 3;
+const DB_GALLERY_DB_VERSION = 4;
 const DB_REVIEW_CAP = 'db_review_photos';
 
 /* -----------------------------------------------------------------------
@@ -112,6 +112,10 @@ function db_gallery_install() {
   UNIQUE KEY token_hash (token_hash),
   KEY post_id (post_id)
 ) $charset;");
+
+  // Photos published before approval dates were recorded start their
+  // time in the gallery now.
+  db_expiry_backfill();
 
   update_option('db_gallery_db_version', DB_GALLERY_DB_VERSION);
 }
