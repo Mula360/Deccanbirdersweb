@@ -527,6 +527,11 @@ add_action('admin_notices', function() {
   );
 });
 
+// Photo submissions: settings, member list, species list (inc/gallery/).
+require_once __DIR__ . '/inc/gallery/setup.php';
+require_once __DIR__ . '/inc/gallery/member-emails.php';
+require_once __DIR__ . '/inc/gallery/species.php';
+
 /* -----------------------------------------------------------------------
  * 7b. Photograph submissions
  *
