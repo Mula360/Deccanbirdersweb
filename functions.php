@@ -2512,3 +2512,40 @@ function db_encode_society_emails($html) {
   }
   return implode('', $parts);
 }
+
+/* -----------------------------------------------------------------------
+ * 16. Favicon
+ *
+ * The icons ship with the theme (assets/img/favicon/), so a fresh install
+ * shows them with nothing to set up. A Site Icon chosen in wp-admin
+ * (Appearance → Customize → Site Identity) takes over, and these stand
+ * aside. /favicon.ico, which browsers ask for on their own, is sent to
+ * the 32 px icon rather than to WordPress's logo.
+ * -------------------------------------------------------------------- */
+
+function db_favicon_url($file) {
+  return get_template_directory_uri() . '/assets/img/favicon/' . $file;
+}
+
+function db_favicon_tags() {
+  if (has_site_icon()) return;
+  $icons = [
+    ['icon', '32x32', 'favicon-32.png'],
+    ['icon', '16x16', 'favicon-16.png'],
+    ['apple-touch-icon', '180x180', 'apple-touch-icon.png'],
+    ['icon', '192x192', 'favicon-192.png'],
+  ];
+  foreach ($icons as [$rel, $sizes, $file]) {
+    printf('<link rel="%s"%s sizes="%s" href="%s">' . "\n",
+      esc_attr($rel), $rel === 'icon' ? ' type="image/png"' : '', esc_attr($sizes), esc_url(db_favicon_url($file)));
+  }
+}
+add_action('wp_head', 'db_favicon_tags', 2);
+add_action('admin_head', 'db_favicon_tags');
+add_action('login_head', 'db_favicon_tags');
+
+add_action('do_faviconico', function() {
+  if (has_site_icon()) return; // WordPress sends it to the Site Icon itself
+  wp_redirect(db_favicon_url('favicon-32.png'), 301);
+  exit;
+});
