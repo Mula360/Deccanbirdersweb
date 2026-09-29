@@ -2479,3 +2479,36 @@ add_filter('rest_endpoints', function($endpoints) {
   unset($endpoints['/wp/v2/users'], $endpoints['/wp/v2/users/(?P<id>[\d]+)']);
   return $endpoints;
 });
+
+/* -----------------------------------------------------------------------
+ * 15. Society email addresses on public pages
+ *
+ * Every @deccanbirders.org address in a page goes out as character
+ * references (&#105;&#110;…), which browsers show and follow as the plain
+ * address. On a Hostinger temporary domain, Hostinger swaps the real
+ * domain for the temporary one in everything it serves, which turned
+ * info@deccanbirders.org into info@<temporary domain> on screen; encoded,
+ * there is nothing for it to swap. It also keeps the addresses from most
+ * spam harvesters. Scripts and styles are left alone, since references
+ * are not decoded there; wp-admin, feeds, AJAX and the REST API are not
+ * touched.
+ * -------------------------------------------------------------------- */
+
+add_action('template_redirect', function() {
+  if (is_admin() || wp_doing_ajax() || is_feed() || (defined('REST_REQUEST') && REST_REQUEST)) return;
+  ob_start('db_encode_society_emails');
+}, 0);
+
+function db_encode_society_emails($html) {
+  if (stripos($html, '@deccanbirders.org') === false) return $html;
+  $parts = preg_split('#(<script\b.*?</script>|<style\b.*?</style>)#is', $html, -1, PREG_SPLIT_DELIM_CAPTURE);
+  foreach ($parts as $i => $part) {
+    if ($i % 2) continue; // a script or style block, kept as it is
+    $parts[$i] = preg_replace_callback(
+      '/[A-Za-z0-9._%+-]+@deccanbirders\.org\b/i',
+      fn($m) => db_attr_literal($m[0]),
+      $part
+    );
+  }
+  return implode('', $parts);
+}
