@@ -1,0 +1,6 @@
+<Files xmlrpc.php>
+Require all denied
+</Files>
+<FilesMatch "^(readme\.html|license\.txt)$">
+Require all denied
+</FilesMatch>

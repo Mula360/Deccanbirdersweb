@@ -54,7 +54,7 @@ add_action('wp_enqueue_scripts', function() {
 
   // Sightings JS — load on sightings page and front page
   if (is_front_page() || is_page('sightings')) {
-    wp_enqueue_script('db-sightings', get_template_directory_uri() . '/assets/js/sightings.js', ['db-bird-loader'], $v, true);
+    wp_enqueue_script('db-sightings', get_template_directory_uri() . '/assets/js/sightings.js', ['db-bird-loader', 'wp-i18n'], $v, true);
   }
   // Events JS — load on events page and front page
   if (is_front_page() || is_page('events')) {
@@ -2444,3 +2444,38 @@ function db_lists_page() {
   </script>
   <?php
 }
+
+/* -----------------------------------------------------------------------
+ * 14. Hardening
+ *
+ * XML-RPC is an old remote-publishing route nothing on this site uses,
+ * and a favourite target for password guessing, so it is switched off
+ * and no longer advertised. Login names are not handed out either: the
+ * author archives (/?author=1 → /author/<login>/) send visitors home,
+ * and the REST API's user list is only there for signed-in users (the
+ * block editor needs it). The web server can also refuse xmlrpc.php
+ * outright — see docs/htaccess-security.txt.
+ * -------------------------------------------------------------------- */
+
+add_filter('xmlrpc_enabled', '__return_false');
+
+add_filter('wp_headers', function($headers) {
+  unset($headers['X-Pingback']);
+  return $headers;
+});
+
+// Priority 1: ahead of WordPress's own redirect_canonical, which would
+// otherwise first send /?author=1 on to /author/<login>/ and so give the
+// login name away in that redirect.
+add_action('template_redirect', function() {
+  if (is_author() || isset($_GET['author'])) {
+    wp_safe_redirect(home_url('/'), 301);
+    exit;
+  }
+}, 1);
+
+add_filter('rest_endpoints', function($endpoints) {
+  if (is_user_logged_in()) return $endpoints;
+  unset($endpoints['/wp/v2/users'], $endpoints['/wp/v2/users/(?P<id>[\d]+)']);
+  return $endpoints;
+});

@@ -39,6 +39,20 @@ function db_smtp_setting($name) {
   return $v !== '' ? $v : db_smtp_fields()[$name][1];
 }
 
+/**
+ * A value written into the page as character references (&#105;&#110;…),
+ * which the browser shows and submits as the plain text. On a host's
+ * temporary address, Hostinger swaps the real domain for the temporary
+ * one in every page it serves — inside form fields too — so a saved
+ * info@deccanbirders.org came back as info@<temporary domain> and was
+ * stored that way on the next save. Encoded, there is nothing to swap.
+ */
+function db_attr_literal($value) {
+  $out = '';
+  foreach (mb_str_split((string) $value) as $ch) $out .= '&#' . mb_ord($ch) . ';';
+  return $out;
+}
+
 function db_smtp_password_set() {
   return defined('DB_SMTP_PASS') && DB_SMTP_PASS;
 }
@@ -192,7 +206,7 @@ function db_mail_page() {
         Add this line to <code>wp-config.php</code>, above "That's all, stop editing":<br>
         <code>define('DB_SMTP_PASS', 'the mailbox password');</code></p></div>
     <?php else: ?>
-      <div class="notice notice-success inline"><p>SMTP password is set in wp-config.php. Email is sent through <strong><?php echo esc_html(db_smtp_setting('host')); ?></strong> as <strong><?php echo esc_html(db_smtp_setting('from_email')); ?></strong>.</p></div>
+      <div class="notice notice-success inline"><p>SMTP password is set in wp-config.php. Email is sent through <strong><?php echo db_attr_literal(db_smtp_setting('host')); ?></strong> as <strong><?php echo db_attr_literal(db_smtp_setting('from_email')); ?></strong>.</p></div>
     <?php endif; ?>
 
     <?php settings_errors(); ?>
@@ -205,7 +219,7 @@ function db_mail_page() {
           <tr>
             <th scope="row"><label for="db-smtp-<?php echo esc_attr($k); ?>"><?php echo esc_html($label); ?></label></th>
             <td><input id="db-smtp-<?php echo esc_attr($k); ?>" type="text" class="regular-text" name="db_smtp_settings[<?php echo esc_attr($k); ?>]"
-                       value="<?php echo esc_attr($stored); ?>" placeholder="<?php echo esc_attr($default); ?>">
+                       value="<?php echo db_attr_literal($stored); ?>" placeholder="<?php echo db_attr_literal($default); ?>">
               <?php if ($hint): ?><p class="description"><?php echo esc_html($hint); ?></p><?php endif; ?></td>
           </tr>
         <?php endforeach; ?>

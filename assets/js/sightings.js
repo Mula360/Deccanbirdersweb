@@ -45,6 +45,18 @@ function showSkeleton(id, message) {
   if (el && window.DB && DB.birdLoader) el.innerHTML = DB.birdLoader(message || 'Fetching the latest checklists…');
 }
 
+/**
+ * "1 bird", "6 birds". eBird leaves the count out when the observer only
+ * noted the species as present, so anything that is not a number keeps
+ * the plural ("? birds").
+ */
+function birdCount(count) {
+  const n = Number(count);
+  const i18n = window.wp && window.wp.i18n;
+  if (!Number.isFinite(n) || !i18n) return String(count) + (n === 1 ? ' bird' : ' birds');
+  return i18n.sprintf(i18n._n('%d bird', '%d birds', n, 'deccan-birders'), n);
+}
+
 function escapeHtml(str) {
   const div = document.createElement('div');
   div.textContent = str == null ? '' : String(str);
@@ -102,7 +114,7 @@ function renderSightingCard(r, extra = '') {
       <div class="sighting-when">${timeAgo(r.when)}</div>
     </div>
     <div class="sighting-chips">
-      <span class="chip chip-green">${escapeHtml(String(r.count))} birds</span>
+      <span class="chip chip-green">${escapeHtml(birdCount(r.count))}</span>
       <span class="chip chip-blue">${escapeHtml(r.status)}</span>
     </div>
     ${extra}

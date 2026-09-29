@@ -136,7 +136,10 @@ $issue_data = function($issue) {
            title="<?php echo esc_attr($d['title']); ?>">
           <div class="frame">
             <?php if ($d['cover']): ?>
-              <img class="cover" src="<?php echo esc_url($d['cover']); ?>" alt="" loading="lazy" decoding="async" width="300" height="400">
+              <img class="cover" src="<?php echo esc_url($d['cover']); ?>" alt="<?php echo esc_attr(sprintf(
+                /* translators: %s: the issue, e.g. "July 2015" or "July 2015, part 2" */
+                __('PITTA newsletter cover – %s', 'deccan-birders'),
+                $months[$m] . ' ' . $year . ($d['is_part'] ? ', part ' . $d['part'] : ''))); ?>" loading="lazy" decoding="async" width="300" height="400">
             <?php else: ?>
               <span class="cover cover--none" aria-hidden="true"><?php echo esc_html($months[$m]); ?></span>
             <?php endif; ?>
@@ -154,7 +157,10 @@ $issue_data = function($issue) {
          title="<?php echo esc_attr($d['title']); ?>">
         <div class="cover">
           <?php if ($d['cover']): ?>
-            <img src="<?php echo esc_url($d['cover']); ?>" alt="" loading="lazy" decoding="async">
+            <img src="<?php echo esc_url($d['cover']); ?>" alt="<?php echo esc_attr(sprintf(
+              /* translators: %s: the special issue, e.g. "Talakona special, November 2015" */
+              __('PITTA newsletter cover – %s', 'deccan-birders'),
+              $special['name'] . ' special, ' . $months[$special['month']] . ' ' . $year)); ?>" loading="lazy" decoding="async">
           <?php endif; ?>
           <div class="shade" aria-hidden="true"></div>
           <span class="tag"><?php esc_html_e('SPECIAL ISSUE', 'deccan-birders'); ?></span>
