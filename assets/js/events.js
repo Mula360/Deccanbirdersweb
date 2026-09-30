@@ -557,53 +557,73 @@ function showHeroStats(events) {
 }
 
 /**
- * The photos from past trips, one at a time. Arrows, dots and a nudge
- * every few seconds — which stops as soon as somebody takes control, so
- * it never fights the reader.
+ * The photos from past trips: a strip of tiles that drifts along one
+ * tile every few seconds and wraps round at the end. The drift pauses
+ * while the pointer or keyboard focus is on the strip, and stops for good
+ * once somebody moves it themselves, so it never fights the reader. The
+ * arrows show only when the strip runs past the screen.
  */
-function initTripGallery() {
-  const track = document.getElementById('trip-gallery-track');
-  if (!track) return;
-  const slides = Array.from(track.children);
-  if (!slides.length) return;
+function initTripStrip() {
+  const strip = document.getElementById('trip-strip');
+  const arrows = document.getElementById('trip-strip-arrows');
+  if (!strip) return;
 
-  const dotsWrap = document.getElementById('trip-gallery-dots');
-  const counter = document.getElementById('trip-gallery-counter');
-  const arrows = Array.from(document.querySelectorAll('.trip-arrow'));
-  let index = 0;
+  const overflows = () => strip.scrollWidth > strip.clientWidth + 8;
+  const step = () => {
+    const tile = strip.querySelector('img');
+    return tile ? Math.round(tile.getBoundingClientRect().width + 12) : 220;
+  };
+
+  // By `tiles` tiles; past either end, round to the other.
+  function move(tiles) {
+    const max = strip.scrollWidth - strip.clientWidth - 2;
+    let to = strip.scrollLeft + step() * tiles;
+    if (tiles > 0 && strip.scrollLeft >= max) to = 0;
+    else if (tiles < 0 && strip.scrollLeft <= 2) to = max + 2;
+    const from = strip.scrollLeft;
+    strip.scrollLeft = to;
+    // Some environments ignore smooth scrolling; jump if nothing moved.
+    setTimeout(() => {
+      if (strip.scrollLeft === from && to !== from) {
+        strip.style.scrollBehavior = 'auto';
+        strip.scrollLeft = to;
+        strip.style.scrollBehavior = '';
+      }
+    }, 220);
+  }
+
   let timer = null;
+  let paused = false;
+  const stop = () => { clearInterval(timer); timer = null; };
 
-  const dots = slides.map((_, i) => {
-    const dot = document.createElement('button');
-    dot.type = 'button';
-    dot.className = 'trip-dot';
-    dot.setAttribute('aria-label', `Photo ${i + 1}`);
-    dot.addEventListener('click', () => { stop(); show(i); });
-    if (dotsWrap) dotsWrap.appendChild(dot);
-    return dot;
-  });
-
-  function show(next) {
-    index = (next + slides.length) % slides.length;
-    track.style.transform = `translateX(-${index * 100}%)`;
-    dots.forEach((d, i) => d.classList.toggle('is-active', i === index));
-    slides.forEach((s, i) => s.setAttribute('aria-hidden', String(i !== index)));
-    if (counter) counter.textContent = `${index + 1} / ${slides.length}`;
+  if (arrows) {
+    arrows.querySelectorAll('.trip-arrow').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        stop();
+        const perClick = Math.max(1, Math.floor(strip.clientWidth / step()) - 1);
+        move(perClick * Number(btn.dataset.step));
+      });
+    });
   }
+  // A swipe, a trackpad or the keyboard: the reader has taken over.
+  ['touchstart', 'wheel', 'keydown'].forEach((type) => strip.addEventListener(type, stop, { passive: true }));
+  strip.addEventListener('mouseenter', () => { paused = true; });
+  strip.addEventListener('mouseleave', () => { paused = false; });
+  strip.addEventListener('focusin', () => { paused = true; });
+  strip.addEventListener('focusout', () => { paused = false; });
 
-  function stop() {
-    if (timer) clearInterval(timer);
-    timer = null;
+  function layout() {
+    const long = overflows();
+    if (arrows) arrows.hidden = !long;
+    if (!long) stop();
   }
+  window.addEventListener('resize', layout);
+  layout();
 
-  arrows.forEach((btn) => btn.addEventListener('click', () => {
-    stop();
-    show(index + Number(btn.dataset.step));
-  }));
-
-  show(0);
-  if (slides.length > 1 && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
-    timer = setInterval(() => show(index + 1), 6000);
+  if (overflows() && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    timer = setInterval(() => {
+      if (!paused && !document.hidden && overflows()) move(1);
+    }, 3500);
   }
 }
 
@@ -628,7 +648,7 @@ function initEventsTabSwitching() {
 
 document.addEventListener('DOMContentLoaded', () => {
   initEventsTabSwitching();
-  initTripGallery();
+  initTripStrip();
   initHomeEvents();
   initHomePastEvents();
   initEventsPage();

@@ -4,22 +4,16 @@
  *
  * Follows the Events redesign: a hero carrying two live counts, a pill
  * tab pair, then the cards themselves (assets/js/events.js renders those
- * from /wp-json/db/v1/events), and a carousel of photos from past trips.
+ * from /wp-json/db/v1/events), and a strip of photos from past trips.
  *
- * The carousel comes from the Trip Photos post type — Trip Photos → Add
- * New, set the featured image — and the whole section is left out while
+ * The strip comes from Trip Photos (one entry per trip, several photos
+ * each: inc/trip-photos.php), and the whole section is left out while
  * there are none.
  */
 get_header();
 while (have_posts()) : the_post();
 
-$trip_photos = get_posts([
-  'post_type'      => 'db_trip_photo',
-  'posts_per_page' => 12,
-  'post_status'    => 'publish',
-  'orderby'        => ['menu_order' => 'ASC', 'date' => 'DESC'],
-]);
-$gallery_page = get_page_by_path('gallery');
+$trip_photos = db_trip_strip_photos();
 ?>
 
 <section class="events-hero">
@@ -57,47 +51,29 @@ $gallery_page = get_page_by_path('gallery');
 </div>
 
 <?php if ($trip_photos): ?>
-<section class="trip-gallery">
-  <div class="trip-gallery-head">
+<section class="home-section trip-gallery">
+  <div class="section-head">
     <div>
       <span class="eyebrow eyebrow--lede" style="color:var(--blue);">From past trips</span>
       <h2 class="section-h2">Field notes in pictures</h2>
     </div>
-    <?php if (count($trip_photos) > 1): ?>
-      <div class="trip-gallery-arrows">
-        <button type="button" class="trip-arrow" data-step="-1" aria-label="Previous photo">←</button>
-        <button type="button" class="trip-arrow trip-arrow--dark" data-step="1" aria-label="Next photo">→</button>
-      </div>
-    <?php endif; ?>
-  </div>
-
-  <div class="trip-gallery-frame">
-    <div class="trip-gallery-track" id="trip-gallery-track">
-      <?php foreach ($trip_photos as $i => $photo):
-        $thumb_id = get_post_thumbnail_id($photo->ID);
-        if (!$thumb_id) continue;
-      ?>
-        <div class="trip-slide" role="group" aria-roledescription="slide"
-             aria-label="<?php printf(esc_attr__('Photo %1$d of %2$d', 'deccan-birders'), $i + 1, count($trip_photos)); ?>">
-          <?php echo wp_get_attachment_image($thumb_id, 'large', false, [
-            'alt'      => $photo->post_title,
-            'loading'  => $i === 0 ? 'eager' : 'lazy',
-            'decoding' => 'async',
-            'sizes'    => '(max-width: 900px) 100vw, 1160px',
-          ]); ?>
-        </div>
-      <?php endforeach; ?>
+    <!-- events.js shows these only when the strip runs past the screen,
+         and moves the strip along by itself until someone uses them. -->
+    <div class="strip-arrows" id="trip-strip-arrows" hidden>
+      <button type="button" class="trip-arrow" data-step="-1" aria-label="<?php esc_attr_e('Earlier photos', 'deccan-birders'); ?>">←</button>
+      <button type="button" class="trip-arrow trip-arrow--dark" data-step="1" aria-label="<?php esc_attr_e('More photos', 'deccan-birders'); ?>">→</button>
     </div>
   </div>
-
-  <div class="trip-gallery-foot">
-    <div class="trip-dots" id="trip-gallery-dots"></div>
-    <p class="trip-gallery-count">
-      <span id="trip-gallery-counter">1 / <?php echo count($trip_photos); ?></span>
-      <?php if ($gallery_page): ?>
-        · <a href="<?php echo esc_url(get_permalink($gallery_page)); ?>">Open the full gallery</a>
-      <?php endif; ?>
-    </p>
+  <div class="trip-strip" id="trip-strip" tabindex="0" aria-label="<?php esc_attr_e('Photos from past trips', 'deccan-birders'); ?>">
+    <?php foreach ($trip_photos as $i => [$id, $alt]): ?>
+      <?php // Tiles the size of the home page's: at most about 215 px wide. ?>
+      <?php echo wp_get_attachment_image($id, 'medium_large', false, [
+        'alt'      => $alt,
+        'loading'  => $i < 6 ? 'eager' : 'lazy',
+        'decoding' => 'async',
+        'sizes'    => '(max-width: 560px) 50vw, 215px',
+      ]); ?>
+    <?php endforeach; ?>
   </div>
 </section>
 <?php endif; ?>

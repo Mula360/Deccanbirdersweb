@@ -175,22 +175,23 @@ add_action('init', function() {
     'rewrite'   => ['slug' => 'gallery'],
   ]);
 
-  // Photos from past trips, for the carousel at the foot of the Events
-  // page. Deliberately its own menu item rather than a field buried in a
-  // page, so "add the photos from Sunday" is one obvious place to go. The
-  // featured image is the photo; the title only describes it for screen
-  // readers.
+  // Photos from past trips, for the strip at the foot of the Events page.
+  // Deliberately its own menu item rather than a field buried in a page,
+  // so "add the photos from Sunday" is one obvious place to go. One entry
+  // per trip, holding all its photos (inc/trip-photos.php); the title
+  // names the trip and stands in as the photos' alt text.
   register_post_type('db_trip_photo', [
     'labels'    => [
       'name'          => 'Trip Photos',
-      'singular_name' => 'Trip Photo',
-      'add_new_item'  => 'Add Trip Photo',
-      'edit_item'     => 'Edit Trip Photo',
+      'singular_name' => 'Trip',
+      'add_new'       => 'Add trip',
+      'add_new_item'  => 'Add trip photos',
+      'edit_item'     => 'Edit trip photos',
       'menu_name'     => 'Trip Photos',
     ],
     'public'    => false,
     'show_ui'   => true,
-    'supports'  => ['title', 'thumbnail', 'page-attributes'],
+    'supports'  => ['title', 'page-attributes'],
     'menu_icon' => 'dashicons-images-alt2',
   ]);
 
@@ -542,6 +543,9 @@ require_once __DIR__ . '/inc/gallery/review.php';
 require_once __DIR__ . '/inc/gallery/queue.php';
 require_once __DIR__ . '/inc/gallery/expiry.php';
 require_once __DIR__ . '/inc/gallery/submissions.php';
+
+// Trip Photos: several photos per trip, for the Events page strip.
+require_once __DIR__ . '/inc/trip-photos.php';
 
 /* -----------------------------------------------------------------------
  * 7b. Photograph submissions
