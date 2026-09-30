@@ -1,10 +1,11 @@
 <?php
 /**
- * [db_photo_gallery] — masonry of Gallery photos (db_gallery_photo CPT).
+ * [db_photo_gallery] — grid of Gallery photos (db_gallery_photo CPT).
  *
- * Design: CSS-columns masonry of bordered white cards, each a figure with
- * the species as the title, the location beneath it, and the photographer
- * credit on its own rule-separated line. Clicking a card opens a lightbox
+ * Design: an even grid of bordered white cards, as the videos use, each a
+ * figure with the photo cropped to 4:3, the species as the title, the
+ * location beneath it, and the photographer credit on its own
+ * rule-separated line at the foot of the card. Clicking a card opens a lightbox
  * (an addition to the design, but it stays out of the way until used).
  *
  * Paged at 24 a page via ?photos=N, so a growing gallery never loads every
