@@ -34,7 +34,7 @@ while (have_posts()) : the_post();
     if ($u) $collage[] = $u;
   }
 
-  $gallery_photos = get_posts(['post_type' => 'db_gallery_photo', 'posts_per_page' => 5, 'post_status' => 'publish']);
+  $gallery_photos = get_posts(['post_type' => 'db_gallery_photo', 'posts_per_page' => 12, 'post_status' => 'publish']);
 ?>
 
 <section class="hero-photo hero-photo--home">
@@ -176,10 +176,17 @@ while (have_posts()) : the_post();
     <?php if ($gallery_photos): ?>
       <?php foreach ($gallery_photos as $photo):
         $im = get_field('photo', $photo->ID);
-        if (!$im) continue;
-        $src = $im['sizes']['large'] ?? $im['url'];
+        $im_id = is_array($im) ? (int) ($im['ID'] ?? 0) : (int) $im;
+        if (!$im_id) continue;
       ?>
-        <img src="<?php echo esc_url($src); ?>" alt="<?php echo esc_attr(get_field('species_name', $photo->ID)); ?>" loading="lazy">
+        <?php // srcset + sizes: a tile is at most about 200 px wide, so the
+              // browser fetches a copy near that size, not the 1024 px one,
+              // twelve times over. ?>
+        <?php echo wp_get_attachment_image($im_id, 'medium_large', false, [
+          'alt'     => get_field('species_name', $photo->ID),
+          'loading' => 'lazy',
+          'sizes'   => '(max-width: 560px) 50vw, (max-width: 1100px) 25vw, 200px',
+        ]); ?>
       <?php endforeach; ?>
     <?php else: ?>
       <?php for ($i = 0; $i < 5; $i++): ?>
