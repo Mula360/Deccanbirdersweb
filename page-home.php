@@ -170,22 +170,30 @@ while (have_posts()) : the_post();
 <section class="home-section home-section--gallery">
   <div class="section-head">
     <h2 class="section-h2">From members' cameras</h2>
-    <a href="/gallery" class="text-link">Full gallery →</a>
+    <div class="section-head-tools">
+      <a href="/gallery" class="text-link">Full gallery →</a>
+      <!-- One row that scrolls sideways; events.js shows these only when
+           it runs past the screen, and drifts it along until they are used. -->
+      <div class="strip-arrows" id="home-gallery-arrows" hidden>
+        <button type="button" class="trip-arrow" data-step="-1" aria-label="<?php esc_attr_e('Earlier photographs', 'deccan-birders'); ?>">←</button>
+        <button type="button" class="trip-arrow trip-arrow--dark" data-step="1" aria-label="<?php esc_attr_e('More photographs', 'deccan-birders'); ?>">→</button>
+      </div>
+    </div>
   </div>
-  <div class="gallery-strip">
+  <div class="gallery-strip" id="home-gallery-strip">
     <?php if ($gallery_photos): ?>
       <?php foreach ($gallery_photos as $photo):
         $im = get_field('photo', $photo->ID);
         $im_id = is_array($im) ? (int) ($im['ID'] ?? 0) : (int) $im;
         if (!$im_id) continue;
       ?>
-        <?php // srcset + sizes: a tile is at most about 200 px wide, so the
+        <?php // srcset + sizes: a tile is at most about 215 px wide, so the
               // browser fetches a copy near that size, not the 1024 px one,
               // twelve times over. ?>
         <?php echo wp_get_attachment_image($im_id, 'medium_large', false, [
           'alt'     => get_field('species_name', $photo->ID),
           'loading' => 'lazy',
-          'sizes'   => '(max-width: 560px) 50vw, (max-width: 1100px) 25vw, 200px',
+          'sizes'   => '(max-width: 560px) 45vw, 215px',
         ]); ?>
       <?php endforeach; ?>
     <?php else: ?>

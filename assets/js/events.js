@@ -557,21 +557,21 @@ function showHeroStats(events) {
 }
 
 /**
- * The photos from past trips: a strip of tiles that drifts along one
- * tile every few seconds and wraps round at the end. The drift pauses
- * while the pointer or keyboard focus is on the strip, and stops for good
- * once somebody moves it themselves, so it never fights the reader. The
- * arrows show only when the strip runs past the screen.
+ * A row of photos that scrolls sideways: the home page's "From members'
+ * cameras" and the Events page's trip photos. It drifts along one tile
+ * every few seconds and wraps round at the end. The drift pauses while
+ * the pointer or keyboard focus is on the row, and stops for good once
+ * somebody moves it themselves, so it never fights the reader. The arrows
+ * show only when the row runs past the screen. Returns a function that
+ * stops the drift.
  */
-function initTripStrip() {
-  const strip = document.getElementById('trip-strip');
-  const arrows = document.getElementById('trip-strip-arrows');
-  if (!strip) return;
+function initPhotoStrip(strip, arrows) {
+  if (!strip) return () => {};
 
   const overflows = () => strip.scrollWidth > strip.clientWidth + 8;
   const step = () => {
-    // Tiles differ in width with their photos' shapes; the first stands in.
-    const tile = strip.querySelector('.trip-tile');
+    // Tiles may differ in width with their photos' shapes; the first stands in.
+    const tile = strip.firstElementChild;
     return tile ? Math.round(tile.getBoundingClientRect().width + 12) : 220;
   };
 
@@ -620,13 +620,21 @@ function initTripStrip() {
   }
   window.addEventListener('resize', layout);
   layout();
-  initTripViewer(strip, stop);
 
   if (overflows() && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
     timer = setInterval(() => {
       if (!paused && !document.hidden && overflows()) move(1);
     }, 3500);
   }
+  return stop;
+}
+
+/** The Events page's trip photos: the row, plus the viewer a click opens. */
+function initTripStrip() {
+  const strip = document.getElementById('trip-strip');
+  if (!strip) return;
+  const stop = initPhotoStrip(strip, document.getElementById('trip-strip-arrows'));
+  initTripViewer(strip, stop);
 }
 
 /**
@@ -704,6 +712,7 @@ function initEventsTabSwitching() {
 document.addEventListener('DOMContentLoaded', () => {
   initEventsTabSwitching();
   initTripStrip();
+  initPhotoStrip(document.getElementById('home-gallery-strip'), document.getElementById('home-gallery-arrows'));
   initHomeEvents();
   initHomePastEvents();
   initEventsPage();

@@ -3145,9 +3145,34 @@ body.lightbox-open { overflow: hidden; }
 .home-otd-species { display: block; font-family: var(--font-head); font-size: 16px; font-weight: 600; letter-spacing: -0.015em; color: #fff; line-height: 1.25; }
 .home-otd-loc { display: block; margin-top: 3px; font-size: 14px; color: rgba(255, 255, 255, 0.7); }
 
-.gallery-strip { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px; }
-.gallery-strip img { width: 100%; height: clamp(160px, 20vw, 230px); object-fit: cover; border-radius: 12px; }
-.gallery-strip .img-placeholder { height: clamp(160px, 20vw, 230px); min-height: 0; border-radius: 12px; }
+/* "From members' cameras": one row of even tiles that scrolls sideways,
+   moved by the arrows beside the heading, a swipe, or events.js's drift. */
+.gallery-strip {
+  display: flex;
+  gap: 12px;
+  overflow-x: auto;
+  scroll-behavior: smooth;
+  overscroll-behavior-x: contain;
+  scroll-snap-type: x proximity;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  margin: 0 -20px;
+  padding: 2px 20px 4px;
+  scroll-padding: 0 20px;
+}
+.gallery-strip::-webkit-scrollbar { display: none; }
+.gallery-strip > img, .gallery-strip > .img-placeholder {
+  flex: 0 0 clamp(150px, 19vw, 215px);
+  width: clamp(150px, 19vw, 215px);
+  height: clamp(160px, 20vw, 230px);
+  min-height: 0;
+  object-fit: cover;
+  border-radius: 12px;
+  scroll-snap-align: start;
+}
+.section-head-tools { display: flex; align-items: center; gap: 18px; }
+@media (prefers-reduced-motion: reduce) { .gallery-strip { scroll-behavior: auto; } }
 
 /* -------------------------------------------------------------------------
    Photo review page — opened from a reviewer's email (inc/gallery/review.php)
