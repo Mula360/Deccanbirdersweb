@@ -761,12 +761,14 @@ function db_proxy_headers() {
  * cache in front of the API (keyed on the full URL, so an extra throwaway
  * parameter misses it). The fresh answer is then cached as usual.
  */
-function db_proxy_fetch($path, WP_REST_Request $request, array $allowed_params, $ttl, $fresh = false) {
+function db_proxy_fetch($path, WP_REST_Request $request, array $allowed_params, $ttl, $fresh = false, array $extra = []) {
   $query = [];
   foreach ($allowed_params as $param) {
     $val = $request->get_param($param);
     if ($val !== null && $val !== '') $query[$param] = $val;
   }
+  // Set by the site, never by the visitor: e.g. the calendar version below.
+  $query = $extra + $query;
   ksort($query);
   $cache_key = 'db_proxy_' . md5($path . '?' . http_build_query($query));
 
@@ -1350,7 +1352,7 @@ add_action('rest_api_init', function() {
       // A finished trip never changes, so past events can sit for hours;
       // an upcoming one gets edited up to the morning of the walk.
       $ttl = $request->get_param('scope') === 'past' ? 6 * HOUR_IN_SECONDS : 15 * MINUTE_IN_SECONDS;
-      $res = db_proxy_fetch('/api/events', $request, ['scope'], $ttl);
+      $res = db_proxy_fetch('/api/events', $request, ['scope'], $ttl, false, db_events_version());
       if (!empty($res['data']) && is_array($res['data'])) {
         foreach ($res['data'] as &$event) {
           $event['coordinators'] = db_event_coordinators($event['note'] ?? '');
@@ -2578,14 +2580,25 @@ add_action('do_faviconico', function() {
  * can take up to half a day to show. This screen fetches both lists fresh.
  * ---------------------------------------------------------------------*/
 
-/** Fetch upcoming and past events fresh. Returns [scope => response]. */
+/**
+ * The calendar version, sent to the API with every events request. The
+ * Vercel edge cache keys on the full URL, so a new version is a new URL
+ * that no stale copy can answer; the site's own cache keys on it too.
+ */
+function db_events_version() {
+  $v = (int) get_option('db_events_version', 0);
+  return $v ? ['v' => $v] : [];
+}
+
+/** Start a new calendar version and fetch both lists under it. Returns [scope => response]. */
 function db_events_refresh() {
+  update_option('db_events_version', time(), false);
   $out = [];
   foreach (['upcoming' => null, 'past' => 'past'] as $label => $scope) {
     $request = new WP_REST_Request('GET', '/db/v1/events');
     if ($scope) $request->set_param('scope', $scope);
     $ttl = $scope === 'past' ? 6 * HOUR_IN_SECONDS : 15 * MINUTE_IN_SECONDS;
-    $out[$label] = db_proxy_fetch('/api/events', $request, ['scope'], $ttl, true);
+    $out[$label] = db_proxy_fetch('/api/events', $request, ['scope'], $ttl, true, db_events_version());
   }
   return $out;
 }
@@ -2622,7 +2635,8 @@ function db_events_refresh_page() {
             <tbody>
             <?php foreach ($res['data'] as $e): ?>
               <tr>
-                <td><?php echo esc_html(wp_date('j M Y', strtotime($e['date'] ?? ''))); ?></td>
+                <td><?php // The date as the calendar wrote it, in its own time zone. ?>
+                  <?php echo esc_html(date('j M Y', strtotime(substr((string) ($e['date'] ?? ''), 0, 10)))); ?></td>
                 <td><?php echo esc_html($e['title'] ?? ''); ?></td>
                 <td><?php echo esc_html($e['place'] ?? ''); ?></td>
               </tr>
