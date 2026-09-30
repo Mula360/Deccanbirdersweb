@@ -756,7 +756,12 @@ function db_proxy_headers() {
   return $secret ? ['x-db-key' => $secret] : [];
 }
 
-function db_proxy_fetch($path, WP_REST_Request $request, array $allowed_params, $ttl) {
+/**
+ * $fresh skips both caches: this site's transient, and the Vercel edge
+ * cache in front of the API (keyed on the full URL, so an extra throwaway
+ * parameter misses it). The fresh answer is then cached as usual.
+ */
+function db_proxy_fetch($path, WP_REST_Request $request, array $allowed_params, $ttl, $fresh = false) {
   $query = [];
   foreach ($allowed_params as $param) {
     $val = $request->get_param($param);
@@ -765,10 +770,11 @@ function db_proxy_fetch($path, WP_REST_Request $request, array $allowed_params, 
   ksort($query);
   $cache_key = 'db_proxy_' . md5($path . '?' . http_build_query($query));
 
-  $cached = get_transient($cache_key);
+  $cached = $fresh ? false : get_transient($cache_key);
   if ($cached !== false) return $cached;
 
-  $url = db_api_base() . $path . (($query) ? ('?' . http_build_query($query)) : '');
+  $upstream = $fresh ? $query + ['fresh' => time()] : $query;
+  $url = db_api_base() . $path . (($upstream) ? ('?' . http_build_query($upstream)) : '');
   // Country-wide "recent" pulls (used as the base for the notable/IUCN
   // filter, see below) can return a large payload, so allow a bit more
   // time than a typical small proxied request.
@@ -2563,3 +2569,72 @@ add_action('do_faviconico', function() {
   wp_redirect(db_favicon_url('favicon-32.png'), 301);
   exit;
 });
+
+/* -----------------------------------------------------------------------
+ * Events → Refresh from calendar
+ *
+ * Trips come from Google Calendar and are cached (past ones for hours, on
+ * this site and on the Vercel API), so a trip just added to the calendar
+ * can take up to half a day to show. This screen fetches both lists fresh.
+ * ---------------------------------------------------------------------*/
+
+/** Fetch upcoming and past events fresh. Returns [scope => response]. */
+function db_events_refresh() {
+  $out = [];
+  foreach (['upcoming' => null, 'past' => 'past'] as $label => $scope) {
+    $request = new WP_REST_Request('GET', '/db/v1/events');
+    if ($scope) $request->set_param('scope', $scope);
+    $ttl = $scope === 'past' ? 6 * HOUR_IN_SECONDS : 15 * MINUTE_IN_SECONDS;
+    $out[$label] = db_proxy_fetch('/api/events', $request, ['scope'], $ttl, true);
+  }
+  return $out;
+}
+
+add_action('admin_menu', function() {
+  add_submenu_page('edit.php?post_type=db_event', 'Refresh from calendar', 'Refresh from calendar', 'edit_pages', 'db-events-refresh', 'db_events_refresh_page');
+});
+
+function db_events_refresh_page() {
+  if (!current_user_can('edit_pages')) return;
+  $result = null;
+  if (isset($_POST['db_events_refresh']) && check_admin_referer('db_events_refresh')) {
+    $result = db_events_refresh();
+    if (class_exists('LiteSpeed\Purge')) LiteSpeed\Purge::purge_all();
+  }
+  ?>
+  <div class="wrap">
+    <h1>Refresh events from Google Calendar</h1>
+    <p style="max-width:720px">The Events page and the home page read the society's Google Calendar and keep a copy for a while, past trips for up to half a day. After adding or changing a trip in the calendar, press the button to show it on the site now.</p>
+    <form method="post">
+      <?php wp_nonce_field('db_events_refresh'); ?>
+      <p><button class="button button-primary" name="db_events_refresh" value="1">Refresh now</button></p>
+    </form>
+    <?php if ($result): ?>
+      <?php foreach ($result as $label => $res): ?>
+        <h2 style="margin-top:24px"><?php echo $label === 'past' ? 'Past trips (last 12 months)' : 'Upcoming trips'; ?></h2>
+        <?php if (!empty($res['error'])): ?>
+          <div class="notice notice-error inline"><p>Could not read the calendar: <?php echo esc_html($res['message'] ?? 'unknown error'); ?></p></div>
+        <?php elseif (empty($res['data'])): ?>
+          <p>None in the calendar.</p>
+        <?php else: ?>
+          <table class="widefat striped" style="max-width:900px">
+            <thead><tr><th style="width:140px">Date</th><th>Title</th><th>Place</th></tr></thead>
+            <tbody>
+            <?php foreach ($res['data'] as $e): ?>
+              <tr>
+                <td><?php echo esc_html(wp_date('j M Y', strtotime($e['date'] ?? ''))); ?></td>
+                <td><?php echo esc_html($e['title'] ?? ''); ?></td>
+                <td><?php echo esc_html($e['place'] ?? ''); ?></td>
+              </tr>
+            <?php endforeach; ?>
+            </tbody>
+          </table>
+        <?php endif; ?>
+      <?php endforeach; ?>
+      <?php if (!array_filter($result, fn($r) => !empty($r['error']))): ?>
+        <p style="margin-top:16px">The site now shows these. Reload the Events page to see them.</p>
+      <?php endif; ?>
+    <?php endif; ?>
+  </div>
+  <?php
+}
