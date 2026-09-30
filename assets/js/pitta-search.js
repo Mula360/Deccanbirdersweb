@@ -96,7 +96,7 @@
       const wanted = urls && urls.length ? new Set(urls) : null;
       panels.forEach((panel) => {
         let anyInYear = false;
-        panel.querySelectorAll('.issue[href], .special[href]').forEach((a) => {
+        panel.querySelectorAll('.issue[href]:not(.gap), .special[href]').forEach((a) => {
           const match = !wanted || wanted.has(a.href);
           a.classList.toggle('dim', !match);
           if (match) anyInYear = true;
@@ -109,7 +109,7 @@
       // Jump to the first year holding a match, so one is on screen.
       if (wanted) {
         const firstHit = panels.find((p) =>
-          Array.from(p.querySelectorAll('.issue[href], .special[href]')).some((a) => wanted.has(a.href)));
+          Array.from(p.querySelectorAll('.issue[href]:not(.gap), .special[href]')).some((a) => wanted.has(a.href)));
         if (firstHit) showYear(firstHit.dataset.year);
       }
     }

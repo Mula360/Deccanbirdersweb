@@ -1842,8 +1842,38 @@ body.lightbox-open { overflow: hidden; }
    issue still to come, another for one that never appeared. */
 .pitta-section .gap .frame { border-style: dashed; background: var(--surface); }
 .pitta-section .gap--soon .frame { border-color: #C6D8CB; }
-.pitta-section .gap .cover { opacity: 0.92; }
 .pitta-section .gap .cap { color: #6B857A; font-weight: 500; }
+
+/* A month with no issue: real text over the plate's illustration (sharp
+   at any size), sized to the tile with container units. Colours are the
+   plates' own. The tile opens the full plate in .plate-dialog. */
+.pitta-section .gap { cursor: zoom-in; }
+/* The frame is the container, so the plate's own padding can use cqw too. */
+.pitta-section .gap .frame { container-type: inline-size; }
+.pitta-section .plate {
+  position: relative; display: flex; flex-direction: column; aspect-ratio: 3 / 4; overflow: hidden;
+  padding: 9cqw 8cqw 0; border-radius: 4px; background: #EDE0CA; color: #1F3B2F;
+}
+.pitta-section .plate-kicker { font-family: var(--font-head); font-size: clamp(9px, 7cqw, 12px); font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; }
+.pitta-section .plate-title { margin-top: 5cqw; font-family: var(--font-head); font-size: clamp(15px, 13cqw, 24px); font-weight: 700; line-height: 1.05; color: #6B5A48; }
+.pitta-section .gap--soon .plate-title { color: #C4552B; }
+.pitta-section .plate-sub { margin-top: 3cqw; font-size: clamp(10px, 7.5cqw, 13px); line-height: 1.25; color: #2A7F8C; }
+.pitta-section .plate-art { margin: auto -8cqw 0; width: calc(100% + 16cqw); max-width: none; height: auto; display: block;
+  -webkit-mask-image: linear-gradient(to bottom, transparent 0, #000 22%); mask-image: linear-gradient(to bottom, transparent 0, #000 22%); }
+.pitta-section .gap .frame { transition: border-color 150ms; }
+.pitta-section .gap:hover .frame, .pitta-section .gap:focus-visible .frame { border-color: var(--blue); }
+
+/* Centred explicitly: the theme's reset (* { margin: 0 }) removes the
+   auto margins browsers centre a modal dialog with. */
+.plate-dialog { position: fixed; inset: 0; margin: auto; width: fit-content; height: fit-content;
+  padding: 0; border: 0; border-radius: 12px; background: transparent; max-width: min(92vw, 560px); overflow: visible; }
+.plate-dialog::backdrop { background: rgba(22, 36, 29, 0.78); }
+.plate-dialog img { display: block; width: 100%; height: auto; max-height: 88vh; object-fit: contain; border-radius: 12px; }
+.plate-dialog-close {
+  position: absolute; top: -14px; right: -14px; width: 36px; height: 36px; border-radius: 50%;
+  border: 0; background: #fff; color: var(--ink); font-size: 18px; cursor: pointer; box-shadow: 0 2px 8px rgba(0,0,0,0.25);
+}
+@media (max-width: 560px) { .plate-dialog-close { top: 8px; right: 8px; } }
 /* Dimmed while a search narrows the grid. */
 .pitta-section .dim { opacity: 0.35; }
 

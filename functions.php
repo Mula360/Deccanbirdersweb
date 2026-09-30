@@ -1588,6 +1588,16 @@ function db_pitta_cover_url($catalog_key) {
     : '';
 }
 
+/**
+ * A plate for a month with no issue (assets/img/<name>.jpg), versioned by
+ * the file's date: the plates keep their names when they are redrawn, so
+ * without it browsers and the CDN would go on showing the old ones.
+ */
+function db_pitta_plate_url($name) {
+  $file = '/assets/img/' . $name . '.jpg';
+  return add_query_arg('ver', (string) @filemtime(get_template_directory() . $file), get_template_directory_uri() . $file);
+}
+
 function db_pitta_title($year, $month, $edition) {
   $when = db_pitta_months()[(int) $month] . ' ' . $year;
   $special = db_pitta_special_name($edition);

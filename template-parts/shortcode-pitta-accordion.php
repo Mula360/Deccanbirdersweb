@@ -114,24 +114,30 @@ $issue_data = function($issue) {
         // things, each with its own plate.
         $awaited = db_pitta_is_awaited($year, $m);
         $plate   = $awaited ? 'pitta-coming-soon' : 'pitta-not-published';
+        $state   = $awaited ? __('Coming soon', 'deccan-birders') : __('Not published', 'deccan-birders');
+        $label   = sprintf(
+          /* translators: 1: month, 2: year */
+          $awaited ? __('%1$s %2$s — coming soon', 'deccan-birders') : __('%1$s %2$s — not published', 'deccan-birders'),
+          $months[$m], $year);
       ?>
-        <div class="issue gap<?php echo $awaited ? ' gap--soon' : ''; ?>">
+        <?php // The words are real text over the plate's illustration, so they
+              // stay sharp at tile size; the link opens the whole plate. ?>
+        <a class="issue gap<?php echo $awaited ? ' gap--soon' : ''; ?>" href="<?php echo esc_url(db_pitta_plate_url($plate . '-full')); ?>"
+           data-plate aria-label="<?php echo esc_attr(sprintf(
+             /* translators: %s: e.g. "September 2026 — coming soon" */
+             __('%s. See the full notice', 'deccan-birders'), $label)); ?>">
           <div class="frame">
-            <img class="cover" src="<?php
-              // Versioned by the file's date: the plates keep their names
-              // when they are redrawn, so without it browsers and the CDN
-              // would go on showing the old ones.
-              $plate_file = '/assets/img/' . $plate . '.jpg';
-              echo esc_url(add_query_arg('ver', (string) @filemtime(get_template_directory() . $plate_file), get_template_directory_uri() . $plate_file));
-            ?>"
-                 alt="<?php echo esc_attr(sprintf(
-                   /* translators: 1: month, 2: year */
-                   $awaited ? __('%1$s %2$s — coming soon', 'deccan-birders') : __('%1$s %2$s — not published', 'deccan-birders'),
-                   $months[$m], $year)); ?>"
-                 loading="lazy" decoding="async" width="600" height="803">
+            <div class="plate">
+              <span class="plate-kicker">PITTA · <?php echo esc_html(mb_substr($months[$m], 0, 3) . ' ' . $year); ?></span>
+              <span class="plate-title"><?php echo esc_html($state); ?></span>
+              <span class="plate-sub"><?php echo $awaited
+                ? esc_html__('Stalking the colourful ghost', 'deccan-birders')
+                : esc_html__('Digging for lost gems', 'deccan-birders'); ?></span>
+              <img class="plate-art" src="<?php echo esc_url(db_pitta_plate_url($plate . '-art')); ?>" alt="" loading="lazy" decoding="async" width="560" height="<?php echo $awaited ? 404 : 350; ?>">
+            </div>
           </div>
           <div class="cap"><?php echo esc_html($months[$m]); ?></div>
-        </div>
+        </a>
       <?php else:
         foreach ($in_month as $issue):
           $d = $issue_data($issue);
@@ -180,6 +186,30 @@ $issue_data = function($issue) {
   </div>
 </div>
 <?php endforeach; ?>
+
+<?php // The full plate for a month with no issue, opened from its tile. ?>
+<dialog class="plate-dialog" id="pitta-plate-dialog" aria-label="<?php esc_attr_e('PITTA notice', 'deccan-birders'); ?>">
+  <button type="button" class="plate-dialog-close" aria-label="<?php esc_attr_e('Close', 'deccan-birders'); ?>">✕</button>
+  <img src="" alt="">
+</dialog>
+<script>
+(function () {
+  var dialog = document.getElementById('pitta-plate-dialog');
+  if (!dialog || typeof dialog.showModal !== 'function') return; // the link opens the image instead
+  var img = dialog.querySelector('img');
+  document.addEventListener('click', function (e) {
+    var a = e.target.closest && e.target.closest('a[data-plate]');
+    if (!a) return;
+    e.preventDefault();
+    img.src = a.href;
+    img.alt = a.getAttribute('aria-label') || '';
+    dialog.showModal();
+  });
+  dialog.querySelector('.plate-dialog-close').addEventListener('click', function () { dialog.close(); });
+  // A click on the dimmed backdrop, outside the picture, closes it too.
+  dialog.addEventListener('click', function (e) { if (e.target === dialog) dialog.close(); });
+})();
+</script>
 
 <div class="foot" id="pitta-foot">
   <button type="button" class="btn btn-ghost" data-step="-1">‹ <?php esc_html_e('Newer', 'deccan-birders'); ?></button>
