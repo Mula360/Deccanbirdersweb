@@ -7,8 +7,7 @@
  *     left  : "Send us a message" card
  *     right : stacked "Phone and WhatsApp" card + tinted
  *             "Volunteer · Report a sighting" card
- *   Row 2 — full-width "Submit a photograph" card, itself two columns
- *           (notes on the left, form on the right with paired field rows).
+ * Photographs are sent through the form on the Gallery page, not here.
  * There is no join band on this page, per the design's showJoinBand rule.
  */
 get_header();
@@ -137,56 +136,6 @@ while (have_posts()) : the_post();
         <button type="submit" class="btn btn-secondary">Submit</button>
       </form>
     </div>
-  </div>
-</section>
-
-<section class="section-boxed" style="padding: 0 20px clamp(60px,8vw,96px);">
-  <div class="photo-submit-card">
-    <div>
-      <span class="eyebrow" style="color:var(--blue);">Members only</span>
-      <h2 class="card-heading card-heading--xl">Submit a photograph</h2>
-      <p class="card-intro card-intro--flush">Your entry goes to <a href="mailto:photos@deccanbirders.org"><strong>photos@deccanbirders.org</strong></a> for review. Once a committee member approves it, the photograph appears in the gallery credited to you by name.</p>
-      <ul class="submit-notes">
-        <li>Tell us the name you would like the credit to read.</li>
-        <li>One bird per frame, no baiting, no nest photography during breeding.</li>
-        <li>Approvals usually take a week; you'll hear back either way.</li>
-      </ul>
-    </div>
-    <form id="db-photo-submit-form" class="stacked-form" novalidate>
-      <div class="field-row">
-        <label class="stacked-field">
-          <span class="stacked-label">Photographer name</span>
-          <input type="text" name="name" placeholder="As it should be credited" required>
-        </label>
-        <label class="stacked-field">
-          <span class="stacked-label">Email</span>
-          <input type="email" name="email" placeholder="you@example.com" required>
-        </label>
-      </div>
-      <div class="field-row">
-        <label class="stacked-field">
-          <span class="stacked-label">Species</span>
-          <input type="text" name="species" placeholder="e.g. Indian Roller" required>
-        </label>
-        <label class="stacked-field">
-          <span class="stacked-label">Where and when</span>
-          <input type="text" name="location" placeholder="Ameenpur Lake, Sep 2026" required>
-        </label>
-      </div>
-      <label class="stacked-field">
-        <span class="stacked-label">Photograph</span>
-        <div class="dropzone">
-          <div>Drop a JPEG here, or browse</div>
-          <div class="form-hint">Up to 10 MB. Please keep the EXIF data intact.</div>
-          <input type="file" name="photo" accept="image/jpeg" required>
-        </div>
-      </label>
-      <label class="form-checkbox">
-        <input type="checkbox" name="consent" required>
-        I took this photograph and allow Deccan Birders to publish it with my credit.
-      </label>
-      <button type="submit" class="btn btn-primary">Send for approval</button>
-    </form>
   </div>
 </section>
 

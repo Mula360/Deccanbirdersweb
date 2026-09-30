@@ -1493,6 +1493,15 @@ a.events-pager-btn { text-decoration: none; display: inline-block; }
   font-size: 14px;
 }
 .dropzone input[type="file"] { margin-top: 12px; }
+/* A file dragged over the box, and one chosen. */
+.dropzone { transition: border-color 150ms, background 150ms; }
+.dropzone.is-over { border-color: var(--blue); border-style: solid; background: #E8F0FA; color: var(--ink); }
+.dropzone.has-file .dropzone-label { color: var(--ink); font-weight: 600; word-break: break-all; }
+/* The photo form's rows while the thank-you shows; their own display
+   rules would otherwise beat the UA's [hidden]. */
+#db-photo-submit-form > [hidden] { display: none !important; }
+.form-success .form-success-more { margin-top: 12px; }
+.form-success .btn { margin-top: 18px; }
 
 /* -------------------------------------------------------------------------
    Fact / humour cards ([db_bird_fact], [db_birding_joke])

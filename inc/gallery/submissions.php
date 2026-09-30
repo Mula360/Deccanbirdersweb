@@ -266,7 +266,12 @@ function db_handle_photo_submit() {
     'receipt'
   );
 
+  // How many more this address may send now, so the form offers
+  // "Submit another photo" only when there is room for one.
+  $status = db_photo_limit_status($email);
   db_photo_reply(true, 'Thank you — your photograph has been sent for review. You will hear back within about a week.', [
     'species_note' => $cap['reached'] ? db_species_cap_message($cap) : '',
+    'remaining'    => max(0, $status['limit'] - $status['used']),
+    'window_days'  => $status['days'],
   ]);
 }

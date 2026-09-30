@@ -159,12 +159,60 @@
 
   function initFile(form) {
     const input = form.querySelector('input[type=file]');
+    const zone = form.querySelector('.dropzone');
     const label = form.querySelector('.dropzone-label');
     if (!input) return;
-    input.addEventListener('change', function () {
+
+    function describe() {
       const file = input.files[0];
       if (label) label.textContent = file ? file.name : 'Drop a photograph here, or browse';
+      if (zone) zone.classList.toggle('has-file', !!file);
       showError(form, file ? fileProblem(file) : '');
+    }
+    input.addEventListener('change', describe);
+
+    if (!zone) return;
+    // Dragging a file onto the box. A file dropped anywhere else on the
+    // page would otherwise make the browser leave the page to show it.
+    const hasFiles = function (e) { return e.dataTransfer && Array.prototype.indexOf.call(e.dataTransfer.types, 'Files') !== -1; };
+    ['dragover', 'drop'].forEach(function (type) {
+      window.addEventListener(type, function (e) { if (hasFiles(e)) e.preventDefault(); });
+    });
+    let depth = 0; // dragenter/leave fire for every child the pointer crosses
+    zone.addEventListener('dragenter', function (e) {
+      if (!hasFiles(e)) return;
+      e.preventDefault();
+      depth++;
+      zone.classList.add('is-over');
+    });
+    zone.addEventListener('dragover', function (e) {
+      if (!hasFiles(e)) return;
+      e.preventDefault();
+      e.dataTransfer.dropEffect = 'copy';
+    });
+    zone.addEventListener('dragleave', function () {
+      depth = Math.max(0, depth - 1);
+      if (!depth) zone.classList.remove('is-over');
+    });
+    zone.addEventListener('drop', function (e) {
+      if (!hasFiles(e)) return;
+      e.preventDefault();
+      depth = 0;
+      zone.classList.remove('is-over');
+      const file = e.dataTransfer.files[0];
+      if (!file) return;
+      // One photograph per submission: keep the first if several are dropped.
+      try {
+        const dt = new DataTransfer();
+        dt.items.add(file);
+        input.files = dt.files;
+      } catch (err) {
+        input.files = e.dataTransfer.files;
+      }
+      describe();
+      if (e.dataTransfer.files.length > 1) {
+        showError(form, 'One photograph per submission: we kept ' + file.name + '. Send the others one at a time.');
+      }
     });
   }
 
@@ -180,6 +228,72 @@
       form.insertBefore(el, form.querySelector('[type=submit]'));
     }
     el.textContent = message;
+  }
+
+  /**
+   * The thank-you, in place of the form. The form is only hidden, so
+   * "Submit another photo" brings it back ready for the next one, with the
+   * name and email kept. The button shows only while this address still
+   * has room under its limit.
+   */
+  function showDone(form, json, species) {
+    const fields = Array.from(form.children);
+    fields.forEach(function (el) { el.hidden = true; });
+
+    const done = document.createElement('div');
+    done.className = 'form-success';
+    done.setAttribute('role', 'status');
+    const p = document.createElement('p');
+    p.textContent = json.message;
+    done.appendChild(p);
+    if (json.species_note) {
+      const n = document.createElement('p');
+      n.className = 'species-note species-note--cap';
+      n.textContent = json.species_note;
+      done.appendChild(n);
+    }
+
+    const left = typeof json.remaining === 'number' ? json.remaining : 1;
+    if (left > 0) {
+      const more = document.createElement('p');
+      more.className = 'form-success-more';
+      more.textContent = 'You can send ' + left + ' more photograph' + (left === 1 ? '' : 's') +
+        ' in the next ' + json.window_days + ' days.';
+      done.appendChild(more);
+      const again = document.createElement('button');
+      again.type = 'button';
+      again.className = 'btn btn-primary';
+      again.textContent = 'Submit another photo';
+      again.addEventListener('click', function () {
+        done.remove();
+        fields.forEach(function (el) { el.hidden = false; });
+        resetForNext(form, species);
+      });
+      done.appendChild(again);
+    } else if (typeof json.remaining === 'number') {
+      const full = document.createElement('p');
+      full.className = 'form-success-more';
+      full.textContent = 'That was your last photograph for now: the limit is reached for the next ' +
+        json.window_days + ' days.';
+      done.appendChild(full);
+    }
+    form.appendChild(done);
+    done.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+  }
+
+  /** Clear everything but who is sending, ready for the next photograph. */
+  function resetForNext(form, species) {
+    species.reset();
+    form.querySelector('[name=location]').value = '';
+    const file = form.querySelector('input[type=file]');
+    file.value = '';
+    file.dispatchEvent(new Event('change'));
+    form.querySelectorAll('input[type=checkbox]').forEach(function (c) { c.checked = false; });
+    showError(form, '');
+    const btn = form.querySelector('[type=submit]');
+    btn.disabled = false;
+    btn.textContent = 'Send for approval';
+    species.focus();
   }
 
   function initSubmit(form, species) {
@@ -215,18 +329,7 @@
         const res = await fetch(DB_CONFIG.ajax_url, { method: 'POST', body: data });
         const json = await res.json();
         if (json.success) {
-          const done = document.createElement('div');
-          done.className = 'form-success';
-          const p = document.createElement('p');
-          p.textContent = json.message;
-          done.appendChild(p);
-          if (json.species_note) {
-            const n = document.createElement('p');
-            n.className = 'species-note species-note--cap';
-            n.textContent = json.species_note;
-            done.appendChild(n);
-          }
-          form.replaceChildren(done);
+          showDone(form, json, species);
         } else {
           showError(form, json.message || 'Something went wrong. Please email photos@deccanbirders.org');
           btn.disabled = false;
