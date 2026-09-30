@@ -570,7 +570,8 @@ function initTripStrip() {
 
   const overflows = () => strip.scrollWidth > strip.clientWidth + 8;
   const step = () => {
-    const tile = strip.querySelector('img');
+    // Tiles differ in width with their photos' shapes; the first stands in.
+    const tile = strip.querySelector('.trip-tile');
     return tile ? Math.round(tile.getBoundingClientRect().width + 12) : 220;
   };
 
@@ -619,12 +620,66 @@ function initTripStrip() {
   }
   window.addEventListener('resize', layout);
   layout();
+  initTripViewer(strip, stop);
 
   if (overflows() && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
     timer = setInterval(() => {
       if (!paused && !document.hidden && overflows()) move(1);
     }, 3500);
   }
+}
+
+/**
+ * A click on a trip photo shows it large on the same page, in a dialog
+ * with previous/next (buttons, arrow keys or a swipe) and Esc or a click
+ * outside to close. Opening one stops the strip's drift.
+ */
+function initTripViewer(strip, stopDrift) {
+  const dialog = document.getElementById('trip-viewer');
+  if (!dialog || typeof dialog.showModal !== 'function') return; // the links still open the photo
+  const tiles = Array.from(strip.querySelectorAll('.trip-tile'));
+  const img = dialog.querySelector('img');
+  const caption = dialog.querySelector('figcaption');
+  let index = 0;
+
+  function show(i) {
+    index = (i + tiles.length) % tiles.length;
+    const tile = tiles[index];
+    const alt = tile.querySelector('img').alt;
+    img.src = tile.href;
+    img.alt = alt;
+    caption.textContent = tiles.length > 1 ? `${alt} · ${index + 1} of ${tiles.length}` : alt;
+    // Fetch the neighbours now, so stepping on is instant.
+    [index + 1, index - 1].forEach((n) => { new Image().src = tiles[(n + tiles.length) % tiles.length].href; });
+  }
+
+  tiles.forEach((tile, i) => tile.addEventListener('click', (e) => {
+    e.preventDefault();
+    stopDrift();
+    show(i);
+    dialog.showModal();
+  }));
+
+  dialog.querySelectorAll('.trip-viewer-step').forEach((btn) => {
+    btn.addEventListener('click', () => show(index + Number(btn.dataset.step)));
+  });
+  dialog.querySelector('.trip-viewer-close').addEventListener('click', () => dialog.close());
+  // A click on the dimmed backdrop lands on the dialog itself.
+  dialog.addEventListener('click', (e) => { if (e.target === dialog) dialog.close(); });
+  dialog.addEventListener('keydown', (e) => {
+    if (e.key === 'ArrowRight') show(index + 1);
+    if (e.key === 'ArrowLeft') show(index - 1);
+  });
+  let startX = null;
+  dialog.addEventListener('touchstart', (e) => { startX = e.touches[0].clientX; }, { passive: true });
+  dialog.addEventListener('touchend', (e) => {
+    if (startX === null) return;
+    const dx = e.changedTouches[0].clientX - startX;
+    if (Math.abs(dx) > 40 && tiles.length > 1) show(index + (dx < 0 ? 1 : -1));
+    startX = null;
+  }, { passive: true });
+  // Back where the reader was: focus returns to the photo they opened.
+  dialog.addEventListener('close', () => { img.removeAttribute('src'); tiles[index].focus({ preventScroll: true }); });
 }
 
 /* -------------------------------------------------------------------------

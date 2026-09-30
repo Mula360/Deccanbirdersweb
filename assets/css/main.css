@@ -1189,16 +1189,46 @@ body.modal-open { overflow: hidden; }
 }
 .trip-strip::-webkit-scrollbar { display: none; }
 .trip-strip:focus-visible { outline: 2px solid var(--blue); outline-offset: 2px; }
-.trip-strip img {
-  flex: 0 0 clamp(150px, 19vw, 215px);
-  width: clamp(150px, 19vw, 215px);
+/* Each photo keeps its own shape at the home page's tile height, so a
+   group photo is never cropped to a narrow slice; a very wide one is
+   capped and trimmed at the sides. */
+.trip-tile { flex: 0 0 auto; display: block; border-radius: 12px; overflow: hidden; scroll-snap-align: start; cursor: zoom-in; }
+.trip-tile:focus-visible { outline: 2px solid var(--blue); outline-offset: 2px; }
+.trip-tile img {
+  display: block;
   height: clamp(160px, 20vw, 230px);
+  width: auto;
+  max-width: min(80vw, 420px);
   object-fit: cover;
-  border-radius: 12px;
-  scroll-snap-align: start;
+  transition: transform 300ms ease;
+}
+.trip-tile:hover img { transform: scale(1.03); }
+
+/* The photo enlarged, on the same page. Centred explicitly: the theme's
+   reset (* { margin: 0 }) removes a modal dialog's auto margins. */
+.trip-viewer { position: fixed; inset: 0; margin: auto; width: fit-content; height: fit-content;
+  max-width: 94vw; padding: 0; border: 0; background: transparent; overflow: visible; }
+.trip-viewer::backdrop { background: rgba(22, 36, 29, 0.9); }
+.trip-viewer figure { margin: 0; }
+.trip-viewer img { display: block; max-width: 94vw; max-height: 84vh; width: auto; height: auto; border-radius: 12px; }
+.trip-viewer figcaption { margin-top: 10px; color: #fff; font-size: 15px; text-align: center; }
+.trip-viewer-close, .trip-viewer-step {
+  position: absolute; width: 44px; height: 44px; border-radius: 50%; border: 0;
+  background: #fff; color: var(--ink); font-size: 20px; line-height: 1; cursor: pointer;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+.trip-viewer-close { top: -16px; right: -16px; }
+.trip-viewer-step { top: calc(50% - 36px); }
+.trip-viewer-prev { left: -22px; }
+.trip-viewer-next { right: -22px; }
+@media (max-width: 700px) {
+  .trip-viewer-close { top: 8px; right: 8px; }
+  .trip-viewer-prev { left: 8px; }
+  .trip-viewer-next { right: 8px; }
 }
 @media (prefers-reduced-motion: reduce) {
   .trip-strip { scroll-behavior: auto; }
+  .trip-tile img { transition: none; }
   .home-sightings-scroller { scroll-behavior: auto; }
 }
 

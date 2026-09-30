@@ -65,16 +65,36 @@ $trip_photos = db_trip_strip_photos();
     </div>
   </div>
   <div class="trip-strip" id="trip-strip" tabindex="0" aria-label="<?php esc_attr_e('Photos from past trips', 'deccan-birders'); ?>">
-    <?php foreach ($trip_photos as $i => [$id, $alt]): ?>
-      <?php // Tiles the size of the home page's: at most about 215 px wide. ?>
-      <?php echo wp_get_attachment_image($id, 'medium_large', false, [
-        'alt'      => $alt,
-        'loading'  => $i < 6 ? 'eager' : 'lazy',
-        'decoding' => 'async',
-        'sizes'    => '(max-width: 560px) 50vw, 215px',
-      ]); ?>
+    <?php foreach ($trip_photos as $i => [$id, $alt]):
+      // The tile links to the large copy, which trip-strip's viewer opens
+      // on this page (and a browser without scripts simply follows).
+      $large = wp_get_attachment_image_url($id, '2048x2048') ?: wp_get_attachment_image_url($id, 'full');
+    ?>
+      <a class="trip-tile" href="<?php echo esc_url($large); ?>" data-index="<?php echo (int) $i; ?>">
+        <?php // Each photo keeps its own shape at the home page's tile height,
+              // so a group photo is never cropped. Up to about 350 px wide
+              // for a landscape photo: the browser picks the 768 px copy. ?>
+        <?php echo wp_get_attachment_image($id, 'medium_large', false, [
+          'alt'      => $alt,
+          'loading'  => $i < 6 ? 'eager' : 'lazy',
+          'decoding' => 'async',
+          'sizes'    => '(max-width: 560px) 70vw, 360px',
+        ]); ?>
+      </a>
     <?php endforeach; ?>
   </div>
+
+  <dialog class="trip-viewer" id="trip-viewer" aria-label="<?php esc_attr_e('Trip photo', 'deccan-birders'); ?>">
+    <figure>
+      <img alt="">
+      <figcaption></figcaption>
+    </figure>
+    <?php if (count($trip_photos) > 1): ?>
+      <button type="button" class="trip-viewer-step trip-viewer-prev" data-step="-1" aria-label="<?php esc_attr_e('Previous photo', 'deccan-birders'); ?>">←</button>
+      <button type="button" class="trip-viewer-step trip-viewer-next" data-step="1" aria-label="<?php esc_attr_e('Next photo', 'deccan-birders'); ?>">→</button>
+    <?php endif; ?>
+    <button type="button" class="trip-viewer-close" aria-label="<?php esc_attr_e('Close', 'deccan-birders'); ?>">×</button>
+  </dialog>
 </section>
 <?php endif; ?>
 
