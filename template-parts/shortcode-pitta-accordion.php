@@ -117,7 +117,13 @@ $issue_data = function($issue) {
       ?>
         <div class="issue gap<?php echo $awaited ? ' gap--soon' : ''; ?>">
           <div class="frame">
-            <img class="cover" src="<?php echo esc_url(get_template_directory_uri() . '/assets/img/' . $plate . '.jpg'); ?>"
+            <img class="cover" src="<?php
+              // Versioned by the file's date: the plates keep their names
+              // when they are redrawn, so without it browsers and the CDN
+              // would go on showing the old ones.
+              $plate_file = '/assets/img/' . $plate . '.jpg';
+              echo esc_url(add_query_arg('ver', (string) @filemtime(get_template_directory() . $plate_file), get_template_directory_uri() . $plate_file));
+            ?>"
                  alt="<?php echo esc_attr(sprintf(
                    /* translators: 1: month, 2: year */
                    $awaited ? __('%1$s %2$s — coming soon', 'deccan-birders') : __('%1$s %2$s — not published', 'deccan-birders'),
