@@ -276,6 +276,18 @@
       full.textContent = 'That was your last photograph for now: the limit is reached for the next ' +
         json.window_days + ' days.';
       done.appendChild(full);
+      // Not a member: membership is how to send more.
+      if (json.member === false && json.membership_url) {
+        const why = document.createElement('p');
+        why.className = 'form-success-more';
+        why.textContent = 'In order to submit more images, get regular updates and get early access to our Newsletter, become a member.';
+        done.appendChild(why);
+        const join = document.createElement('a');
+        join.className = 'btn btn-primary';
+        join.href = json.membership_url;
+        join.textContent = 'Become a member';
+        done.appendChild(join);
+      }
     }
     form.appendChild(done);
     done.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
