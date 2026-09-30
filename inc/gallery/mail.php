@@ -82,7 +82,33 @@ add_action('phpmailer_init', function($m) {
   foreach ($GLOBALS['db_mail_embeds'] ?? [] as [$path, $cid, $name]) {
     if (is_readable($path)) $m->addEmbeddedImage($path, $cid, $name);
   }
+
+  // Things spam filters hold against a message, even with SPF, DKIM and
+  // DMARC passing: an HTML part with no plain-text twin, and a Message-ID
+  // naming a different domain from the sender's (the site's temporary
+  // Hostinger address, before launch).
+  if ($m->ContentType === 'text/html' && trim($m->AltBody) === '') {
+    $m->AltBody = db_mail_plain_text($m->Body);
+  }
+  $domain = substr(strrchr((string) $m->From, '@'), 1);
+  if ($domain) $m->MessageID = sprintf('<%s@%s>', wp_generate_password(24, false), $domain);
 });
+
+/** The plain-text twin of an HTML email: links spelled out, tags gone. */
+function db_mail_plain_text($html) {
+  $text = preg_replace_callback('#<a\s[^>]*href=(["\'])(.*?)\1[^>]*>(.*?)</a>#is', function($a) {
+    $label = trim(wp_strip_all_tags($a[3]));
+    $url   = html_entity_decode($a[2], ENT_QUOTES);
+    return $label && $label !== $url ? "$label: $url" : $url;
+  }, $html);
+  $text = preg_replace('#<img[^>]*alt=(["\'])(.*?)\1[^>]*>#is', '[$2]', $text);
+  $text = preg_replace('#<li[^>]*>#i', "\n- ", $text);
+  $text = preg_replace('#</(p|div|tr|li|ul|h[1-6])>|</strong>\s*<ul[^>]*>|<br\s*/?>#i', "\n", $text);
+  $text = preg_replace('#</td>#i', "  ", $text);
+  $text = html_entity_decode(wp_strip_all_tags($text), ENT_QUOTES, 'UTF-8');
+  $text = preg_replace("/[ \t]+\n/", "\n", $text);
+  return trim(preg_replace("/\n{3,}/", "\n\n", $text));
+}
 
 /**
  * wp_mail() with images embedded in the message rather than linked, so

@@ -192,6 +192,12 @@ function db_email_button($href, $label, $colour) {
 }
 
 /** Email every reviewer about a new submission: one email each, their own links. */
+/** A reviewer's first name, or their display name if it isn't an email address. */
+function db_reviewer_greeting_name($user) {
+  $name = trim((string) $user->first_name) ?: trim((string) $user->display_name);
+  return is_email($name) || $name === '' ? 'there' : $name;
+}
+
 function db_photo_notify_reviewers($post_id) {
   $flags   = db_photo_flags($post_id);
   $facts   = db_photo_facts($post_id);
@@ -199,13 +205,12 @@ function db_photo_notify_reviewers($post_id) {
   $cid     = 'db-photo-' . $post_id;
   $days    = db_gallery_setting('link_expiry_days');
   $subject = ($flags ? '[Flagged] ' : '') . 'Photograph to review: ' . get_field('species_name', $post_id);
-  $reply   = 'Reply-To: ' . $facts['Photographer'] . ' <' . $facts['Email'] . '>';
 
   $reviewers = db_photo_reviewers();
   foreach ($reviewers as $user) {
     $token = db_review_token_create($post_id, $user->ID);
     $html  = '<div style="font-family:Arial,sans-serif;font-size:15px;line-height:1.5;color:#16241D;max-width:640px">'
-      . '<p>Hi ' . esc_html($user->display_name) . ', a photograph is waiting for review.</p>'
+      . '<p>Hi ' . esc_html(db_reviewer_greeting_name($user)) . ', a photograph is waiting for review.</p>'
       . ($flags ? '<div style="background:#FFF4D6;border-radius:8px;padding:10px 14px;margin:12px 0"><strong>Flagged</strong><ul style="margin:6px 0 0;padding-left:20px">'
           . implode('', array_map(fn($f) => '<li>' . esc_html($f) . '</li>', $flags)) . '</ul></div>' : '')
       . ($image ? '<p><img src="cid:' . esc_attr($cid) . '" alt="' . esc_attr($facts['Species']) . '" style="max-width:100%;height:auto;border-radius:8px;display:block"></p>' : '')
@@ -222,7 +227,10 @@ function db_photo_notify_reviewers($post_id) {
 
     db_mail_with_images(
       $user->user_email, $subject, $html,
-      ['Content-Type: text/html; charset=UTF-8', $reply],
+      // No Reply-To: a sender's own Gmail address as Reply-To on the
+      // society's mail counts against it with spam filters. The
+      // photographer's address is in the message.
+      ['Content-Type: text/html; charset=UTF-8'],
       $image ? [[$image, $cid, basename($image)]] : [],
       'review'
     );
