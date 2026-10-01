@@ -1094,11 +1094,42 @@ function db_rest_no_cache(WP_REST_Response $response) {
 
 const DB_GLANCE_MARK = '/-{2,}\s*at\s+a\s+glance\s*-{2,}/i';
 
+/**
+ * Is this line one of the block's own? The block ends at the first line
+ * that isn't, so an invitation can carry on after it (a sign-off pasted
+ * below the block stays part of the invitation).
+ */
+function db_event_glance_line($line) {
+  return (bool) preg_match('/^\s*(?:meet(?:\s+note)?|pick\s?up|direct(?:\s+note)?|contribution|bring|duration|species|birds|coordinators?)\s*:/i', $line);
+}
+
 /** The invitation without its At a glance block, for showing as written. */
 function db_event_invitation($description) {
-  if (!preg_match(DB_GLANCE_MARK, (string) $description, $m, PREG_OFFSET_CAPTURE)) return (string) $description;
-  $before = preg_replace('#(?:<(?:p|div|span)[^>]*>|<br\s*/?>|\s|&nbsp;)+$#i', '', substr($description, 0, $m[0][1]));
-  return force_balance_tags($before);
+  $description = (string) $description;
+  if (!preg_match(DB_GLANCE_MARK, $description)) return $description;
+
+  // Walk the description line by line (a line ends at <br>, a paragraph
+  // or block boundary, or a newline): drop the mark, then the block's own
+  // lines and the blank ones between them, and keep everything else.
+  $parts = preg_split('#(<br\s*/?>|</p>\s*<p[^>]*>|</div>\s*<div[^>]*>|\n)#i', $description, -1, PREG_SPLIT_DELIM_CAPTURE);
+  $out = '';
+  $state = 'before';
+  foreach ($parts as $i => $part) {
+    $is_break = $i % 2 === 1;
+    $text = trim(html_entity_decode(strip_tags($part), ENT_QUOTES, 'UTF-8'), " \t\n\r\0\x0B\xc2\xa0");
+    if ($state === 'before') {
+      if (!$is_break && preg_match(DB_GLANCE_MARK, $text)) { $state = 'block'; continue; }
+      $out .= $part;
+    } elseif ($state === 'block') {
+      if ($is_break || $text === '' || db_event_glance_line($text)) continue;
+      $state = 'after';
+      $out .= "\n" . $part;
+    } else {
+      $out .= $part;
+    }
+  }
+  $out = preg_replace('#(?:<(?:p|div|span)[^>]*>|<br\s*/?>|\s|&nbsp;)+$#i', '', $out);
+  return force_balance_tags($out);
 }
 
 /**
@@ -1127,8 +1158,13 @@ function db_event_glance($description) {
     return $out;
   };
 
+  $seen = false;
   foreach (preg_split('/\r\n|\r|\n/', substr($text, $m[0][1] + strlen($m[0][0]))) as $line) {
     $line = trim(preg_replace('/\s+/u', ' ', $line));
+    if ($line === '') continue;
+    // The block ends at the first line that isn't one of its own.
+    if (!db_event_glance_line($line)) { if ($seen) break; continue; }
+    $seen = true;
     if (!preg_match('/^([A-Za-z ]{3,20}?)\s*:\s*(.+)$/u', $line, $lm)) continue;
     $label = strtolower(trim($lm[1]));
     $value = trim($lm[2]);
