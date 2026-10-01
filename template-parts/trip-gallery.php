@@ -39,7 +39,7 @@ $eyebrow = $args['eyebrow'] ?? 'From past trips';
               // for a landscape photo: the browser picks the 768 px copy. ?>
         <?php echo wp_get_attachment_image($id, 'medium_large', false, [
           'alt'      => $alt,
-          'loading'  => $i < 6 ? 'eager' : 'lazy',
+          'loading'  => 'lazy', // the row sits low on both pages it appears on
           'decoding' => 'async',
           'sizes'    => '(max-width: 560px) 70vw, 360px',
         ]); ?>

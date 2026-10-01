@@ -14,12 +14,15 @@
       // The real logo already contains both the bird illustration and the
       // "Deccan Birders" wordmark, so it replaces the whole lockup — showing
       // the text alongside it would duplicate the wordmark.
-      $logo_id  = get_theme_mod('custom_logo');
-      $logo_src = $logo_id ? wp_get_attachment_image_src($logo_id, 'full') : null;
-      if ($logo_src):
+      // Shown about 133 px wide (55 px tall), so a 300 px copy is plenty,
+      // even on sharp screens; the original upload is 1,696 px and 103 KB.
+      $logo_id = get_theme_mod('custom_logo');
+      if ($logo_id && wp_attachment_is_image($logo_id)):
       ?>
-        <img class="logo-img" src="<?php echo esc_url($logo_src[0]); ?>" alt="Deccan Birders"
-             width="<?php echo (int) $logo_src[1]; ?>" height="<?php echo (int) $logo_src[2]; ?>">
+        <?php echo wp_get_attachment_image($logo_id, 'medium', false, [
+          'class' => 'logo-img', 'alt' => 'Deccan Birders', 'loading' => false,
+          'fetchpriority' => 'high', 'sizes' => '(max-width: 640px) 102px, 133px',
+        ]); ?>
       <?php else: ?>
         <span class="logo-mark" aria-hidden="true">DB</span>
         <span class="logo-name">Deccan Birders</span>

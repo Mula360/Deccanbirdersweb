@@ -684,6 +684,18 @@ function db_sc_aims($atts) {
  */
 function db_hero_image($field, $post_id, $fallback_alt = '', $height = 'clamp(200px, 34vw, 400px)') {
   $img = $post_id ? get_field($field, $post_id) : null;
+  if (!empty($img['ID'])) {
+    // WordPress's resized copies with srcset, so a phone gets a phone-sized
+    // photo rather than the original upload (600 KB and more).
+    echo wp_get_attachment_image((int) $img['ID'], '1536x1536', false, [
+      'alt'           => $img['alt'] ?: $fallback_alt,
+      'style'         => 'width:100%;height:' . $height . ';object-fit:cover;border-radius:var(--radius-card);',
+      'sizes'         => '(max-width: 1180px) 100vw, 1140px',
+      'loading'       => false,
+      'fetchpriority' => 'high',
+    ]);
+    return;
+  }
   if (!empty($img['url'])) {
     printf(
       '<img src="%s" alt="%s" style="width:100%%;height:%s;object-fit:cover;border-radius:var(--radius-card);">',
@@ -2933,3 +2945,53 @@ function db_events_refresh_page() {
   </div>
   <?php
 }
+
+// The "EditURI" link in every page's head points at xmlrpc.php, which is
+// switched off and blocked: drop the link too.
+remove_action('wp_head', 'rsd_link');
+
+/**
+ * A one-line summary for search results, and the title, summary and
+ * picture a link shows when shared (WhatsApp, Facebook, X). The picture
+ * is the page's featured image if it has one, otherwise the logo.
+ */
+function db_page_summary() {
+  $map = [
+    'home'             => 'Deccan Birders is a Hyderabad birding club: field trips, bird walks, sightings and photographs from across Telangana and Andhra Pradesh.',
+    'about'            => 'Who the Deccan Birders are: a Hyderabad club of birdwatchers, photographers and naturalists exploring Telangana and Andhra Pradesh.',
+    'committee'        => 'The Executive Committee that runs Deccan Birders.',
+    'aims'             => 'What Deccan Birders works for: watching, recording and protecting the birds of the Deccan.',
+    'sightings'        => 'Recent and notable bird sightings in Telangana and Andhra Pradesh, from eBird.',
+    'events'           => 'Upcoming Deccan Birders field trips and bird walks, and photos and notes from past trips.',
+    'gallery'          => 'Bird photographs and videos from Deccan Birders members.',
+    'archives'         => 'Past issues of Pitta, the Deccan Birders newsletter, and the club archives.',
+    'membership'       => 'Join Deccan Birders: field trips, bird walks, the Pitta newsletter and a community of birders in Hyderabad.',
+    'contact'          => 'Get in touch with Deccan Birders.',
+    'winter-migration' => 'Get ready for winter migration in Telangana and Andhra Pradesh: which birds arrive when, where to see them, and countdowns to the peak.',
+    'bird-trends'      => 'Which birds are reported less, or more, in Telangana and Andhra Pradesh, from eBird records.',
+    'backpack'         => 'What to pack for a morning birding in the Deccan: optics, clothing, water and safety.',
+  ];
+  if (is_front_page()) return $map['home'];
+  if (is_page()) {
+    $slug = get_post_field('post_name', get_queried_object_id());
+    if (isset($map[$slug])) return $map[$slug];
+  }
+  if (is_singular() && has_excerpt()) return wp_strip_all_tags(get_the_excerpt());
+  return get_bloginfo('description') ?: $map['home'];
+}
+
+add_action('wp_head', function() {
+  $desc  = db_page_summary();
+  $title = wp_get_document_title();
+  $url   = is_singular() ? get_permalink() : home_url(add_query_arg([]));
+  $image = '';
+  if (is_singular() && has_post_thumbnail()) $image = get_the_post_thumbnail_url(null, 'large');
+  if (!$image && ($logo = get_theme_mod('custom_logo'))) $image = wp_get_attachment_image_url($logo, 'medium_large');
+  printf('<meta name="description" content="%s">' . "\n", esc_attr($desc));
+  printf('<meta property="og:type" content="website">' . "\n" . '<meta property="og:site_name" content="Deccan Birders">' . "\n");
+  printf('<meta property="og:title" content="%s">' . "\n", esc_attr($title));
+  printf('<meta property="og:description" content="%s">' . "\n", esc_attr($desc));
+  printf('<meta property="og:url" content="%s">' . "\n", esc_url($url));
+  if ($image) printf('<meta property="og:image" content="%s">' . "\n", esc_url($image));
+  echo '<meta name="twitter:card" content="' . ($image ? 'summary_large_image' : 'summary') . '">' . "\n";
+}, 5);

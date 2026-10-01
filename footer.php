@@ -8,7 +8,8 @@
         // chip because the logo has dark elements that would disappear
         // against the dark footer.
         $f_logo_id  = get_theme_mod('custom_logo');
-        $f_logo_src = $f_logo_id ? wp_get_attachment_image_src($f_logo_id, 'full') : null;
+        // A 300 px copy, as in the header: shown 52 px tall.
+        $f_logo_src = $f_logo_id ? wp_get_attachment_image_src($f_logo_id, 'medium') : null;
         if ($f_logo_src):
         ?>
           <img class="footer-logo-img" src="<?php echo esc_url($f_logo_src[0]); ?>" alt="Deccan Birders"
