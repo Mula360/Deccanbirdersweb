@@ -1179,6 +1179,12 @@ function db_event_note_html($description) {
     'div'    => [],
   ];
   $html = wp_kses((string) $description, $allowed);
+  // Invitations typed straight into the calendar arrive as plain text with
+  // line breaks; without this they read as one long block.
+  // Each line is its own paragraph there, so space them as paragraphs.
+  if (!preg_match('#<(?:p|br|div|li)\b#i', $html)) {
+    $html = wpautop(preg_replace("/\n\s*/", "\n\n", trim($html)));
+  }
   $html = make_clickable($html);
 
   // Every link leaves the site, so force the same treatment on all of
@@ -1209,20 +1215,33 @@ function db_event_prose($description) {
  */
 function db_event_species($description) {
   $text = db_event_prose($description);
-  if (!preg_match('/\b(?:birds?|species)\s+(?:to\s+expect|expected|one\s+can\s+expect|likely)\b[:,]?\s*(.+?)(?:\.\s|$)/iu', $text, $m)) {
-    return [];
+  // The cues invitations use: "Birds to expect …", "Notable species to
+  // watch for include …", "rare species like …", "species such as …".
+  $cues = [
+    '/\b(?:birds?|species)\s+(?:to\s+(?:expect|watch\s+(?:out\s+)?for|look\s+(?:out\s+)?for|see)|expected|one\s+can\s+expect|likely)(?:\s+(?:include|includes|are|is))?\b[:,]?\s*(.+?)(?:\.\s|$)/iu',
+    // Not "tree species like Red Sanders".
+    '/(?<!tree )(?<!trees )(?<!plant )(?<!butterfly )(?<!animal )\b(?:birds?|species)\s+(?:like|such\s+as|including)\s+(.+?)(?:\.\s|$)/iu',
+  ];
+  $list = '';
+  foreach ($cues as $cue) {
+    if (preg_match($cue, $text, $m)) { $list = $m[1]; break; }
   }
-  $names = preg_split('/\s*(?:,|;|\band\b|&)\s*/iu', $m[1]);
+  if ($list === '') return [];
+
+  $names = preg_split('/\s*(?:,|;|\band\b|&)\s*/iu', $list);
   $out = [];
   foreach ($names as $name) {
-    $name = trim($name, " \t\n\r\0\x0B.-");
-    $name = preg_replace('/^(?:the|a|an)\s+/i', '', $name);
+    $name = trim(preg_replace('/\s+etc\.?$/i', '', trim($name)), " \t\n\r\0\x0B.-");
+    // Species names are capitalised; words in front of one that aren't
+    // ("the striking Painted Francolin") are the sentence, not the name.
+    $name = preg_replace('/^(?:[a-z][\p{L}\'\-]*\s+)+(?=\p{Lu})/u', '', $name);
     // A species name, not the sentence carrying on past the list: these
-    // usually trail off with "and other wetland and woodland birds".
+    // usually trail off with "and other wetland birds" or "among others".
     if ($name === '' || str_word_count($name) > 5 || mb_strlen($name) > 46) continue;
     if (!preg_match('/^[\p{L}][\p{L}\'\-\s\(\)]*$/u', $name)) continue;
-    if (preg_match('/^(?:other|various|many|several|etc|more)\b/i', $name)) break;
-    if (preg_match('/\b(?:birds|species|visitors|migrants)$/i', $name)) break;
+    if (preg_match('/^(?:other|various|many|several|etc|more|among|others)\b/i', $name)) break;
+    if (preg_match('/\b(?:birds|species|visitors|migrants|others)$/i', $name)) break;
+    if (!preg_match('/^\p{Lu}/u', $name)) continue;
     $out[] = $name;
     if (count($out) >= 20) break;
   }
@@ -1238,29 +1257,71 @@ function db_event_species($description) {
  */
 function db_event_stops($description) {
   $text = db_event_prose($description);
-  $maps = db_event_map_links($description);
+  $time = '(?<time>\d{1,2}(?:[:.]\d{2})?\s*(?:am|pm))';
 
-  $stop = function($pattern) use ($text) {
-    if (!preg_match($pattern, $text, $m)) return ['name' => '', 'time' => ''];
-    $name = trim(preg_replace('/\s+/u', ' ', $m['name'] ?? ''), " ,.-");
-    return [
-      'name' => mb_strlen($name) <= 70 ? $name : '',
-      'time' => isset($m['time']) ? db_event_tidy_time($m['time']) : '',
-    ];
+  $stop = function(array $patterns) use ($text) {
+    foreach ($patterns as $pattern) {
+      if (!preg_match($pattern, $text, $m)) continue;
+      // Links are stripped from the prose, which can leave "Taj Dhaba,
+      // Muthangi ( )" behind.
+      $name = preg_replace('/\(\s*[:;,]?\s*\)|\(\s*$/u', '', $m['name'] ?? '');
+      $name = trim(preg_replace('/\s+/u', ' ', $name), " ,.-:(");
+      if ($name === '' || mb_strlen($name) > 70) continue;
+      return ['name' => $name, 'time' => isset($m['time']) ? db_event_tidy_time($m['time']) : ''];
+    }
+    return ['name' => '', 'time' => ''];
   };
 
-  $meet  = $stop('/\bmeet\s+at\s+(?<name>[^.]{3,70}?)\s+by\s+(?<time>\d{1,2}[:.]?\d{0,2}\s*(?:am|pm))/iu');
-  $final = $stop('/\b(?:final\s+stop|directly)\b[^.]{0,60}?\breach\s+at\s+(?<name>[^.]{3,70}?)\s+by\s+(?<time>\d{1,2}[:.]?\d{0,2}\s*(?:am|pm))/iu');
+  // Where the group gathers first: "may meet at X by 5:15 AM", or "The
+  // First Meeting Point is X at 5:00 AM".
+  $meet = $stop([
+    "/\bmeet\s+at\s+(?<name>[^.]{3,70}?)\s+by\s+$time/iu",
+    "/\b(?<!final )(?<!second )(?:first\s+)?(?:meeting|pick-?up)\s+point\s+(?:is|will\s+be|:)\s*(?<name>[^.]{3,70}?)\s+(?:at|by)\s+$time/iu",
+  ]);
+  // A second gathering point on the way: "the Final Meeting Point is
+  // Muthangi, Patancheru at 5:30 AM".
+  $pickup = $stop([
+    "/\b(?:final|second|next)\s+(?:meeting|pick-?up)\s+point\s+(?:is|will\s+be|:)\s*(?<name>[^.]{3,70}?)\s+(?:at|by)\s+$time/iu",
+  ]);
+  // Where people joining directly go: "can reach at Lakshimapur Lake by
+  // 6:00 AM", "If anyone wishes to come directly, meet at Yenkathala
+  // Grasslands at 6.30am".
+  $final = $stop([
+    "/\b(?:final\s+stop|directly)\b[^.]{0,60}?\b(?:reach|meet(?:\s+us)?|join(?:\s+us)?)\s+at\s+(?<name>[^.]{3,70}?)\s+(?:by|at)\s+$time/iu",
+  ]);
 
-  $meet['map']  = $maps ? reset($maps) : '';
-  $final['map'] = db_event_destination_map($description);
-  if ($final['map'] === $meet['map'] && count($maps) < 2) $meet['map'] = '';
+  // One place said twice ("meet at the zoo entrance … join directly at the
+  // zoo entrance") is one stop, not two.
+  if ($final['name'] !== '' && strcasecmp($final['name'], $meet['name']) === 0) $final = ['name' => '', 'time' => ''];
 
-  return ['meet' => $meet, 'final' => $final];
+  $meet['map']   = db_event_map_after($description, $meet['name']);
+  $pickup['map'] = db_event_map_after($description, $pickup['name']);
+  $final['map']  = db_event_map_after($description, $final['name'])
+    ?: db_event_destination_map($description, array_filter([$meet['map'], $pickup['map']]));
+
+  return ['meet' => $meet, 'pickup' => $pickup, 'final' => $final];
+}
+
+/**
+ * The map link that goes with a place named in the invitation: the first
+ * one after the name, in the same sentence. '' when there isn't one.
+ */
+function db_event_map_after($description, $name) {
+  if ($name === '') return '';
+  $text = db_event_text($description);
+  $at = mb_stripos($text, $name);
+  if ($at === false) return '';
+  $rest = mb_substr($text, $at + mb_strlen($name), 400);
+  // The sentence ends at a full stop followed by a capital; a URL's own
+  // dots never are.
+  if (preg_match('/\.\s+(?=\p{Lu})/u', $rest, $end, PREG_OFFSET_CAPTURE)) $rest = substr($rest, 0, $end[0][1]);
+  return preg_match('#https?://(?:maps\.app\.goo\.gl|(?:www\.)?google\.[a-z.]+/maps)[^\s<>"\']*#i', $rest, $m)
+    ? db_event_clean_url($m[0]) : '';
 }
 
 function db_event_tidy_time($raw) {
   $raw = strtolower(trim(preg_replace('/\s+/u', ' ', $raw)));
+  $raw = preg_replace('/(\d)(am|pm)$/', '$1 $2', $raw);
   return str_replace(['.', ' am', ' pm'], [':', ' am', ' pm'], $raw);
 }
 
@@ -1286,6 +1347,13 @@ function db_event_facts($description, $start_time = '') {
       'label' => 'Starts',
       'value' => $stops['meet']['time'] ?: $start_time,
       'note'  => $stops['meet']['name'] ? 'Meet at ' . $stops['meet']['name'] : '',
+    ];
+  }
+  if ($stops['pickup']['name']) {
+    $facts[] = [
+      'label' => 'Second pickup',
+      'value' => $stops['pickup']['time'],
+      'note'  => $stops['pickup']['name'],
     ];
   }
   if ($stops['final']['name']) {
@@ -1321,7 +1389,7 @@ function db_event_facts($description, $start_time = '') {
  * Lakshimapur Lake … <link>"). The card's pin should be the final stop, so
  * prefer the last link introduced that way, and otherwise the last link.
  */
-function db_event_destination_map($description) {
+function db_event_destination_map($description, array $exclude = []) {
   if (!$description) return '';
   $text = db_event_text($description);
   if (!preg_match_all('#https?://(?:maps\.app\.goo\.gl|(?:www\.)?google\.[a-z.]+/maps)[^\s<>"\']*#i',
@@ -1329,7 +1397,9 @@ function db_event_destination_map($description) {
     return '';
   }
 
-  $links = $m[0];
+  // Not a link already known to be a meeting point.
+  $links = array_values(array_filter($m[0], fn($l) => !in_array(db_event_clean_url($l[0]), $exclude, true)));
+  if (!$links) return '';
   foreach (array_reverse($links) as [$url, $offset]) {
     $lead = substr($text, max(0, $offset - 220), min(220, $offset));
     if (preg_match('/\b(final|directly|destination|reach at|end point)\b/i', $lead)) {
@@ -1356,10 +1426,10 @@ add_action('rest_api_init', function() {
       if (!empty($res['data']) && is_array($res['data'])) {
         foreach ($res['data'] as &$event) {
           $event['coordinators'] = db_event_coordinators($event['note'] ?? '');
-          $event['mapUrl']       = db_event_destination_map($event['note'] ?? '');
+          $event['stops']        = db_event_stops($event['note'] ?? '');
+          $event['mapUrl']       = $event['stops']['final']['map'];
           $event['noteHtml']     = db_event_note_html($event['note'] ?? '');
           $event['species']      = db_event_species($event['note'] ?? '');
-          $event['stops']        = db_event_stops($event['note'] ?? '');
           $event['facts']        = db_event_facts($event['note'] ?? '');
         }
         unset($event);

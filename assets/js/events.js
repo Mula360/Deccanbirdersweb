@@ -163,6 +163,11 @@ function pastEventFields(item) {
     turnout:  null,
     pick:     '',
     coordinators: e.coordinators || [],
+    // What the invitation said, for the card's "At a glance" panel.
+    stops:    e.stops || {},
+    facts:    e.facts || [],
+    mapUrl:   e.mapUrl || '',
+    speciesList: e.species || [],
     noteHtml: e.noteHtml || '',
     notes:    stripHtml(e.note)
   };
@@ -253,10 +258,12 @@ function renderEventCard(kind, data, index, opts = {}) {
         data.mapUrl ? { href: data.mapUrl, text: 'View on map', external: true } : '')}
     </div>`;
 
-  const species = (!past && data.species && data.species.length)
+  // Upcoming: the birds to look for. Past: the ones the invitation named.
+  const speciesNames = past ? (data.speciesList || []) : (data.species || []);
+  const species = speciesNames.length
     ? `<div class="ev-species">
-        <span class="ev-species-label">Possible species</span>
-        ${data.species.map((sp) => `<span class="ev-species-name">${escapeHtml(sp)}</span>`).join('')}
+        <span class="ev-species-label">${past ? 'Birds the invite named' : 'Possible species'}</span>
+        ${speciesNames.map((sp) => `<span class="ev-species-name">${escapeHtml(sp)}</span>`).join('')}
       </div>`
     : '';
 
@@ -274,6 +281,8 @@ function renderEventCard(kind, data, index, opts = {}) {
 
   const buttons = [
     stops.meet && stops.meet.map ? `<a class="ev-btn ev-btn--blue" href="${escapeHtml(stops.meet.map)}" target="_blank" rel="noopener">Meeting point map</a>` : '',
+    // Upcoming cards carry the site's map in their Location line already.
+    past && data.mapUrl ? `<a class="ev-btn" href="${escapeHtml(data.mapUrl)}" target="_blank" rel="noopener">Trip site map</a>` : '',
     coordinator ? `<a class="ev-btn" href="tel:${escapeHtml(coordinator.tel)}">Call coordinator</a>` : '',
   ].join('');
 
