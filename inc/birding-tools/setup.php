@@ -78,9 +78,11 @@ function db_bt_start() {
 function db_bt_kick($wait = 0) {
   $key = get_option('db_bt_kick_key');
   if (!$key) { $key = wp_generate_password(32, false); update_option('db_bt_kick_key', $key, false); }
+  // A second, not the customary 0.01: over HTTPS the request is often not
+  // even sent in a hundredth of a second, and the run never moves.
   wp_remote_post(admin_url('admin-ajax.php'), [
     'blocking'  => false,
-    'timeout'   => 0.01,
+    'timeout'   => 1,
     'sslverify' => false,
     'body'      => ['action' => 'db_bt_tick', 'key' => $key, 'wait' => (int) $wait],
   ]);
@@ -98,6 +100,20 @@ function db_bt_tick_request() {
   db_bt_tick();
   wp_die();
 }
+
+// The Birding Tools screen drives a run too, while it is open: it asks for
+// a slice every 25 seconds and shows the progress. This works whatever the
+// host allows, as it comes from the administrator's own browser.
+add_action('wp_ajax_db_bt_admin_tick', function() {
+  if (!current_user_can('manage_options') || !check_ajax_referer('db_bt_admin_tick', 'nonce', false)) wp_send_json_error(null, 403);
+  if (db_bt_running()) db_bt_tick();
+  $job = db_bt_job();
+  wp_send_json_success([
+    'status'  => $job['status'] ?? 'never',
+    'fetched' => (int) ($job['fetched'] ?? 0),
+    'running' => db_bt_running(),
+  ]);
+});
 
 /** One slice of a run: fetch what is missing for up to ~20 seconds, then start the next. */
 function db_bt_tick() {

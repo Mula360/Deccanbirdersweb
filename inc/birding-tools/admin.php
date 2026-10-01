@@ -43,7 +43,7 @@ function db_bt_admin_page() {
     <table class="widefat striped" style="max-width:760px">
       <tbody>
         <tr><th style="width:220px">Figures on the site</th><td><?php echo $trends ? 'Worked out ' . esc_html(wp_date('j M Y, g:i a', strtotime($trends['generated']))) : '<strong>None yet</strong>'; ?></td></tr>
-        <tr><th>Latest run</th><td><?php
+        <tr><th>Latest run</th><td id="db-bt-latest"><?php
           if ($status === 'running') {
             $pct = !empty($job['wanted']) ? min(99, round(100 * $job['fetched'] / max(1, $job['wanted']))) : 0;
             printf('Under way since %s: %d requests fetched so far.%s', esc_html(wp_date('j M, g:i a', $job['started'])), (int) $job['fetched'],
@@ -76,6 +76,34 @@ function db_bt_admin_page() {
       <?php wp_nonce_field('db_bt_admin'); ?>
       <button class="button button-primary" name="db_bt_run" value="1"><?php echo db_bt_running() ? 'Continue now' : 'Recalculate now'; ?></button>
     </form>
+
+    <?php if (db_bt_running()): ?>
+      <p id="db-bt-live" style="max-width:760px;color:#2271b1">While this page is open it keeps the recalculation moving and shows its progress here.</p>
+      <script>
+      (function () {
+        var body = new FormData();
+        body.append('action', 'db_bt_admin_tick');
+        body.append('nonce', <?php echo wp_json_encode(wp_create_nonce('db_bt_admin_tick')); ?>);
+        var cell = document.getElementById('db-bt-latest'), note = document.getElementById('db-bt-live');
+        function step() {
+          fetch(ajaxurl, { method: 'POST', body: body, credentials: 'same-origin' })
+            .then(function (r) { return r.json(); })
+            .then(function (r) {
+              if (!r || !r.success) return;
+              if (r.data.running) {
+                cell.textContent = 'Under way: ' + r.data.fetched + ' requests fetched so far.';
+                setTimeout(step, 25000);
+              } else {
+                cell.textContent = r.data.status === 'done' ? 'Finished just now.' : 'Stopped (' + r.data.status + ').';
+                note.textContent = 'Reload this page to see the new figures.';
+              }
+            })
+            .catch(function () { setTimeout(step, 60000); });
+        }
+        setTimeout(step, 3000);
+      })();
+      </script>
+    <?php endif; ?>
 
     <h2 style="margin-top:32px">Habitats</h2>
     <p style="max-width:760px">Winter Migration groups each winter visitor as Wetland, Grassland &amp; farmland, Scrub or Woodland, from its bird family (ducks, waders, gulls and herons are wetland; harriers, larks, pipits and starlings grassland; reed warblers and shrikes scrub; leaf warblers, flycatchers and pittas woodland). To move a species, add a line here: its name, an equals sign, and <code>wet</code>, <code>grass</code>, <code>scrub</code> or <code>wood</code>.</p>
