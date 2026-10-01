@@ -7,6 +7,7 @@
  * year, see template-parts/shortcode-pitta-accordion.php) carrying the
  * section's bottom spacing.
  */
+if (!defined('ABSPATH')) exit;
 get_header();
 while (have_posts()) : the_post();
 ?>

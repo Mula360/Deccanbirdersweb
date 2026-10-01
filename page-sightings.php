@@ -8,6 +8,7 @@
  * announced. The design's region pill group is dropped rather than offering a
  * switch we no longer support.
  */
+if (!defined('ABSPATH')) exit;
 get_header();
 while (have_posts()) : the_post();
 ?>

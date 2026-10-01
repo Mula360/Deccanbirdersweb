@@ -6,6 +6,7 @@
  * Design: a bordered card split into cells by 2px gaps over a grey backing,
  * each cell a green numbered disc beside the text.
  */
+if (!defined('ABSPATH')) exit;
 
 $page_id = get_page_by_path('aims')?->ID;
 $aims    = $page_id ? db_list('aims', $page_id) : [];

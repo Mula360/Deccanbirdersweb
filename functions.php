@@ -427,18 +427,27 @@ function db_handle_contact() {
   if (!wp_verify_nonce($_POST['nonce'] ?? '', 'db_contact_nonce')) {
     wp_send_json(['success' => false, 'message' => 'Security check failed.']);
   }
-  $name    = sanitize_text_field($_POST['name'] ?? '');
+  // Hidden from people, filled in by bots — drop it without a word.
+  if (!empty($_POST['website'])) {
+    wp_send_json(['success' => true]);
+  }
+  if (db_rate_limited('contact', 3) || db_mail_budget_spent()) {
+    wp_send_json(['success' => false, 'message' => 'That is a few messages in a short time — please try again in an hour, or email info@deccanbirders.org.']);
+  }
+  $name    = db_mail_name($_POST['name'] ?? '');
   $email   = sanitize_email($_POST['email'] ?? '');
-  $subject = sanitize_text_field($_POST['subject'] ?? 'General');
-  $message = sanitize_textarea_field($_POST['message'] ?? '');
-  if (!$name || !$email || !$message) {
+  $subject = mb_substr(sanitize_text_field($_POST['subject'] ?? 'General'), 0, 100);
+  $message = mb_substr(sanitize_textarea_field($_POST['message'] ?? ''), 0, 5000);
+  if (!$name || !is_email($email) || !$message) {
     wp_send_json(['success' => false, 'message' => 'Please fill in all required fields.']);
   }
   $to      = 'info@deccanbirders.org';
   $headers = ['Content-Type: text/html; charset=UTF-8', "Reply-To: $name <$email>"];
-  $body    = "<p><strong>From:</strong> $name ($email)</p><p><strong>Subject:</strong> $subject</p><p>$message</p>";
+  $body    = '<p><strong>From:</strong> ' . esc_html("$name ($email)") . '</p><p><strong>Subject:</strong> ' . esc_html($subject) . '</p>' . wpautop(esc_html($message));
   wp_mail($to, "Website enquiry: $subject", $body, $headers);
-  wp_mail($email, 'We received your message — Deccan Birders', "<p>Hi $name,</p><p>Thank you for getting in touch. We will reply within 2 working days.</p><p>— Deccan Birders</p>", $headers);
+  // The acknowledgement goes to whatever address was typed, so it carries
+  // nothing the sender wrote: it can't be used to mail someone else a message.
+  wp_mail($email, 'We received your message — Deccan Birders', '<p>Hello,</p><p>Thank you for getting in touch. We will reply within 2 working days.</p><p>— Deccan Birders</p>', ['Content-Type: text/html; charset=UTF-8']);
   wp_send_json(['success' => true]);
 }
 
@@ -452,24 +461,24 @@ function db_handle_volunteer() {
   if (!empty($_POST['website'])) {
     wp_send_json(['success' => true]);
   }
-  if (db_rate_limited('volunteer', 3)) {
+  if (db_rate_limited('volunteer', 3) || db_mail_budget_spent()) {
     wp_send_json(['success' => false, 'message' => 'That is a few submissions in a short time — please try again in an hour.']);
   }
-  $name          = sanitize_text_field($_POST['name'] ?? '');
+  $name          = db_mail_name($_POST['name'] ?? '');
   $email         = sanitize_email($_POST['email'] ?? '');
   $help_with_raw = $_POST['help_with'] ?? [];
   $help_with     = is_array($help_with_raw)
-    ? array_map('sanitize_text_field', $help_with_raw)
-    : array_filter([sanitize_text_field($help_with_raw)]);
-  if (!$name || !$email) {
+    ? array_map(fn($h) => mb_substr(sanitize_text_field((string) $h), 0, 100), array_slice($help_with_raw, 0, 10))
+    : array_filter([mb_substr(sanitize_text_field((string) $help_with_raw), 0, 100)]);
+  if (!$name || !is_email($email)) {
     wp_send_json(['success' => false, 'message' => 'Please fill in all required fields.']);
   }
   $to           = db_notify_email('volunteers');
   $headers      = ['Content-Type: text/html; charset=UTF-8', "Reply-To: $name <$email>"];
   $help_with_str = $help_with ? implode(', ', $help_with) : 'Not specified';
-  $body         = "<p><strong>From:</strong> $name ($email)</p><p><strong>Would like to help with:</strong> $help_with_str</p>";
+  $body         = '<p><strong>From:</strong> ' . esc_html("$name ($email)") . '</p><p><strong>Would like to help with:</strong> ' . esc_html($help_with_str) . '</p>';
   wp_mail($to, "New volunteer: $name", $body, $headers);
-  wp_mail($email, 'Thank you for volunteering — Deccan Birders', "<p>Hi $name,</p><p>Thank you for offering to help. A committee member will be in touch soon.</p><p>— Deccan Birders</p>", $headers);
+  wp_mail($email, 'Thank you for volunteering — Deccan Birders', '<p>Hello,</p><p>Thank you for offering to help. A committee member will be in touch soon.</p><p>— Deccan Birders</p>', ['Content-Type: text/html; charset=UTF-8']);
 
   db_append_to_sheet([
     'submitted' => current_time('mysql'),
@@ -492,6 +501,10 @@ function db_handle_volunteer() {
 function db_append_to_sheet(array $row) {
   $url = db_setting('volunteer_sheet_url');
   if (!$url) return false;
+  // A value starting with = + - or @ would be stored as a spreadsheet
+  // formula (one that could send the sheet's other rows elsewhere); a
+  // leading apostrophe keeps it plain text.
+  $row = array_map(fn($v) => is_string($v) && preg_match('/^[=+\-@\t\r]/', $v) ? "'" . $v : $v, $row);
   $row['secret'] = db_setting('volunteer_sheet_secret');
 
   $res = wp_remote_post($url, [
@@ -571,6 +584,25 @@ function db_rate_limited($action, $max_per_hour) {
   return false;
 }
 
+/**
+ * A ceiling on the email the public forms can make the site send in an
+ * hour, from all visitors together: a script hopping between addresses
+ * gets past the per-visitor throttle, but not this, so the mailbox can't
+ * be used to flood anyone.
+ */
+function db_mail_budget_spent($max_per_hour = 40) {
+  $key = 'db_mail_budget_' . gmdate('YmdH');
+  $count = (int) get_transient($key);
+  if ($count >= $max_per_hour) return true;
+  set_transient($key, $count + 1, HOUR_IN_SECONDS);
+  return false;
+}
+
+/** A sender's name, safe inside a "Name <address>" header: no commas, quotes or angle brackets. */
+function db_mail_name($raw) {
+  return trim(mb_substr(str_replace([',', ';', '"', '<', '>'], ' ', sanitize_text_field((string) $raw)), 0, 80));
+}
+
 
 /** Who sent it, in the Gallery list, so pending entries are reviewable at a glance. */
 add_filter('manage_db_gallery_photo_posts_columns', function($cols) {
@@ -594,8 +626,14 @@ function db_handle_sighting_report() {
   // "what would you like to help with" choice. There is deliberately no
   // name or email field, so submissions are anonymous and there is no
   // address to send an acknowledgement to or to set as Reply-To.
-  $species_location = sanitize_text_field($_POST['species_location'] ?? '');
-  $help_with        = sanitize_text_field($_POST['help_with'] ?? '');
+  if (!empty($_POST['website'])) {
+    wp_send_json(['success' => true]);
+  }
+  if (db_rate_limited('sighting', 5) || db_mail_budget_spent()) {
+    wp_send_json(['success' => false, 'message' => 'That is a few reports in a short time — please try again in an hour.']);
+  }
+  $species_location = mb_substr(sanitize_text_field((string) ($_POST['species_location'] ?? '')), 0, 300);
+  $help_with        = mb_substr(sanitize_text_field((string) ($_POST['help_with'] ?? '')), 0, 100);
   if (!$species_location) {
     wp_send_json(['success' => false, 'message' => 'Please tell us the species and location.']);
   }
@@ -773,6 +811,20 @@ function db_proxy_headers() {
   return $secret ? ['x-db-key' => $secret] : [];
 }
 
+/** What each visitor-supplied proxy parameter may look like. */
+function db_proxy_param_pattern($param) {
+  $patterns = [
+    'region'      => '/^[A-Z]{2}(-[A-Z0-9]{1,3}){0,2}$/',
+    'tab'         => '/^(recent|notable|hotspots|taxonomy|hotspot_species|onthisday|lookup)$/',
+    'locId'       => '/^L\d{1,10}$/',
+    'speciesCode' => '/^[a-z0-9]{3,12}$/',
+    'm'           => '/^(0?[1-9]|1[0-2])$/',
+    'd'           => '/^(0?[1-9]|[12]\d|3[01])$/',
+    'scope'       => '/^(past|upcoming)$/',
+  ];
+  return $patterns[$param] ?? '/^$/';
+}
+
 /**
  * $fresh skips both caches: this site's transient, and the Vercel edge
  * cache in front of the API (keyed on the full URL, so an extra throwaway
@@ -782,7 +834,13 @@ function db_proxy_fetch($path, WP_REST_Request $request, array $allowed_params, 
   $query = [];
   foreach ($allowed_params as $param) {
     $val = $request->get_param($param);
-    if ($val !== null && $val !== '') $query[$param] = $val;
+    if ($val === null || $val === '') continue;
+    // The API pastes these into eBird paths, and each new value is a fresh
+    // upstream call: only well-formed values are passed on.
+    if (!is_scalar($val) || !preg_match(db_proxy_param_pattern($param), (string) $val)) {
+      return ['error' => true, 'message' => 'Invalid request.'];
+    }
+    $query[$param] = (string) $val;
   }
   // Set by the site, never by the visitor: e.g. the calendar version below.
   $query = $extra + $query;
@@ -799,14 +857,17 @@ function db_proxy_fetch($path, WP_REST_Request $request, array $allowed_params, 
   // time than a typical small proxied request.
   $res = wp_remote_get($url, ['timeout' => 20, 'headers' => db_proxy_headers()]);
 
+  // The details go to the server log, not to visitors.
   if (is_wp_error($res)) {
-    return ['error' => true, 'message' => $res->get_error_message()];
+    error_log('db_proxy_fetch ' . $path . ': ' . $res->get_error_message());
+    return ['error' => true, 'message' => 'The data could not be loaded just now.'];
   }
   $code = wp_remote_retrieve_response_code($res);
   $body = json_decode(wp_remote_retrieve_body($res), true);
 
   if ($code !== 200 || !is_array($body)) {
-    return ['error' => true, 'message' => 'Upstream API returned HTTP ' . $code];
+    error_log('db_proxy_fetch ' . $path . ': HTTP ' . $code);
+    return ['error' => true, 'message' => 'The data could not be loaded just now.'];
   }
   if (empty($body['error'])) {
     set_transient($cache_key, $body, $ttl);
@@ -1225,7 +1286,7 @@ function db_event_glance($description) {
 function db_event_glance_time($raw) {
   $raw = strtolower(trim($raw));
   if (!preg_match('/^(\d{1,2})(?:[:.](\d{2}))?\s*(am|pm)?$/', $raw, $m)) return $raw;
-  $h = (int) $m[1]; $min = $m[2] ?? '00'; $ap = $m[3] ?? '';
+  $h = (int) $m[1]; $min = ($m[2] ?? '') !== '' ? $m[2] : '00'; $ap = $m[3] ?? '';
   if ($ap === '') { $ap = $h >= 12 ? 'pm' : 'am'; if ($h > 12) $h -= 12; if ($h === 0) $h = 12; }
   return $h . ':' . $min . ' ' . $ap;
 }
@@ -1347,10 +1408,16 @@ function db_event_note_html($description) {
 
   // Every link leaves the site, so force the same treatment on all of
   // them, whether they came from the calendar or from make_clickable().
-  $html = preg_replace('/\s(?:target|rel)="[^"]*"/i', '', $html);
-  $html = str_ireplace('<a ', '<a target="_blank" rel="noopener nofollow" ', $html);
+  // Set through the HTML parser, never by pattern-matching the markup: a
+  // regex can be steered across attribute quotes into running script.
+  $tags = new WP_HTML_Tag_Processor($html);
+  while ($tags->next_tag('a')) {
+    $tags->set_attribute('target', '_blank');
+    $tags->set_attribute('rel', 'noopener nofollow');
+  }
+  $allowed['a'] += ['target' => true, 'rel' => true];
 
-  return trim($html);
+  return trim(wp_kses($tags->get_updated_html(), $allowed));
 }
 
 /**
@@ -1607,7 +1674,10 @@ function db_event_destination_map($description, array $exclude = []) {
 
 /** Trailing punctuation from prose ("… <link>, as it takes 45 mins"). */
 function db_event_clean_url($url) {
-  return rtrim($url, '.,;:)]');
+  // A link ends at the first space, quote or bracket: anything after it
+  // isn't part of the address, and must never reach an href.
+  $url = strtok(trim((string) $url), " \t\r\n<>\"'`") ?: '';
+  return esc_url_raw(rtrim($url, '.,;:)]'), ['http', 'https']);
 }
 
 add_action('rest_api_init', function() {
@@ -1725,10 +1795,11 @@ function db_youtube_get($endpoint, array $params) {
   $params['key'] = db_youtube_key();
   $url = 'https://www.googleapis.com/youtube/v3/' . $endpoint . '?' . http_build_query($params);
   $res = wp_remote_get($url, ['timeout' => 15]);
-  if (is_wp_error($res)) return ['error' => true, 'message' => $res->get_error_message()];
+  // The details go to the server log; visitors get a plain message.
+  if (is_wp_error($res)) { error_log('db_youtube_get ' . $endpoint . ': ' . $res->get_error_message()); return ['error' => true, 'message' => 'The videos could not be loaded just now.']; }
   $body = json_decode(wp_remote_retrieve_body($res), true);
-  if (!is_array($body)) return ['error' => true, 'message' => 'Unreadable response from YouTube'];
-  if (isset($body['error'])) return ['error' => true, 'message' => $body['error']['message'] ?? 'YouTube API error'];
+  if (!is_array($body)) return ['error' => true, 'message' => 'The videos could not be loaded just now.'];
+  if (isset($body['error'])) { error_log('db_youtube_get ' . $endpoint . ': ' . ($body['error']['message'] ?? 'error')); return ['error' => true, 'message' => 'The videos could not be loaded just now.']; }
   return $body;
 }
 
@@ -2980,18 +3051,53 @@ function db_page_summary() {
   return get_bloginfo('description') ?: $map['home'];
 }
 
-add_action('wp_head', function() {
-  $desc  = db_page_summary();
-  $title = wp_get_document_title();
-  $url   = is_singular() ? get_permalink() : home_url(add_query_arg([]));
-  $image = '';
-  if (is_singular() && has_post_thumbnail()) $image = get_the_post_thumbnail_url(null, 'large');
-  if (!$image && ($logo = get_theme_mod('custom_logo'))) $image = wp_get_attachment_image_url($logo, 'medium_large');
-  printf('<meta name="description" content="%s">' . "\n", esc_attr($desc));
-  printf('<meta property="og:type" content="website">' . "\n" . '<meta property="og:site_name" content="Deccan Birders">' . "\n");
-  printf('<meta property="og:title" content="%s">' . "\n", esc_attr($title));
-  printf('<meta property="og:description" content="%s">' . "\n", esc_attr($desc));
-  printf('<meta property="og:url" content="%s">' . "\n", esc_url($url));
-  if ($image) printf('<meta property="og:image" content="%s">' . "\n", esc_url($image));
-  echo '<meta name="twitter:card" content="' . ($image ? 'summary_large_image' : 'summary') . '">' . "\n";
-}, 5);
+// Yoast SEO writes the description and share tags; it is given these
+// summaries where a page has none of its own, and the logo as the share
+// picture where a page has no image. Without Yoast, the theme writes them.
+if (defined('WPSEO_VERSION')) {
+  // Yoast's own fallback is the first words of the page, headings and
+  // all; a description typed into Yoast for the page still wins.
+  $own = function($key) {
+    return is_singular() && get_post_meta(get_queried_object_id(), '_yoast_wpseo_' . $key, true);
+  };
+  add_filter('wpseo_metadesc', fn($d) => $own('metadesc') ? $d : db_page_summary());
+  add_filter('wpseo_opengraph_desc', fn($d) => $own('opengraph-description') || $own('metadesc') ? $d : db_page_summary());
+  add_filter('wpseo_twitter_description', fn($d) => $own('twitter-description') || $own('metadesc') ? $d : db_page_summary());
+  add_filter('wpseo_add_opengraph_additional_images', function($images) {
+    if (!$images->has_images() && ($logo = get_theme_mod('custom_logo'))) $images->add_image_by_id($logo);
+    return $images;
+  });
+} else {
+  add_action('wp_head', function() {
+    $desc  = db_page_summary();
+    $image = '';
+    if (is_singular() && has_post_thumbnail()) $image = get_the_post_thumbnail_url(null, 'large');
+    if (!$image && ($logo = get_theme_mod('custom_logo'))) $image = wp_get_attachment_image_url($logo, 'medium_large');
+    printf('<meta name="description" content="%s">' . "\n", esc_attr($desc));
+    echo '<meta property="og:type" content="website">' . "\n" . '<meta property="og:site_name" content="Deccan Birders">' . "\n";
+    printf('<meta property="og:title" content="%s">' . "\n", esc_attr(wp_get_document_title()));
+    printf('<meta property="og:description" content="%s">' . "\n", esc_attr($desc));
+    printf('<meta property="og:url" content="%s">' . "\n", esc_url(is_singular() ? get_permalink() : home_url(add_query_arg([]))));
+    if ($image) printf('<meta property="og:image" content="%s">' . "\n", esc_url($image));
+    echo '<meta name="twitter:card" content="' . ($image ? 'summary_large_image' : 'summary') . '">' . "\n";
+  }, 5);
+}
+
+// The author sitemap lists the admin's username (taken from the login
+// email); the site has no author pages worth indexing, so leave it empty.
+add_filter('wpseo_sitemap_exclude_author', '__return_empty_array');
+
+/**
+ * Basic browser protections on every public page: no MIME sniffing, no
+ * framing by other sites (clickjacking), only the origin sent onward as
+ * the referrer, and no access to camera, microphone or location. HTTPS
+ * only, once the browser has seen the site over HTTPS.
+ */
+add_action('send_headers', function() {
+  if (is_admin()) return;
+  header('X-Content-Type-Options: nosniff');
+  header('X-Frame-Options: SAMEORIGIN');
+  header('Referrer-Policy: strict-origin-when-cross-origin');
+  header('Permissions-Policy: camera=(), microphone=(), geolocation=(), payment=()');
+  if (is_ssl()) header('Strict-Transport-Security: max-age=31536000');
+});

@@ -10,6 +10,7 @@
  * Photographs are sent through the form on the Gallery page, not here.
  * There is no join band on this page, per the design's showJoinBand rule.
  */
+if (!defined('ABSPATH')) exit;
 get_header();
 while (have_posts()) : the_post();
   $phone = db_setting('contact_phone') ?: '+91 97388 40070';
@@ -30,6 +31,9 @@ while (have_posts()) : the_post();
     <h2 class="card-heading card-heading--lg">Send us a message</h2>
     <p class="card-intro">Questions about membership, trips or a bird you can't identify.</p>
     <form id="db-contact-form" class="stacked-form" novalidate>
+      <div class="hp-field" aria-hidden="true">
+        <label>Website<input type="text" name="website" tabindex="-1" autocomplete="off"></label>
+      </div>
       <label class="stacked-field">
         <span class="stacked-label">Name</span>
         <input type="text" name="name" placeholder="Your name" required>
@@ -117,6 +121,9 @@ while (have_posts()) : the_post();
       <h2 class="card-heading">Seen something unusual?</h2>
       <p class="card-intro card-intro--tight">Tell us what you saw, where and when. You can also put your hand up for the winter waterfowl census or a school outreach session.</p>
       <form id="db-sighting-report-form" class="stacked-form stacked-form--tight" novalidate>
+        <div class="hp-field" aria-hidden="true">
+          <label>Website<input type="text" name="website" tabindex="-1" autocomplete="off"></label>
+        </div>
         <label class="stacked-field">
           <span class="stacked-label">Species and location</span>
           <input type="text" name="species_location" placeholder="e.g. Indian Skimmer, Manjeera" required>

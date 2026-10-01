@@ -189,6 +189,11 @@ function db_handle_photo_submit() {
       || !$size || !in_array($size[2], DB_PHOTO_IMAGETYPES, true)) {
     db_photo_reply(false, 'Please send a JPG, PNG or WebP photograph.');
   }
+  // A small file can declare an enormous canvas, and decoding it would
+  // take all the server's memory. 60 megapixels is above any camera.
+  if ($size[0] > 12000 || $size[1] > 12000 || $size[0] * $size[1] > 60000000) {
+    db_photo_reply(false, 'That photograph is too large in pixels. Please resize it to under 12,000 pixels a side and try again.');
+  }
 
   // Two submissions from one address at the same moment must not both
   // slip under the limit, so the count and the log row are taken inside

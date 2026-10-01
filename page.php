@@ -5,6 +5,7 @@
  * to plain the_content() for any page that doesn't have a dedicated
  * template (e.g. a page created later that isn't one of the 10 core ones).
  */
+if (!defined('ABSPATH')) exit;
 global $post;
 $slug = $post ? $post->post_name : '';
 

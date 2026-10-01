@@ -1,3 +1,4 @@
+<?php if (!defined('ABSPATH')) exit; ?>
 <footer class="site-footer" role="contentinfo">
   <div class="footer-inner">
 

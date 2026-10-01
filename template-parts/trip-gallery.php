@@ -8,6 +8,7 @@
  * $args['class']: an extra class for the section, for each page's spacing.
  * $args['title'], $args['eyebrow']: the heading and the line above it.
  */
+if (!defined('ABSPATH')) exit;
 $trip_photos = db_trip_strip_photos();
 $extra_class = isset($args['class']) ? ' ' . sanitize_html_class($args['class']) : '';
 $title   = $args['title'] ?? 'Field notes in pictures';

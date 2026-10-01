@@ -8,6 +8,7 @@
  * the page is otherwise the design's, inside the site's own header,
  * join band and footer.
  */
+if (!defined('ABSPATH')) exit;
 get_header();
 $data = db_bt_read('trends.json');
 $states = $data['states'] ?? [];

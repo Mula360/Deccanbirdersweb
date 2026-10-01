@@ -8,6 +8,7 @@
  *
  * The strip is template-parts/trip-gallery.php, shared with the home page.
  */
+if (!defined('ABSPATH')) exit;
 get_header();
 while (have_posts()) : the_post();
 

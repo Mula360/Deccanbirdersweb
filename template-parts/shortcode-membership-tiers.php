@@ -10,6 +10,7 @@
  * dark button — followed by the benefits grid, whose 2px gaps over a grey
  * backing render as hairline dividers between cells.
  */
+if (!defined('ABSPATH')) exit;
 
 $page_id = get_page_by_path('membership')?->ID;
 if (!$page_id) return;

@@ -7,6 +7,7 @@
  * the eBird strip, the three "This week at the hide" cards, and the
  * gallery strip. Live data is filled in by events.js / sightings.js.
  */
+if (!defined('ABSPATH')) exit;
 get_header();
 while (have_posts()) : the_post();
   $id = get_the_ID();

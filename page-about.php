@@ -8,6 +8,7 @@
  * now redirects here). The Executive Committee grid deliberately does NOT
  * live here: it is its own page, reached via the card-link below.
  */
+if (!defined('ABSPATH')) exit;
 get_header();
 while (have_posts()) : the_post();
   $id = get_the_ID();

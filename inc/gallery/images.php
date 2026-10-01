@@ -40,7 +40,13 @@ function db_photo_process($src, $dest_dir) {
 
   // One thread: multi-threaded ImageMagick is a known cause of hung
   // requests under PHP on shared hosting.
-  if (extension_loaded('imagick')) Imagick::setResourceLimit(Imagick::RESOURCETYPE_THREAD, 1);
+  if (extension_loaded('imagick')) {
+    Imagick::setResourceLimit(Imagick::RESOURCETYPE_THREAD, 1);
+    // And a ceiling on what one image may use, whatever it claims to be.
+    Imagick::setResourceLimit(Imagick::RESOURCETYPE_MEMORY, 256 * 1024 * 1024);
+    Imagick::setResourceLimit(Imagick::RESOURCETYPE_MAP, 512 * 1024 * 1024);
+    if (defined('Imagick::RESOURCETYPE_AREA')) Imagick::setResourceLimit(Imagick::RESOURCETYPE_AREA, 60000000);
+  }
 
   try {
     $result = extension_loaded('imagick')

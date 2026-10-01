@@ -7,6 +7,7 @@
  * The member grid comes from [db_committee_grid], which reads the About
  * page's committee_members ACF repeater.
  */
+if (!defined('ABSPATH')) exit;
 get_header();
 while (have_posts()) : the_post();
   $id        = get_the_ID();

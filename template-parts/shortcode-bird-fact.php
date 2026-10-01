@@ -5,6 +5,7 @@
  *
  * Emits bare content for the green "This week at the hide" card.
  */
+if (!defined('ABSPATH')) exit;
 
 $home_id = get_page_by_path('home')?->ID;
 $facts   = $home_id ? db_list('bird_facts', $home_id) : [];

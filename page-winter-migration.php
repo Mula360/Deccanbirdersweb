@@ -8,6 +8,7 @@
  * page is the design's, inside the site's own header, join band and
  * footer. Birding Tools in the menu opens this page.
  */
+if (!defined('ABSPATH')) exit;
 get_header();
 $data = db_bt_read('migration.json');
 // The winter that is current or coming (from May, the one ahead), from

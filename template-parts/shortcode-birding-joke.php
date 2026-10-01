@@ -8,6 +8,7 @@
  * punchline; the stored text is a single string, so split on the first
  * question mark when there is one and fall back to one block otherwise.
  */
+if (!defined('ABSPATH')) exit;
 
 $home_id = get_page_by_path('home')?->ID;
 $jokes   = $home_id ? db_list('birding_jokes', $home_id) : [];

@@ -3,6 +3,7 @@
  * [db_milestones] — society history timeline, from the About page's
  * "milestones" repeater.
  */
+if (!defined('ABSPATH')) exit;
 
 $page_id    = get_page_by_path('about')?->ID;
 $milestones = $page_id ? db_list('milestones', $page_id) : [];

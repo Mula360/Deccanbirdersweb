@@ -7,6 +7,7 @@
  * top — the photograph, or a tinted block carrying the member's initials
  * when there isn't one yet — then role, name and email beneath.
  */
+if (!defined('ABSPATH')) exit;
 
 $page_id = get_page_by_path('about')?->ID;
 $members = $page_id ? db_list('committee_members', $page_id) : [];

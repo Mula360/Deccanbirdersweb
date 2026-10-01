@@ -103,7 +103,11 @@
         const json = await res.json();
 
         if (json.success) {
-          form.innerHTML = '<div class="form-success"><p>Thank you! We will reply to ' + data.get('email') + ' within 2 working days.</p></div>';
+          const done = document.createElement('div');
+          done.className = 'form-success';
+          done.innerHTML = '<p></p>';
+          done.firstChild.textContent = 'Thank you! We will reply to ' + data.get('email') + ' within 2 working days.';
+          form.replaceChildren(done);
         } else {
           if (globalError) globalError.textContent = json.message || 'Something went wrong. Please email us directly at info@deccanbirders.org';
           btn.disabled = false;

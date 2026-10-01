@@ -6,6 +6,7 @@
  * photo masonry (plus the "Submit a photograph" card, which belongs to the
  * Photographs tab) or the video grid. Videos are populated by videos.js.
  */
+if (!defined('ABSPATH')) exit;
 get_header();
 while (have_posts()) : the_post();
   $youtube = db_setting('social_youtube') ?: 'https://www.youtube.com/channel/UChYefSo9bbi-BBbRn9euCpg';

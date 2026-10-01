@@ -15,6 +15,7 @@
  * assets/js/pitta-search.js switches years and fills #pitta-results from
  * /wp-json/db/v1/pitta-search.
  */
+if (!defined('ABSPATH')) exit;
 
 $issues = get_posts(['post_type' => 'db_pitta', 'posts_per_page' => -1, 'post_status' => 'publish']);
 if (!$issues) {

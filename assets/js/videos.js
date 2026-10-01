@@ -18,10 +18,11 @@ const PAGE_SIZE = 6; // two rows of three on desktop
 let videos = [];
 let page = 1;
 
+// Quotes too: the result also goes inside attribute values (href="…").
 function escapeHtml(str) {
-  const div = document.createElement('div');
-  div.textContent = str == null ? '' : String(str);
-  return div.innerHTML;
+  return (str == null ? '' : String(str)).replace(/[&<>"']/g, (c) => ({
+    '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;',
+  })[c]);
 }
 
 // "12 Mar 2024" — short, and unambiguous in any locale.

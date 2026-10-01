@@ -14,6 +14,7 @@
  * the Activities page's if that content was entered there, and finally to
  * the list below.
  */
+if (!defined('ABSPATH')) exit;
 
 $activities_page = get_page_by_path('activities');
 $activities = db_list('activities', get_the_ID())

@@ -12,6 +12,7 @@
  * full-size photo in one page. Links carry #photos-panel so the Gallery
  * page comes back on the Photographs tab.
  */
+if (!defined('ABSPATH')) exit;
 
 $per_page = 24;
 

@@ -7,6 +7,7 @@
  * Light blue band, heading and standfirst on the left, green pill button
  * on the right, wrapping to stacked on narrow screens.
  */
+if (!defined('ABSPATH')) exit;
 $membership_url = ($m = get_page_by_path('membership')) ? get_permalink($m) : '/membership';
 ?>
 <section class="join-band">

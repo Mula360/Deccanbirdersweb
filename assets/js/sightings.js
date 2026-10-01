@@ -57,10 +57,11 @@ function birdCount(count) {
   return i18n.sprintf(i18n._n('%d bird', '%d birds', n, 'deccan-birders'), n);
 }
 
+// Quotes too: the result also goes inside attribute values (href="…").
 function escapeHtml(str) {
-  const div = document.createElement('div');
-  div.textContent = str == null ? '' : String(str);
-  return div.innerHTML;
+  return (str == null ? '' : String(str)).replace(/[&<>"']/g, (c) => ({
+    '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;',
+  })[c]);
 }
 
 // Homepage strip — hairline-divided cells, per the design.

@@ -7,6 +7,7 @@
  * is in the page as written, and assets/js/backpack.js turns them into
  * tabs (with no script, they simply read one after another).
  */
+if (!defined('ABSPATH')) exit;
 get_header();
 $img = get_template_directory_uri() . '/assets/img/backpack/';
 

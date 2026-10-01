@@ -2,6 +2,7 @@
 /**
  * Template for the Membership page — rendered directly in PHP (no Elementor).
  */
+if (!defined('ABSPATH')) exit;
 get_header();
 while (have_posts()) : the_post();
 ?>
