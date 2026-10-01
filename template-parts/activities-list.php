@@ -27,11 +27,11 @@ if (!$activities) {
         'activity_description' => '<ul><li>Trip reports by members with great details and pictures</li><li>Bird of the month column</li><li>Opportunity to print your articles</li></ul>'],
       ['activity_title' => 'Annual Bird Race', 'activity_cadence' => 'Once a year',
         'activity_description' => '<ul><li>Full day birding with an assigned team</li><li>Team with the maximum sightings wins</li><li>Sumptuous dinner to celebrate the day</li></ul>'],
-      ['activity_title' => 'Annual Waterfowl Census', 'activity_cadence' => 'Every winter',
+      ['activity_title' => 'Asian Waterfowl Census', 'activity_cadence' => 'Every winter',
         'activity_description' => '<ul><li>Census performed every Winter season</li><li>Volunteering opportunity to do the census</li><li>Data submitted to Wetlands International</li></ul>'],
       ['activity_title' => 'Webinars', 'activity_cadence' => 'Through the year',
         'activity_description' => '<ul><li>Talks by eminent ornithologists</li><li>Network with the experts</li><li>Become aware of the latest developments</li></ul>'],
-      ['activity_title' => 'Annual Nature Camps and Trekking', 'activity_cadence' => 'Once a year',
+      ['activity_title' => 'Outstation Nature Camps and Trekking', 'activity_cadence' => '2–3 times a year',
         'activity_description' => '<ul><li>National and International camps</li><li>Focus on the bird watching</li><li>Exclusive access to sanctuaries wherever possible</li></ul>'],
   ];
 }

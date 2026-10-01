@@ -13,7 +13,7 @@ while (have_posts()) : the_post();
   $id = get_the_ID();
   $hero_badge    = get_field('hero_badge', $id) ?: 'Founded 1980 · Hyderabad';
   $hero_title    = get_field('hero_title', $id) ?: 'Spreading the message of bird conservation';
-  $hero_subtitle = get_field('hero_subtitle', $id) ?: 'Since 1980, the Deccan Birders have documented the birds of the Deccan Plateau through field trips, citizen science, and the monthly PITTA bulletin.';
+  $hero_subtitle = get_field('hero_subtitle', $id) ?: 'Since 1980, the Deccan Birders have documented the birds of the Deccan Plateau through field trips, citizen science, and the monthly PITTA newsletter.';
   $stats         = db_list('stats', $id);
   if (!$stats) {
     $stats = [
@@ -99,9 +99,9 @@ while (have_posts()) : the_post();
     <div class="activity-brief"><span class="activity-brief-cadence">Every month</span><span class="activity-brief-title">Monthly Field Trips</span></div>
     <div class="activity-brief"><span class="activity-brief-cadence">Twelve issues a year</span><span class="activity-brief-title">PITTA – Monthly Newsletter</span></div>
     <div class="activity-brief"><span class="activity-brief-cadence">Once a year</span><span class="activity-brief-title">Annual Bird Race</span></div>
-    <div class="activity-brief"><span class="activity-brief-cadence">Every winter</span><span class="activity-brief-title">Annual Waterfowl Census</span></div>
+    <div class="activity-brief"><span class="activity-brief-cadence">Every winter</span><span class="activity-brief-title">Asian Waterfowl Census</span></div>
     <div class="activity-brief"><span class="activity-brief-cadence">Through the year</span><span class="activity-brief-title">Webinars</span></div>
-    <div class="activity-brief"><span class="activity-brief-cadence">Once a year</span><span class="activity-brief-title">Annual Nature Camps and Trekking</span></div>
+    <div class="activity-brief"><span class="activity-brief-cadence">2–3 times a year</span><span class="activity-brief-title">Outstation Nature Camps and Trekking</span></div>
   </div>
 </section>
 

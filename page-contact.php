@@ -77,7 +77,7 @@ while (have_posts()) : the_post();
           <legend class="stacked-label">I'd like to help with</legend>
           <?php foreach ([
             'Field trips and walks',
-            'Annual waterfowl census',
+            'Asian Waterfowl Census',
             'School and college outreach',
             'PITTA newsletter',
             'Photography and the gallery',
@@ -119,7 +119,7 @@ while (have_posts()) : the_post();
     <div class="contact-card contact-card--tint">
       <span class="eyebrow" style="color:var(--green);">Volunteer · Report a sighting</span>
       <h2 class="card-heading">Seen something unusual?</h2>
-      <p class="card-intro card-intro--tight">Tell us what you saw, where and when. You can also put your hand up for the winter waterfowl census or a school outreach session.</p>
+      <p class="card-intro card-intro--tight">Tell us what you saw, where and when. You can also put your hand up for the Asian Waterfowl Census or a school outreach session.</p>
       <form id="db-sighting-report-form" class="stacked-form stacked-form--tight" novalidate>
         <div class="hp-field" aria-hidden="true">
           <label>Website<input type="text" name="website" tabindex="-1" autocomplete="off"></label>
@@ -133,7 +133,7 @@ while (have_posts()) : the_post();
           <span class="stacked-label">I'd like to help with</span>
           <select name="help_with">
             <option>Reporting a sighting only</option>
-            <option>Annual waterfowl census</option>
+            <option>Asian Waterfowl Census</option>
             <option>Field trip coordination</option>
             <option>School and college outreach</option>
             <option>PITTA newsletter</option>

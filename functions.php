@@ -3166,3 +3166,61 @@ add_action('send_headers', function() {
 // post, including WordPress's sample "Hello world!" one.
 add_filter('comments_open', '__return_false', 20);
 add_filter('pings_open', '__return_false', 20);
+
+/**
+ * One-time wording update for text saved in WP Admin (2026-10-01): PITTA
+ * is the "monthly newsletter", never a "bulletin"; the nature camps are
+ * outstation camps, 2–3 times a year; the census is the Asian Waterfowl
+ * Census. Only these exact phrases change, and only once, so anything an
+ * editor writes later is left alone.
+ */
+add_action('init', function() {
+  if (get_option('db_content_rev_1')) return;
+  update_option('db_content_rev_1', 1, false);
+
+  $map = [
+    'monthly PITTA bulletin'           => 'monthly PITTA newsletter',
+    'PITTA bulletin'                   => 'PITTA newsletter',
+    'monthly bulletin'                 => 'monthly newsletter',
+    'Annual Nature Camps and Trekking' => 'Outstation Nature Camps and Trekking',
+    'Annual nature camps and trekking' => 'Outstation nature camps and trekking, 2–3 times a year',
+    'Annual Waterfowl Census'          => 'Asian Waterfowl Census',
+    'Annual waterfowl census'          => 'Asian Waterfowl Census',
+  ];
+  $swap = function($value) use (&$swap, $map) {
+    if (is_string($value)) return strtr($value, $map);
+    if (is_array($value)) return array_map($swap, $value);
+    return $value;
+  };
+
+  foreach (['home', 'about', 'activities', 'membership', 'contact'] as $slug) {
+    $page = get_page_by_path($slug);
+    if (!$page) continue;
+    foreach (get_post_meta($page->ID) as $key => $values) {
+      if ($key[0] === '_') continue;
+      $old = get_post_meta($page->ID, $key, true);
+      $new = $swap($old);
+      if ($new !== $old) update_post_meta($page->ID, $key, $new);
+    }
+    // The camps row's "how often", in either way a list can be stored.
+    $rows = get_post_meta($page->ID, 'activities', true);
+    if (is_array($rows)) {
+      foreach ($rows as &$row) {
+        if (is_array($row) && ($row['activity_title'] ?? '') === 'Outstation Nature Camps and Trekking') $row['activity_cadence'] = '2–3 times a year';
+      }
+      unset($row);
+      update_post_meta($page->ID, 'activities', $rows);
+    } else {
+      for ($i = 0, $n = (int) $rows; $i < $n; $i++) {
+        if (get_post_meta($page->ID, "activities_{$i}_activity_title", true) === 'Outstation Nature Camps and Trekking') {
+          update_post_meta($page->ID, "activities_{$i}_activity_cadence", '2–3 times a year');
+        }
+      }
+    }
+  }
+
+  $tagline = get_option('options_footer_tagline', '');
+  if (is_string($tagline) && $tagline !== '' && strtr($tagline, $map) !== $tagline) update_option('options_footer_tagline', strtr($tagline, $map));
+
+  do_action('litespeed_purge_all');
+}, 20);

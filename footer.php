@@ -20,7 +20,7 @@
           <span class="logo-name">Deccan Birders</span>
         <?php endif; ?>
       </a>
-      <p class="footer-tagline"><?php echo esc_html(db_setting('footer_tagline') ?: 'Since 1980, documenting the birds of the Deccan Plateau through field trips, citizen science, and the monthly PITTA bulletin.'); ?></p>
+      <p class="footer-tagline"><?php echo esc_html(db_setting('footer_tagline') ?: 'Since 1980, documenting the birds of the Deccan Plateau through field trips, citizen science, and the monthly PITTA newsletter.'); ?></p>
       <div class="footer-social">
         <?php if ($eb = db_setting('social_ebird')): ?>
           <a href="<?php echo esc_url($eb); ?>" target="_blank" rel="noopener" class="social-link">eBird</a>
