@@ -1173,6 +1173,29 @@ function db_sightings_regional(WP_REST_Request $request, $tab, $ttl, array $allo
  * transient TTLs (and any subsequent bug fix) until the cache expired.
  * Explicitly setting a real Cache-Control header here overrides that.
  */
+/**
+ * The same, for public data every visitor sees alike (events, sightings,
+ * videos, PITTA search): the LiteSpeed page cache keeps each answer for
+ * $seconds and serves it without running PHP, so a crowd costs the server
+ * one request per answer per period instead of one per visitor. Browsers
+ * keep it a minute. Errors are never cached. Refresh from calendar (and
+ * any LiteSpeed purge) clears them.
+ */
+function db_rest_shared_cache(WP_REST_Response $response, $seconds) {
+  $data = $response->get_data();
+  if ($response->get_status() !== 200 || (is_array($data) && !empty($data['error']))) {
+    return db_rest_no_cache($response);
+  }
+  $response->header('Cache-Control', 'public, max-age=60');
+  if (has_action('litespeed_control_set_ttl')) {
+    do_action('litespeed_control_force_cacheable', 'db public data');
+    do_action('litespeed_control_set_ttl', (int) $seconds);
+  } else {
+    $response->header('X-LiteSpeed-Cache-Control', 'public,max-age=' . (int) $seconds);
+  }
+  return $response;
+}
+
 function db_rest_no_cache(WP_REST_Response $response) {
   $response->header('Cache-Control', 'no-cache, no-store, must-revalidate');
   $response->header('Pragma', 'no-cache');
@@ -1737,7 +1760,7 @@ add_action('rest_api_init', function() {
         }
         unset($event);
       }
-      return db_rest_no_cache(rest_ensure_response($res));
+      return db_rest_shared_cache(rest_ensure_response($res), $request->get_param('scope') === 'past' ? HOUR_IN_SECONDS : 5 * MINUTE_IN_SECONDS);
     },
   ]);
 
@@ -1771,9 +1794,9 @@ add_action('rest_api_init', function() {
         // filter it against our own conservation-status watchlist.
         if ($tab === 'notable') {
           $recent = db_sightings_regional($request, 'recent', $ttl, ['region', 'tab']);
-          if (!empty($recent['error'])) return db_rest_no_cache(rest_ensure_response($recent));
+          if (!empty($recent['error'])) return db_rest_shared_cache(rest_ensure_response($recent), 10 * MINUTE_IN_SECONDS);
           $notable = db_group_notable_by_species(db_filter_notable_by_iucn($recent));
-          return db_rest_no_cache(rest_ensure_response(db_sightings_page($request, $notable)));
+          return db_rest_shared_cache(rest_ensure_response(db_sightings_page($request, $notable)), 10 * MINUTE_IN_SECONDS);
         }
 
         // Telangana and Andhra Pradesh first, then the rest of India.
@@ -1782,14 +1805,14 @@ add_action('rest_api_init', function() {
         $limits = ['hotspots' => [5, 5], 'onthisday' => [10, 10]];
         if (isset($limits[$tab]) || $tab === 'recent') {
           $data = db_sightings_regional($request, $tab, $ttl, ['region', 'tab', 'm', 'd'], $limits[$tab] ?? [null, null]);
-          if (!empty($data['error'])) return db_rest_no_cache(rest_ensure_response($data));
-          return db_rest_no_cache(rest_ensure_response(db_sightings_page($request, $data)));
+          if (!empty($data['error'])) return db_rest_shared_cache(rest_ensure_response($data), 10 * MINUTE_IN_SECONDS);
+          return db_rest_shared_cache(rest_ensure_response(db_sightings_page($request, $data)), 10 * MINUTE_IN_SECONDS);
         }
       }
 
       // hotspot_species and the species lookup are already tied to one
       // place, so they pass straight through.
-      return db_rest_no_cache(rest_ensure_response(db_proxy_fetch('/api/sightings', $request, ['region', 'tab', 'm', 'd', 'locId', 'speciesCode'], $ttl)));
+      return db_rest_shared_cache(rest_ensure_response(db_proxy_fetch('/api/sightings', $request, ['region', 'tab', 'm', 'd', 'locId', 'speciesCode'], $ttl)), 10 * MINUTE_IN_SECONDS);
     },
   ]);
 
@@ -1801,9 +1824,9 @@ add_action('rest_api_init', function() {
       // pages through every upload; the Vercel API only ever returned the
       // newest 12. Without a key we fall back to it.
       if (db_youtube_key()) {
-        return db_rest_no_cache(rest_ensure_response(db_youtube_videos()));
+        return db_rest_shared_cache(rest_ensure_response(db_youtube_videos()), HOUR_IN_SECONDS);
       }
-      return db_rest_no_cache(rest_ensure_response(db_proxy_fetch('/api/videos', $request, [], 6 * HOUR_IN_SECONDS)));
+      return db_rest_shared_cache(rest_ensure_response(db_proxy_fetch('/api/videos', $request, [], 6 * HOUR_IN_SECONDS)), HOUR_IN_SECONDS);
     },
   ]);
 });
@@ -2337,7 +2360,7 @@ add_action('rest_api_init', function() {
         $data = db_pitta_search($q);
         if (empty($data['error'])) set_transient($cache_key, $data, 12 * HOUR_IN_SECONDS);
       }
-      return db_rest_no_cache(rest_ensure_response($data));
+      return db_rest_shared_cache(rest_ensure_response($data), HOUR_IN_SECONDS);
     },
   ]);
 });
