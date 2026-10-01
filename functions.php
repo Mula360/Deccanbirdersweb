@@ -547,7 +547,7 @@ require_once __DIR__ . '/inc/gallery/submissions.php';
 // Trip Photos: several photos per trip, for the Events page strip.
 require_once __DIR__ . '/inc/trip-photos.php';
 
-// Birding Tools: Migration Season and Bird Trends, recalculated every 3 days.
+// Birding Tools: Winter Migration, Bird Trends and Backpack, recalculated every 3 days.
 require_once __DIR__ . '/inc/birding-tools/engine.php';
 require_once __DIR__ . '/inc/birding-tools/setup.php';
 require_once __DIR__ . '/inc/birding-tools/admin.php';

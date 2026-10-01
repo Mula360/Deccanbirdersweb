@@ -159,15 +159,15 @@ add_action('init', function() {
   update_option('db_bt_setup_v1', 1, false);
 
   $ids = [];
-  foreach (['migration-season' => 'Migration Season', 'bird-trends' => 'Bird Trends'] as $slug => $title) {
+  foreach (['winter-migration' => 'Winter Migration', 'bird-trends' => 'Bird Trends'] as $slug => $title) {
     $page = get_page_by_path($slug);
     $ids[$slug] = $page ? $page->ID : wp_insert_post(['post_type' => 'page', 'post_status' => 'publish', 'post_title' => $title, 'post_name' => $slug]);
   }
 
-  // Birding Tools before Contact in the main menu, opening Migration Season.
+  // Birding Tools before Contact in the main menu, opening Winter Migration.
   $locations = get_nav_menu_locations();
   $menu_id = $locations['primary-nav'] ?? 0;
-  if (!$menu_id || is_wp_error($ids['migration-season']) || is_wp_error($ids['bird-trends'])) return;
+  if (!$menu_id || is_wp_error($ids['winter-migration']) || is_wp_error($ids['bird-trends'])) return;
   $items = wp_get_nav_menu_items($menu_id) ?: [];
   foreach ($items as $item) if ($item->title === 'Birding Tools') return; // someone added it already
 
@@ -183,13 +183,13 @@ add_action('init', function() {
   }
   $parent = wp_update_nav_menu_item($menu_id, 0, [
     'menu-item-title'    => 'Birding Tools',
-    'menu-item-url'      => get_permalink($ids['migration-season']),
+    'menu-item-url'      => get_permalink($ids['winter-migration']),
     'menu-item-type'     => 'custom',
     'menu-item-status'   => 'publish',
     'menu-item-position' => $position,
   ]);
   if (is_wp_error($parent)) return;
-  foreach (['migration-season', 'bird-trends'] as $i => $slug) {
+  foreach (['winter-migration', 'bird-trends'] as $i => $slug) {
     wp_update_nav_menu_item($menu_id, 0, [
       'menu-item-object-id' => $ids[$slug],
       'menu-item-object'    => 'page',
@@ -237,9 +237,38 @@ add_action('init', function() {
   ]);
 });
 
+// Migration Season became Winter Migration: rename the existing page (its
+// menu item follows the page's title), point Birding Tools at its new
+// address, once.
+add_action('init', function() {
+  if (get_option('db_bt_setup_v3')) return;
+  if (!current_user_can('manage_options') && !wp_doing_cron()) return;
+  update_option('db_bt_setup_v3', 1, false);
+  $page = get_page_by_path('migration-season');
+  if (!$page || get_page_by_path('winter-migration')) return;
+  wp_update_post(['ID' => $page->ID, 'post_title' => 'Winter Migration', 'post_name' => 'winter-migration']);
+  $menu_id = get_nav_menu_locations()['primary-nav'] ?? 0;
+  foreach ($menu_id ? (wp_get_nav_menu_items($menu_id) ?: []) : [] as $item) {
+    if ($item->title === 'Birding Tools' && $item->type === 'custom') {
+      update_post_meta($item->ID, '_menu_item_url', esc_url_raw(get_permalink($page->ID)));
+    }
+  }
+});
+
+// Links to the old address (shared, bookmarked, in search results) land
+// on the renamed page.
+add_action('template_redirect', function() {
+  if (!is_404()) return;
+  $path = trim((string) parse_url($_SERVER['REQUEST_URI'] ?? '', PHP_URL_PATH), '/');
+  if ($path === 'migration-season' && ($page = get_page_by_path('winter-migration'))) {
+    wp_safe_redirect(get_permalink($page), 301);
+    exit;
+  }
+});
+
 // The menu's Birding Tools item is a link, so mark it current on its pages.
 add_filter('nav_menu_css_class', function($classes, $item) {
-  if ($item->title === 'Birding Tools' && (is_page('migration-season') || is_page('bird-trends') || is_page('backpack'))) {
+  if ($item->title === 'Birding Tools' && (is_page('winter-migration') || is_page('bird-trends') || is_page('backpack'))) {
     $classes[] = 'current-menu-ancestor';
   }
   return $classes;
@@ -250,15 +279,15 @@ add_filter('nav_menu_css_class', function($classes, $item) {
  * -------------------------------------------------------------------- */
 
 add_action('wp_enqueue_scripts', function() {
-  $pages = ['bird-trends' => 'bird-trends', 'migration-season' => 'migration-season', 'backpack' => 'backpack'];
+  $pages = ['bird-trends' => 'bird-trends', 'winter-migration' => 'winter-migration', 'backpack' => 'backpack'];
   foreach ($pages as $slug => $script) {
     if (!is_page($slug)) continue;
     $dir = get_template_directory();
     $uri = get_template_directory_uri();
     wp_enqueue_style('db-birding-tools', $uri . '/assets/css/birding-tools.css', ['db-main'], (string) @filemtime($dir . '/assets/css/birding-tools.css'));
     wp_enqueue_script('db-' . $script, $uri . '/assets/js/' . $script . '.js', [], (string) @filemtime($dir . '/assets/js/' . $script . '.js'), true);
-    if ($slug === 'migration-season') {
-      wp_localize_script('db-migration-season', 'DB_BT', ['geo' => $uri . '/assets/data/ts-ap-geo.json']);
+    if ($slug === 'winter-migration') {
+      wp_localize_script('db-winter-migration', 'DB_BT', ['geo' => $uri . '/assets/data/ts-ap-geo.json']);
     }
   }
 });

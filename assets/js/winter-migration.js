@@ -1,8 +1,8 @@
-/* Deccan Birders — Birding Tools → Migration Season.
+/* Deccan Birders — Birding Tools → Winter Migration.
  *
- * Draws the page from the figures page-migration-season.php prints as
+ * Draws the page from the figures page-winter-migration.php prints as
  * JSON (#bt-data, from inc/birding-tools/engine.php, recalculated every 3
- * days): countdowns to each habitat group's peak, the winter visitors to
+ * days, page-winter-migration.php): countdowns to each habitat group's peak, the winter visitors to
  * expect in a chosen month, the hotspots on a map, and an arrival
  * calendar. The drawing is the design's own; the map outline is loaded
  * from the theme (DB_BT.geo).
@@ -39,10 +39,17 @@
     $('months').innerHTML = M.map((m, i) => `<button class="bt-pill" type="button" data-m="${i}" aria-pressed="${i === st.m}">${m}</button>`).join('');
     $('habs').innerHTML = [['all', 'All habitats'], ...Object.entries(HAB).map(([k, h]) => [k, h[0]])].map(([k, n]) => `<button class="bt-pill" type="button" data-h="${k}" aria-pressed="${st.h === k}">${k === 'all' ? '' : `<span class="bt-dot" style="background:${HAB[k][1]}"></span>`}${esc(n)}</button>`).join('');
   }
+  // The winter that is current or coming: from May on, the one ahead.
+  const seasonYear = now.getMonth() >= 4 ? now.getFullYear() : now.getFullYear() - 1;
+  const sep1 = new Date(seasonYear, 8, 1);
+  const onSeason = (days) => new Date(sep1.getFullYear(), sep1.getMonth(), sep1.getDate() + days);
   function renderWaves() {
     const day = 864e5, t0 = new Date(now.getFullYear(), now.getMonth(), now.getDate());
     const w = WAVES.filter((w) => st.h === 'all' || w[1] === st.h).map((w) => {
-      const [, , A, P, E] = w, Pd = new Date(P + 'T00:00:00'), Ed = new Date(E + 'T00:00:00');
+      // Peak and end as days into the season, placed on this winter, so
+      // the countdowns roll over each year by themselves.
+      const Pd = w[5] ? onSeason(w[5][1]) : new Date(w[3] + 'T00:00:00');
+      const Ed = w[5] ? onSeason(w[5][2]) : new Date(w[4] + 'T00:00:00');
       const dp = Math.round((Pd - t0) / day), over = t0 > Ed;
       const big = over ? '—' : dp > 0 ? dp : 'Now';
       const unit = over ? 'Season over' : dp > 0 ? (dp === 1 ? 'day to peak' : 'days to peak') : 'At its peak';

@@ -1,4 +1,4 @@
-/* Birding Tools: Migration Season and Bird Trends.
+/* Birding Tools: Winter Migration and Bird Trends.
  *
  * From the designs for the two pages, with every class renamed bt-* so
  * none collides with the site's own (.card, .eyebrow, .chip …), and the
@@ -50,7 +50,7 @@
 @media (max-width:380px){.bt--trends .bt-g4.incs{grid-template-columns:1fr}}
 
 
-/* Migration Season */
+/* Winter Migration */
 .bt--migration .bt-hero-grid{display:grid;grid-template-columns:minmax(0,1fr) 380px;gap:40px;align-items:end}.bt--migration .bt-waves{display:flex;flex-direction:column;gap:10px}.bt--migration .bt-wave{display:grid;grid-template-columns:76px minmax(0,1fr);gap:12px;align-items:center;border-top:1px solid rgba(255,255,255,.18);padding-top:10px}.bt--migration .bt-wave b{font-family:Sora,sans-serif;font-weight:700;font-size:34px;letter-spacing:-.03em;color:var(--yellow);text-align:right;line-height:1.1}.bt--migration .bt-wave span{display:flex;flex-direction:column;font-size:14px;color:#B9C6BF}.bt--migration .bt-wave strong{font-family:Sora,sans-serif;font-weight:600;font-size:14px;color:#fff}.bt--migration .bt-month-pills{margin-top:36px}.bt--migration .bt-exp-head{display:flex;justify-content:space-between;align-items:center;gap:16px;margin-bottom:18px;flex-wrap:wrap}.bt--migration .bt-exp-head h2{font-family:Sora,sans-serif;font-weight:700;font-size:clamp(24px,3vw,30px);letter-spacing:-.025em;color:var(--ink);margin:0}.bt--migration .bt-hab-pills .bt-pill{font-size:13px;min-height:40px;padding:0 14px}.bt--migration .bt-sp{border:1px solid var(--line);border-top:4px solid var(--c);border-radius:16px;padding:16px 18px;display:flex;flex-direction:column;gap:4px}.bt--migration .bt-sp .bt-st{font-family:Sora,sans-serif;font-weight:600;font-size:12px}.bt--migration .bt-sp .bt-nm{font-family:Sora,sans-serif;font-weight:700;font-size:17px;color:var(--ink)}.bt--migration .bt-sp .bt-v{display:flex;align-items:baseline;gap:6px;margin-top:4px}.bt--migration .bt-sp .bt-v b{font-family:Sora,sans-serif;font-weight:700;font-size:32px;letter-spacing:-.03em;color:var(--ink)}.bt--migration .bt-sp .bt-v small{font-size:14px;color:var(--muted)}.bt--migration .bt-sp .bt-tr{font-size:14px}.bt--migration .bt-empty{padding:20px;text-align:center;color:var(--muted)}.bt--migration .bt-map{background:#E7EDE9;border-radius:16px;overflow:hidden;height:460px}.bt--migration .bt-map svg{width:100%;height:100%;display:block}.bt--migration .bt-spot{padding:16px 18px}.bt--migration .bt-spot .bt-top{display:flex;justify-content:space-between;gap:8px;align-items:center;font-size:14px;color:var(--muted)}.bt--migration .bt-spot h3{font-family:Sora,sans-serif;font-weight:700;font-size:17px;color:var(--ink);margin:10px 0 0;display:flex;gap:10px;align-items:center}.bt--migration .bt-spot h3 i{font-style:normal;width:26px;height:26px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-size:13px;flex:none;border:1.5px solid var(--ink)}.bt--migration .bt-spot .bt-ar{font-size:14px;color:var(--muted)}.bt--migration .bt-spot p{font-size:15px;line-height:1.5;margin:6px 0 0}.bt--migration .bt-tl{padding:24px 28px 20px}.bt--migration .bt-tl-head,.bt--migration .bt-tl-row{display:grid;grid-template-columns:260px minmax(0,1fr);gap:20px;align-items:center}.bt--migration .bt-tl-head{padding-bottom:10px}.bt--migration .bt-tl-count{font-size:14px;color:var(--muted)}.bt--migration .bt-tl-months{display:grid;grid-template-columns:repeat(8,1fr);background:var(--bg);border-radius:999px;padding:4px}.bt--migration .bt-tl-months span{text-align:center;font-family:Sora,sans-serif;font-weight:600;font-size:13px;padding:8px 0;border-radius:999px;color:var(--body)}.bt--migration .bt-tl-months span.now{background:var(--ink);color:#fff}.bt--migration .bt-tl-group{display:flex;align-items:center;gap:8px;padding:18px 0 6px;font-family:Sora,sans-serif;font-weight:600;font-size:12px;letter-spacing:.08em;text-transform:uppercase}.bt--migration .bt-tl-row{min-height:54px;padding:0 10px;margin:0 -10px;border-radius:12px}.bt--migration .bt-tl-row:hover{background:rgba(245,244,239,.75)}.bt--migration .bt-tl-name{display:flex;flex-direction:column;gap:1px;padding:6px 0}.bt--migration .bt-tl-name b{font-family:Sora,sans-serif;font-weight:600;font-size:15px;color:var(--ink)}.bt--migration .bt-tl-name small{font-size:13.5px;color:var(--muted)}.bt--migration .bt-tl-track{position:relative;align-self:stretch;min-height:54px;background:repeating-linear-gradient(90deg,transparent 0 calc(12.5% - 1px),#EEF2EF calc(12.5% - 1px) 12.5%)}.bt--migration .bt-tl-bar{position:absolute;top:50%;height:26px;transform:translateY(-50%);border-radius:999px;box-shadow:inset 0 0 0 1px rgba(22,36,29,.06)}.bt--migration .bt-tl-today{position:absolute;top:0;bottom:0;border-left:2px dashed var(--ink);z-index:1}.bt--migration .bt-tl-legend{display:flex;gap:24px;flex-wrap:wrap;align-items:center;font-size:14px;color:var(--muted);border-top:1px solid var(--line2);margin-top:14px;padding-top:14px}.bt--migration .bt-tl-legend span{display:flex;align-items:center;gap:8px}
 @media (max-width:900px){.bt--migration .bt-hero-grid{grid-template-columns:1fr;gap:28px}.bt--migration .bt-wave{grid-template-columns:64px minmax(0,1fr)}.bt--migration .bt-wave b{font-size:28px}.bt--migration .bt-map{height:auto;aspect-ratio:1000/953}
 }
@@ -115,7 +115,7 @@
 .bt-pack-leave-name{font-family:Sora,sans-serif;font-weight:600;font-size:15.5px;color:var(--ink)}
 @media (max-width:640px){.bt-pack-hero-inner{padding:48px 16px 80px}.bt-pack-kit,.bt-pack-seasons,.bt-pack-leave-wrap{padding-left:16px;padding-right:16px}.bt-pack-tabs{top:76px}}
 
-/* Migration Season: the arrival calendar's months choose the month. */
+/* Winter Migration: the arrival calendar's months choose the month. */
 .bt--migration .bt-tl-months button{text-align:center;font-family:Sora,sans-serif;font-weight:600;font-size:13px;padding:8px 0;border:0;border-radius:999px;background:transparent;color:var(--body);cursor:pointer;position:relative}
 .bt--migration .bt-tl-months button:hover{background:#fff;color:var(--ink)}
 .bt--migration .bt-tl-months button.sel{background:var(--ink);color:#fff}
@@ -124,3 +124,21 @@
 .bt--migration .bt-tl-switch{font:inherit;font-family:Sora,sans-serif;font-weight:600;font-size:13.5px;color:var(--green-d);background:none;border:0;border-bottom:2px solid var(--yellow);padding:0 0 1px;cursor:pointer}
 .bt--migration .bt-tl-new{font-style:normal;font-family:Sora,sans-serif;font-weight:600;font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--green-d);background:var(--green-l);border-radius:6px;padding:2px 6px;margin-left:6px;vertical-align:2px}
 @media (max-width:720px){.bt--migration .bt-tl-months button{font-size:11.5px;padding:6px 0}}
+
+/* Winter Migration on phones: the habitat filter is one row that scrolls
+   sideways, like the months above it, and each expected bird is a compact
+   row (name and trend left, its figure right) instead of a tall card. */
+@media (max-width:640px){
+  .bt--migration .bt-exp-head{flex-direction:column;flex-wrap:nowrap;align-items:stretch;gap:12px;margin-bottom:14px}
+  .bt--migration .bt-hab-pills{flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;margin:0 -16px;padding:0 16px 2px;min-width:0;max-width:calc(100% + 32px)}
+  .bt--migration .bt-hab-pills::-webkit-scrollbar{display:none}
+  .bt--migration .bt-hab-pills .bt-pill{flex:none}
+  .bt--migration #expected{grid-template-columns:1fr;gap:8px}
+  .bt--migration .bt-sp{display:grid;grid-template-columns:minmax(0,1fr) auto;column-gap:12px;row-gap:2px;align-items:center;padding:12px 14px;border-top:1px solid var(--line);border-left:4px solid var(--c);border-radius:12px}
+  .bt--migration .bt-sp .bt-st{grid-column:1;font-size:11.5px}
+  .bt--migration .bt-sp .bt-nm{grid-column:1;font-size:16px;line-height:1.25}
+  .bt--migration .bt-sp .bt-tr{grid-column:1;font-size:13px}
+  .bt--migration .bt-sp .bt-v{grid-column:2;grid-row:1 / span 3;flex-direction:column;align-items:flex-end;gap:0;margin:0;text-align:right}
+  .bt--migration .bt-sp .bt-v b{font-size:24px;line-height:1.1}
+  .bt--migration .bt-sp .bt-v small{font-size:11.5px;line-height:1.2;max-width:70px}
+}

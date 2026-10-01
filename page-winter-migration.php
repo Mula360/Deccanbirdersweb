@@ -1,24 +1,28 @@
 <?php
 /**
- * Birding Tools → Migration Season: the winter visitors to expect each
+ * Birding Tools → Winter Migration: the winter visitors to expect each
  * month, where to see them, and when each group peaks.
  *
  * All from inc/birding-tools/engine.php (recalculated every 3 days),
- * printed here as JSON for assets/js/migration-season.js to draw. The
+ * printed here as JSON for assets/js/winter-migration.js to draw. The
  * page is the design's, inside the site's own header, join band and
  * footer. Birding Tools in the menu opens this page.
  */
 get_header();
 $data = db_bt_read('migration.json');
+// The winter that is current or coming (from May, the one ahead), from
+// today's date, so the page moves on each year by itself.
+$season_year = (int) wp_date('n') >= 5 ? (int) wp_date('Y') : (int) wp_date('Y') - 1;
+$season = $season_year . '–' . substr((string) ($season_year + 1), -2);
 ?>
 <div class="bt bt--migration">
   <section class="bt-hero bt-dark">
     <div class="bt-wrap">
       <div class="bt-hero-grid">
         <div>
-          <div class="bt-eyebrow">Winter <?php echo esc_html($data['season'] ?? ''); ?></div>
-          <h1 class="bt-h1">Get ready for<br>migration season</h1>
-          <p class="bt-lead">Arrival dates, what past seasons tell us to expect, and where to be.</p>
+          <div class="bt-eyebrow">Winter <?php echo esc_html($season); ?></div>
+          <h1 class="bt-h1">Get ready for<br>winter migration</h1>
+          <p class="bt-lead">Arrival dates, what <?php echo !empty($data['years']) ? 'eBird records from ' . esc_html($data['years']) : 'past winters'; ?> tell us to expect for <?php echo esc_html($season); ?>, and where to be.</p>
         </div>
         <?php if ($data): ?><div class="bt-waves" id="waves" aria-label="Countdown to peak arrival"></div><?php endif; ?>
       </div>

@@ -1,6 +1,6 @@
 <?php
 /**
- * Birding Tools: the figures behind Bird Trends and Migration Season.
+ * Birding Tools: the figures behind Bird Trends and Winter Migration.
  *
  * Everything is worked out from the eBird Observation Dataset as GBIF
  * publishes it (Cornell Lab of Ornithology, CC BY 4.0): GBIF's search API
@@ -140,7 +140,7 @@ function db_bt_taxonomy($run) {
 }
 
 /**
- * Habitat by bird family, for the Migration Season groups. Genera listed
+ * Habitat by bird family, for the Winter Migration groups. Genera listed
  * separately where one family spans two habitats (chats and redstarts
  * are scrub birds; flycatchers, their family-mates, are woodland ones).
  * Reviewed once; any species can be overridden in wp-admin.
@@ -376,7 +376,7 @@ function db_bt_state_trends($key, $run, $now_year) {
 }
 
 /* -----------------------------------------------------------------------
- * Migration Season
+ * Winter Migration
  * -------------------------------------------------------------------- */
 
 /** Calendar months in season order: Sep … Apr. */
@@ -559,6 +559,9 @@ function db_bt_waves($run, $last_year, array $migrants, $tax, $season_year) {
       'start' => $sep1->modify("+$start days")->format('Y-m-d'),
       'peak'  => $sep1->modify("+$peak_day days")->format('Y-m-d'),
       'end'   => $sep1->modify("+$end days")->format('Y-m-d'),
+      // Days from 1 September, so the page can place them on whichever
+      // winter is current, whatever year the figures were worked out in.
+      'days'  => [$start, $peak_day, $end],
     ];
   }
   if (!empty($missing)) return null;
@@ -629,7 +632,7 @@ function db_bt_compute($run, $now = null) {
     'species'   => array_values($species),
   ];
 
-  // Migration Season: the latest year both states have complete.
+  // Winter Migration: the latest year both states have complete.
   $lasts = array_filter(array_map(fn($st) => empty($st['error']) ? end($st['years']) : null, $states));
   $last_year = $lasts ? min($lasts) : $now_year - 1;
   $migrants = db_bt_migrants($run, $last_year, $tax);
@@ -661,7 +664,7 @@ function db_bt_compute($run, $now = null) {
     'years'     => ($last_year - 4) . '–' . $last_year,
     'species'   => $list,
     'spots'     => array_map(fn($s) => [$s['name'], $s['area'], $s['hab'], $s['best'], $s['top'], $s['lat'], $s['lng']], $spots),
-    'waves'     => array_map(fn($w) => [$w['label'], $w['hab'], $w['start'], $w['peak'], $w['end']], $waves),
+    'waves'     => array_map(fn($w) => [$w['label'], $w['hab'], $w['start'], $w['peak'], $w['end'], $w['days']], $waves),
   ];
 
   return ['done' => true, 'trends' => $trends, 'migration' => $migration];

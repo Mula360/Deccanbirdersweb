@@ -1,7 +1,7 @@
 <?php
 /**
  * Tools → Birding Tools: where the 3-day recalculation stands, a button
- * to run it now, and the habitat overrides for Migration Season.
+ * to run it now, and the habitat overrides for Winter Migration.
  */
 
 if (!defined('ABSPATH')) exit;
@@ -36,7 +36,7 @@ function db_bt_admin_page() {
   ?>
   <div class="wrap">
     <h1>Birding Tools</h1>
-    <p style="max-width:760px">The <a href="<?php echo esc_url(home_url('/migration-season/')); ?>">Migration Season</a> and <a href="<?php echo esc_url(home_url('/bird-trends/')); ?>">Bird Trends</a> pages are worked out from eBird records (via GBIF) and recalculated every 3 days, in the background, a little at a time.</p>
+    <p style="max-width:760px">The <a href="<?php echo esc_url(home_url('/winter-migration/')); ?>">Winter Migration</a> and <a href="<?php echo esc_url(home_url('/bird-trends/')); ?>">Bird Trends</a> pages are worked out from eBird records (via GBIF) and recalculated every 3 days, in the background, a little at a time.</p>
     <?php if ($notice): ?><div class="notice notice-success"><p><?php echo esc_html($notice); ?></p></div><?php endif; ?>
 
     <h2>Status</h2>
@@ -68,7 +68,7 @@ function db_bt_admin_page() {
               }
             ?></td></tr>
           <?php endforeach; ?>
-          <tr><th>Migration Season</th><td><?php printf('%d winter visitors, %d hotspots, %d countdowns', (int) $s['migrants'], (int) $s['spots'], (int) $s['waves']); ?></td></tr>
+          <tr><th>Winter Migration</th><td><?php printf('%d winter visitors, %d hotspots, %d countdowns', (int) $s['migrants'], (int) $s['spots'], (int) $s['waves']); ?></td></tr>
         <?php endif; ?>
       </tbody>
     </table>
@@ -78,7 +78,7 @@ function db_bt_admin_page() {
     </form>
 
     <h2 style="margin-top:32px">Habitats</h2>
-    <p style="max-width:760px">Migration Season groups each winter visitor as Wetland, Grassland &amp; farmland, Scrub or Woodland, from its bird family (ducks, waders, gulls and herons are wetland; harriers, larks, pipits and starlings grassland; reed warblers and shrikes scrub; leaf warblers, flycatchers and pittas woodland). To move a species, add a line here: its name, an equals sign, and <code>wet</code>, <code>grass</code>, <code>scrub</code> or <code>wood</code>.</p>
+    <p style="max-width:760px">Winter Migration groups each winter visitor as Wetland, Grassland &amp; farmland, Scrub or Woodland, from its bird family (ducks, waders, gulls and herons are wetland; harriers, larks, pipits and starlings grassland; reed warblers and shrikes scrub; leaf warblers, flycatchers and pittas woodland). To move a species, add a line here: its name, an equals sign, and <code>wet</code>, <code>grass</code>, <code>scrub</code> or <code>wood</code>.</p>
     <form method="post">
       <?php wp_nonce_field('db_bt_admin'); ?>
       <textarea name="db_bt_habitats" rows="8" class="large-text code" style="max-width:760px" placeholder="Bluethroat = scrub&#10;Rosy Starling = grass"><?php echo esc_textarea(get_option('db_bt_habitat_overrides', '')); ?></textarea>
