@@ -3101,3 +3101,8 @@ add_action('send_headers', function() {
   header('Permissions-Policy: camera=(), microphone=(), geolocation=(), payment=()');
   if (is_ssl()) header('Strict-Transport-Security: max-age=31536000');
 });
+
+// The site has no comments anywhere; close them, and pingbacks, on every
+// post, including WordPress's sample "Hello world!" one.
+add_filter('comments_open', '__return_false', 20);
+add_filter('pings_open', '__return_false', 20);
