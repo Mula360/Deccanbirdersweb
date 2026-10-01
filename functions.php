@@ -442,8 +442,10 @@ function db_handle_contact() {
     wp_send_json(['success' => false, 'message' => 'Please fill in all required fields.']);
   }
   $to      = 'info@deccanbirders.org';
-  $headers = ['Content-Type: text/html; charset=UTF-8', "Reply-To: $name <$email>"];
-  $body    = '<p><strong>From:</strong> ' . esc_html("$name ($email)") . '</p><p><strong>Subject:</strong> ' . esc_html($subject) . '</p>' . wpautop(esc_html($message));
+  $headers = ['Content-Type: text/html; charset=UTF-8'];
+  $body    = '<p>A message from the Contact page of the website.</p>'
+    . '<p><strong>From:</strong> ' . esc_html("$name ($email)") . '</p><p><strong>Subject:</strong> ' . esc_html($subject) . '</p>' . wpautop(esc_html($message))
+    . db_reply_link($name, $email, "Re: $subject");
   wp_mail($to, "Website enquiry: $subject", $body, $headers);
   // The acknowledgement goes to whatever address was typed, so it carries
   // nothing the sender wrote: it can't be used to mail someone else a message.
@@ -474,9 +476,11 @@ function db_handle_volunteer() {
     wp_send_json(['success' => false, 'message' => 'Please fill in all required fields.']);
   }
   $to           = db_notify_email('volunteers');
-  $headers      = ['Content-Type: text/html; charset=UTF-8', "Reply-To: $name <$email>"];
+  $headers      = ['Content-Type: text/html; charset=UTF-8'];
   $help_with_str = $help_with ? implode(', ', $help_with) : 'Not specified';
-  $body         = '<p><strong>From:</strong> ' . esc_html("$name ($email)") . '</p><p><strong>Would like to help with:</strong> ' . esc_html($help_with_str) . '</p>';
+  $body         = '<p>A new volunteer offer from the "Lend a hand" form on the Contact page.</p>'
+    . '<p><strong>From:</strong> ' . esc_html("$name ($email)") . '</p><p><strong>Would like to help with:</strong> ' . esc_html($help_with_str) . '</p>'
+    . db_reply_link($name, $email, 'Volunteering with Deccan Birders');
   wp_mail($to, "New volunteer: $name", $body, $headers);
   wp_mail($email, 'Thank you for volunteering — Deccan Birders', '<p>Hello,</p><p>Thank you for offering to help. A committee member will be in touch soon.</p><p>— Deccan Birders</p>', ['Content-Type: text/html; charset=UTF-8']);
 
@@ -633,6 +637,16 @@ function db_mail_budget_spent($max_per_hour = 40) {
   if ($count >= $max_per_hour) return true;
   set_transient($key, $count + 1, HOUR_IN_SECONDS);
   return false;
+}
+
+/**
+ * A "Reply to …" link for the committee's copy of a form message. Not a
+ * Reply-To header: mail from deccanbirders.org whose replies go to a
+ * Gmail address is a phishing pattern, and spam filters file it as spam.
+ */
+function db_reply_link($name, $email, $subject) {
+  return sprintf('<p><a href="%s">Reply to %s</a></p>',
+    esc_url('mailto:' . $email . '?subject=' . rawurlencode($subject), ['mailto']), esc_html($name));
 }
 
 /** A sender's name, safe inside a "Name <address>" header: no commas, quotes or angle brackets. */

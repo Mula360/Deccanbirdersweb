@@ -90,8 +90,13 @@ add_action('phpmailer_init', function($m) {
   if ($m->ContentType === 'text/html' && trim($m->AltBody) === '') {
     $m->AltBody = db_mail_plain_text($m->Body);
   }
+  // The same goes for the name the server gives itself when it connects
+  // (by default the temporary address too).
   $domain = substr(strrchr((string) $m->From, '@'), 1);
-  if ($domain) $m->MessageID = sprintf('<%s@%s>', wp_generate_password(24, false), $domain);
+  if ($domain) {
+    $m->Hostname  = $domain;
+    $m->MessageID = sprintf('<%s@%s>', wp_generate_password(24, false), $domain);
+  }
 });
 
 /** The plain-text twin of an HTML email: links spelled out, tags gone. */
