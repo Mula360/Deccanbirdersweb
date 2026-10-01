@@ -591,7 +591,7 @@ function db_bt_season_day($date) {
  */
 function db_bt_compute($run, $now = null) {
   $GLOBALS['db_bt_wanted'] = [];
-  $now = $now ?: current_time('timestamp');
+  $now = $now ?: time(); // a real timestamp: wp_date() adds the site's time zone itself
   $now_year = (int) wp_date('Y', $now);
 
   $tax = db_bt_taxonomy($run);
