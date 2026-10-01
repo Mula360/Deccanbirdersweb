@@ -270,7 +270,7 @@ function renderEventCard(kind, data, index, opts = {}) {
   const chips = past ? `<div class="ev-chips">
       ${data.species != null && data.species !== '' ? `<span class="ev-chip"><span class="ev-dot"></span>${escapeHtml(String(data.species))} species</span>` : ''}
       ${data.turnout != null && data.turnout !== '' ? `<span class="ev-chip"><span class="ev-dot ev-dot--amber"></span>${escapeHtml(String(data.turnout))} out</span>` : ''}
-      ${coordinator ? `<a class="ev-chip" href="tel:${escapeHtml(coordinator.tel)}"><span class="ev-dot ev-dot--amber"></span>${escapeHtml(coordinator.name)} · ${escapeHtml(coordinator.phone)}</a>` : ''}
+      ${(data.coordinators || []).map((c) => `<a class="ev-chip" href="tel:${escapeHtml(c.tel)}"><span class="ev-dot ev-dot--amber"></span>${escapeHtml(c.name)} · ${escapeHtml(c.phone)}</a>`).join('')}
     </div>` : '';
 
   const glanceFacts = (data.facts || []).map((f) => `<div class="ev-glance-fact">
@@ -283,7 +283,8 @@ function renderEventCard(kind, data, index, opts = {}) {
     stops.meet && stops.meet.map ? `<a class="ev-btn ev-btn--blue" href="${escapeHtml(stops.meet.map)}" target="_blank" rel="noopener">Meeting point map</a>` : '',
     // Upcoming cards carry the site's map in their Location line already.
     past && data.mapUrl ? `<a class="ev-btn" href="${escapeHtml(data.mapUrl)}" target="_blank" rel="noopener">Trip site map</a>` : '',
-    coordinator ? `<a class="ev-btn" href="tel:${escapeHtml(coordinator.tel)}">Call coordinator</a>` : '',
+    // One call button per coordinator, named when there is more than one.
+    ...(data.coordinators || []).map((c, i, all) => `<a class="ev-btn" href="tel:${escapeHtml(c.tel)}">${all.length > 1 ? `Call ${escapeHtml(c.name.split(' ').find((w) => w.replace(/\./g, '').length > 1) || c.name)}` : 'Call coordinator'}</a>`),
   ].join('');
 
   const aside = (glanceFacts || buttons) ? `<aside class="ev-glance">

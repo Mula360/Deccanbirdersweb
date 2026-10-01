@@ -1074,6 +1074,109 @@ function db_rest_no_cache(WP_REST_Response $response) {
  * through untouched, so the names and numbers are pulled out here and
  * added to each event for the Events page to show.
  * ---------------------------------------------------------------------*/
+/* -----------------------------------------------------------------------
+ * The "At a glance" block
+ *
+ * The committee ends each calendar invitation with a short labelled block
+ * (see the guide "Posting a field trip on Google Calendar"):
+ *
+ *   --- At a glance ---
+ *   Meet: Taaza Tiffins, Thumkunta | 5:15 AM | https://maps.app.goo.gl/…
+ *   Meet note: 45 min drive to the lake
+ *   Pickup: …   Direct: …   Contribution: …   Bring: …   Duration: …
+ *   Species: Bird one, Bird two
+ *   Coordinator: K Sudhir - 89776 13055
+ *
+ * When it is there, the card is filled from it exactly, and the guesses
+ * from the invitation's wording below are not used. Invitations without
+ * one still get the guesses.
+ * ---------------------------------------------------------------------*/
+
+const DB_GLANCE_MARK = '/-{2,}\s*at\s+a\s+glance\s*-{2,}/i';
+
+/** The invitation without its At a glance block, for showing as written. */
+function db_event_invitation($description) {
+  if (!preg_match(DB_GLANCE_MARK, (string) $description, $m, PREG_OFFSET_CAPTURE)) return (string) $description;
+  $before = preg_replace('#(?:<(?:p|div|span)[^>]*>|<br\s*/?>|\s|&nbsp;)+$#i', '', substr($description, 0, $m[0][1]));
+  return force_balance_tags($before);
+}
+
+/**
+ * The At a glance block, read into its parts, or null when the invitation
+ * has none. Unknown labels are ignored; anything left out comes back
+ * empty.
+ */
+function db_event_glance($description) {
+  $text = db_event_text($description);
+  if (!preg_match(DB_GLANCE_MARK, $text, $m, PREG_OFFSET_CAPTURE)) return null;
+
+  $empty_stop = ['name' => '', 'time' => '', 'map' => '', 'note' => ''];
+  $g = [
+    'meet' => $empty_stop, 'pickup' => $empty_stop, 'final' => $empty_stop,
+    'pickups' => [], 'contribution' => '', 'bring' => '', 'duration' => '', 'species' => [], 'coordinators' => [],
+  ];
+  $stop = function($value) use ($empty_stop) {
+    $parts = array_map('trim', explode('|', $value));
+    $out = $empty_stop;
+    foreach ($parts as $i => $part) {
+      if ($part === '') continue;
+      if (preg_match('#^https?://#i', $part)) $out['map'] = db_event_clean_url($part);
+      elseif (preg_match('/^\d{1,2}(?:[:.]\d{2})?\s*(?:am|pm)?$/i', $part)) $out['time'] = db_event_glance_time($part);
+      elseif ($out['name'] === '') $out['name'] = $part;
+    }
+    return $out;
+  };
+
+  foreach (preg_split('/\r\n|\r|\n/', substr($text, $m[0][1] + strlen($m[0][0]))) as $line) {
+    $line = trim(preg_replace('/\s+/u', ' ', $line));
+    if (!preg_match('/^([A-Za-z ]{3,20}?)\s*:\s*(.+)$/u', $line, $lm)) continue;
+    $label = strtolower(trim($lm[1]));
+    $value = trim($lm[2]);
+    switch ($label) {
+      case 'meet':        $g['meet']   = ['note' => $g['meet']['note']] + $stop($value); break;
+      case 'meet note':   $g['meet']['note'] = $value; break;
+      case 'pickup':
+      case 'pick up':
+        // One line per pickup point, in the order the convoy reaches them.
+        $g['pickups'][] = $stop($value);
+        $g['pickup'] = $g['pickups'][0];
+        break;
+      case 'direct':      $g['final']  = ['note' => $g['final']['note']] + $stop($value); break;
+      case 'direct note': $g['final']['note'] = $value; break;
+      case 'contribution': $g['contribution'] = $value; break;
+      case 'bring':       $g['bring'] = $value; break;
+      case 'duration':    $g['duration'] = $value; break;
+      case 'species':
+      case 'birds':
+        $g['species'] = array_slice(array_values(array_filter(array_map('trim', preg_split('/\s*[,;]\s*/u', $value)))), 0, 30);
+        break;
+      case 'coordinator':
+      case 'coordinators':
+        foreach (preg_split('/\s*[,;]\s*/u', $value) as $who) {
+          if (!preg_match('/^(.+?)\s*[-–—:]?\s*((?:\+?91[\s-]?)?[6-9][\d\s-]{8,12}\d)$/u', trim($who), $cm)) continue;
+          $digits = db_event_phone_digits($cm[2]);
+          if (!$digits) continue;
+          $g['coordinators'][] = [
+            'name'  => trim($cm[1], " -–—:"),
+            'phone' => substr($digits, 0, 5) . ' ' . substr($digits, 5),
+            'tel'   => '+91' . $digits,
+          ];
+        }
+        break;
+    }
+  }
+  return $g;
+}
+
+/** "5:15 AM", "05:15", "5.15am" → "5:15 am"; a 24-hour time gets am/pm. */
+function db_event_glance_time($raw) {
+  $raw = strtolower(trim($raw));
+  if (!preg_match('/^(\d{1,2})(?:[:.](\d{2}))?\s*(am|pm)?$/', $raw, $m)) return $raw;
+  $h = (int) $m[1]; $min = $m[2] ?? '00'; $ap = $m[3] ?? '';
+  if ($ap === '') { $ap = $h >= 12 ? 'pm' : 'am'; if ($h > 12) $h -= 12; if ($h === 0) $h = 12; }
+  return $h . ':' . $min . ' ' . $ap;
+}
+
 /** The invitation's text, with tags turned into line breaks. */
 function db_event_text($description) {
   $text = preg_replace('#<(br|/p|/div|/li|/h[1-6])[^>]*>#i', "\n", (string) $description);
@@ -1099,6 +1202,8 @@ function db_event_phone_digits($raw) {
  */
 function db_event_coordinators($description) {
   if (!$description) return [];
+  $glance = db_event_glance($description);
+  if ($glance && $glance['coordinators']) return array_slice($glance['coordinators'], 0, 4);
   $text = db_event_text($description);
 
   // Anything after the "coordinators" line is the contact list; without
@@ -1178,7 +1283,7 @@ function db_event_note_html($description) {
     'span'   => [],
     'div'    => [],
   ];
-  $html = wp_kses((string) $description, $allowed);
+  $html = wp_kses(db_event_invitation($description), $allowed);
   // Invitations typed straight into the calendar arrive as plain text with
   // line breaks; without this they read as one long block.
   // Each line is its own paragraph there, so space them as paragraphs.
@@ -1214,6 +1319,8 @@ function db_event_prose($description) {
  * point: a card shows the row only when there is something to put in it.
  */
 function db_event_species($description) {
+  $glance = db_event_glance($description);
+  if ($glance) return $glance['species'];
   $text = db_event_prose($description);
   // The cues invitations use: "Birds to expect …", "Notable species to
   // watch for include …", "rare species like …", "species such as …".
@@ -1256,6 +1363,15 @@ function db_event_species($description) {
  * anything the invitation doesn't say.
  */
 function db_event_stops($description) {
+  $glance = db_event_glance($description);
+  if ($glance) {
+    $out = ['meet' => $glance['meet'], 'pickup' => $glance['pickup'], 'final' => $glance['final']];
+    // No Direct line: the trip's pin falls back to the invitation's links.
+    if ($out['final']['map'] === '') {
+      $out['final']['map'] = db_event_destination_map($description, array_filter([$out['meet']['map'], $out['pickup']['map']]));
+    }
+    return $out;
+  }
   $text = db_event_prose($description);
   $time = '(?<time>\d{1,2}(?:[:.]\d{2})?\s*(?:am|pm))';
 
@@ -1338,6 +1454,33 @@ function db_event_map_links($description) {
  * when the invitation actually says it.
  */
 function db_event_facts($description, $start_time = '') {
+  $glance = db_event_glance($description);
+  if ($glance) {
+    $facts = [];
+    $m = $glance['meet'];
+    if ($m['name'] || $m['time']) {
+      $facts[] = ['label' => 'Starts', 'value' => $m['time'],
+        'note' => trim(($m['name'] ? 'Meet at ' . $m['name'] : '') . ($m['note'] ? ' · ' . $m['note'] : ''), ' ·')];
+    }
+    $ordinals = ['Second', 'Third', 'Fourth', 'Fifth'];
+    foreach (array_slice($glance['pickups'], 0, 4) as $i => $p) {
+      if ($p['name'] === '') continue;
+      $facts[] = ['label' => $ordinals[$i] . ' pickup', 'value' => $p['time'], 'note' => $p['name']];
+    }
+    $f = $glance['final'];
+    if ($f['name']) {
+      $facts[] = ['label' => 'Direct to site', 'value' => $f['time'],
+        'note' => trim($f['name'] . ($f['note'] ? ' · ' . $f['note'] : ''), ' ·')];
+    }
+    if ($glance['contribution']) {
+      $facts[] = ['label' => 'Non-member contribution', 'value' => $glance['contribution'], 'note' => ''];
+    }
+    if ($glance['bring'] || $glance['duration']) {
+      $d = $glance['duration'];
+      $facts[] = ['label' => 'Bring', 'value' => $glance['bring'], 'note' => $d && !preg_match('/\btrip\b/i', $d) ? $d . ' trip' : $d];
+    }
+    return $facts;
+  }
   $text  = db_event_prose($description);
   $stops = db_event_stops($description);
   $facts = [];
@@ -2650,6 +2793,21 @@ add_action('do_faviconico', function() {
  * can take up to half a day to show. This screen fetches both lists fresh.
  * ---------------------------------------------------------------------*/
 
+/** What the card will show for one invitation, for the Refresh screen's checklist. */
+function db_event_check($description) {
+  $stops = db_event_stops($description);
+  $labels = array_column(db_event_facts($description), 'label');
+  return [
+    'block'        => db_event_glance($description) !== null,
+    'meet'         => $stops['meet']['name'] !== '',
+    'direct'       => $stops['final']['name'] !== '' || $stops['final']['map'] !== '',
+    'contribution' => in_array('Non-member contribution', $labels, true),
+    'bring'        => in_array('Bring', $labels, true),
+    'species'      => (bool) db_event_species($description),
+    'coordinator'  => (bool) db_event_coordinators($description),
+  ];
+}
+
 /**
  * The calendar version, sent to the API with every events request. The
  * Vercel edge cache keys on the full URL, so a new version is a new URL
@@ -2688,6 +2846,7 @@ function db_events_refresh_page() {
   <div class="wrap">
     <h1>Refresh events from Google Calendar</h1>
     <p style="max-width:720px">The Events page and the home page read the society's Google Calendar and keep a copy for a while, past trips for up to half a day. After adding or changing a trip in the calendar, press the button to show it on the site now.</p>
+    <p style="max-width:720px">The table shows, for each trip, what its card will carry. A dash means that part is missing: add it to the trip's <strong>At a glance</strong> block in the calendar (see the guide "Posting a field trip on Google Calendar"), save, and refresh again.</p>
     <form method="post">
       <?php wp_nonce_field('db_events_refresh'); ?>
       <p><button class="button button-primary" name="db_events_refresh" value="1">Refresh now</button></p>
@@ -2700,15 +2859,26 @@ function db_events_refresh_page() {
         <?php elseif (empty($res['data'])): ?>
           <p>None in the calendar.</p>
         <?php else: ?>
-          <table class="widefat striped" style="max-width:900px">
-            <thead><tr><th style="width:140px">Date</th><th>Title</th><th>Place</th></tr></thead>
+          <table class="widefat striped" style="max-width:1100px">
+            <thead><tr>
+              <th style="width:110px">Date</th><th>Trip</th><th>At a glance block</th>
+              <th>Meet</th><th>Direct</th><th>Contribution</th><th>Bring</th><th>Species</th><th>Coordinator</th>
+            </tr></thead>
             <tbody>
-            <?php foreach ($res['data'] as $e): ?>
+            <?php foreach ($res['data'] as $e):
+              $note  = $e['note'] ?? '';
+              $check = db_event_check($note);
+            ?>
               <tr>
                 <td><?php // The date as the calendar wrote it, in its own time zone. ?>
                   <?php echo esc_html(date('j M Y', strtotime(substr((string) ($e['date'] ?? ''), 0, 10)))); ?></td>
-                <td><?php echo esc_html($e['title'] ?? ''); ?></td>
-                <td><?php echo esc_html($e['place'] ?? ''); ?></td>
+                <td><?php echo esc_html(trim(preg_replace('/^.*\|/', '', $e['title'] ?? ''))); ?></td>
+                <td><?php echo $check['block'] ? 'Yes' : '<span style="color:#996800">No, guessed from the wording</span>'; ?></td>
+                <?php foreach (['meet', 'direct', 'contribution', 'bring', 'species', 'coordinator'] as $k): ?>
+                  <td style="text-align:center"><?php echo $check[$k]
+                    ? '<span style="color:#17924C" aria-label="Found">&#10003;</span>'
+                    : '<span style="color:#B3261E" aria-label="Missing">&mdash;</span>'; ?></td>
+                <?php endforeach; ?>
               </tr>
             <?php endforeach; ?>
             </tbody>
