@@ -201,9 +201,45 @@ add_action('init', function() {
   }
 });
 
-// The menu's Birding Tools item is a link, so mark it current on its two pages.
+// Backpack, added after the first two: its page, and a third item under
+// Birding Tools. Once, like the rest; the menu is the admins' after that.
+add_action('init', function() {
+  if (get_option('db_bt_setup_v2') || !get_option('db_bt_setup_v1')) return;
+  if (!current_user_can('manage_options') && !wp_doing_cron()) return;
+  update_option('db_bt_setup_v2', 1, false);
+
+  $page = get_page_by_path('backpack');
+  $id = $page ? $page->ID : wp_insert_post(['post_type' => 'page', 'post_status' => 'publish', 'post_title' => 'Backpack', 'post_name' => 'backpack']);
+  if (is_wp_error($id)) return;
+
+  $menu_id = get_nav_menu_locations()['primary-nav'] ?? 0;
+  if (!$menu_id) return;
+  $items = wp_get_nav_menu_items($menu_id) ?: [];
+  $parent = null;
+  foreach ($items as $item) {
+    if ($item->title === 'Birding Tools' && !(int) $item->menu_item_parent) $parent = $item;
+    if ((int) $item->object_id === (int) $id && $item->object === 'page') return; // already in the menu
+  }
+  if (!$parent) return;
+  // Straight after the last item under Birding Tools.
+  $last = (int) $parent->menu_order;
+  foreach ($items as $item) if ((int) $item->menu_item_parent === (int) $parent->ID) $last = max($last, (int) $item->menu_order);
+  foreach ($items as $item) {
+    if ((int) $item->menu_order > $last) wp_update_post(['ID' => $item->ID, 'menu_order' => (int) $item->menu_order + 1]);
+  }
+  wp_update_nav_menu_item($menu_id, 0, [
+    'menu-item-object-id' => $id,
+    'menu-item-object'    => 'page',
+    'menu-item-type'      => 'post_type',
+    'menu-item-parent-id' => $parent->ID,
+    'menu-item-status'    => 'publish',
+    'menu-item-position'  => $last + 1,
+  ]);
+});
+
+// The menu's Birding Tools item is a link, so mark it current on its pages.
 add_filter('nav_menu_css_class', function($classes, $item) {
-  if ($item->title === 'Birding Tools' && (is_page('migration-season') || is_page('bird-trends'))) {
+  if ($item->title === 'Birding Tools' && (is_page('migration-season') || is_page('bird-trends') || is_page('backpack'))) {
     $classes[] = 'current-menu-ancestor';
   }
   return $classes;
@@ -214,7 +250,7 @@ add_filter('nav_menu_css_class', function($classes, $item) {
  * -------------------------------------------------------------------- */
 
 add_action('wp_enqueue_scripts', function() {
-  $pages = ['bird-trends' => 'bird-trends', 'migration-season' => 'migration-season'];
+  $pages = ['bird-trends' => 'bird-trends', 'migration-season' => 'migration-season', 'backpack' => 'backpack'];
   foreach ($pages as $slug => $script) {
     if (!is_page($slug)) continue;
     $dir = get_template_directory();
