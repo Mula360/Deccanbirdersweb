@@ -573,9 +573,46 @@ require_once __DIR__ . '/inc/birding-tools/admin.php';
  * reject) in inc/gallery/review.php. What stays here is the throttle the
  * other public forms share, and the "Submitted by" column.
  * ---------------------------------------------------------------------*/
+/**
+ * The visitor's address, for the throttles. Hostinger's CDN sits in front
+ * of the site, so REMOTE_ADDR is one of its edge servers, shared by every
+ * visitor; the CDN adds the visitor's own address as the last entry of
+ * X-Forwarded-For (anything earlier in that header was sent by the
+ * visitor and could be made up). IPv6 visitors are grouped by their /64,
+ * which one household or phone can move around inside.
+ */
+function db_client_ip() {
+  $ip = $_SERVER['REMOTE_ADDR'] ?? '';
+  if (!empty($_SERVER['HTTP_X_FORWARDED_FOR'])) {
+    $parts = array_map('trim', explode(',', (string) $_SERVER['HTTP_X_FORWARDED_FOR']));
+    $last = end($parts);
+    if (filter_var($last, FILTER_VALIDATE_IP)) $ip = $last;
+  }
+  if (filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_IPV6)) {
+    $ip = implode(':', array_slice(str_split(bin2hex(inet_pton($ip)), 4), 0, 4)) . '::/64';
+  }
+  return $ip;
+}
+
+/**
+ * For administrators: what the server sees of the visitor's address, to
+ * check the throttles above key on the right thing.
+ * /wp-admin/admin-ajax.php?action=db_ip_check
+ */
+add_action('wp_ajax_db_ip_check', function() {
+  if (!current_user_can('manage_options')) wp_die('', 403);
+  nocache_headers();
+  $seen = ['REMOTE_ADDR' => $_SERVER['REMOTE_ADDR'] ?? ''];
+  foreach ($_SERVER as $k => $v) {
+    if (strpos($k, 'HTTP_') === 0 && preg_match('/IP|FORWARD|CLIENT|REAL|CDN|VIA/', $k)) $seen[$k] = $v;
+  }
+  $seen['used_for_limits'] = db_client_ip();
+  wp_send_json($seen);
+});
+
 /** Crude per-visitor throttle: true when this one has had enough. */
 function db_rate_limited($action, $max_per_hour) {
-  $ip = $_SERVER['REMOTE_ADDR'] ?? '';
+  $ip = db_client_ip();
   if (!$ip) return false;
   $key = 'db_rate_' . md5($action . '|' . $ip);
   $count = (int) get_transient($key);
@@ -778,7 +815,7 @@ function db_api_base() {
  * reader, well below anyone harvesting the lot.
  */
 function db_rest_rate_limited($max_per_minute = 60) {
-  $ip = $_SERVER['REMOTE_ADDR'] ?? '';
+  $ip = db_client_ip();
   if (!$ip) return false;
   $key = 'db_rest_' . md5($ip . '|' . floor(time() / MINUTE_IN_SECONDS));
   $count = (int) get_transient($key);
