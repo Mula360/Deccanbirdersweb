@@ -204,6 +204,9 @@ while (have_posts()) : the_post();
   </div>
 </section>
 
+<?php // Photos from past trips, the same row as on the Events page. ?>
+<?php get_template_part('template-parts/trip-gallery', null, ['class' => 'trip-gallery--home']); ?>
+
 <?php get_template_part('template-parts/join-band'); ?>
 
 <?php endwhile;

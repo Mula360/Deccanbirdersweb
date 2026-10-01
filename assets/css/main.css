@@ -1173,6 +1173,9 @@ body.modal-open { overflow: hidden; }
    page's "From members' cameras". It scrolls sideways with no scrollbar;
    the arrows, a swipe or events.js's slow drift move it. */
 .home-section.trip-gallery { padding-top: 0; padding-bottom: clamp(60px, 8vw, 80px); }
+/* On the home page it follows "From members' cameras", so it keeps the
+   usual space above it. */
+.home-section.trip-gallery--home { padding-top: clamp(40px, 6vw, 72px); }
 .trip-strip {
   display: flex;
   gap: 12px;
