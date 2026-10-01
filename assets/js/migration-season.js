@@ -25,7 +25,7 @@
   let GEO = null;
 
   const now = new Date(), cm = (now.getMonth() + 4) % 12;
-  const st = { m: cm <= 7 ? cm : 0, h: 'all', expAll: false, tlAll: false };
+  const st = { m: cm <= 7 ? cm : 0, h: 'all', expAll: false, tlAll: false, tlMonth: true };
   const freq = (s, i) => (i < s[4] || i > s[5]) ? 0 : s[9][i];
   const mix = (a, b, t) => { const h = (s) => [1, 3, 5].map((i) => parseInt(s.slice(i, i + 2), 16)), A = h(a), B = h(b); return 'rgb(' + A.map((v, i) => Math.round(v + (B[i] - v) * t)).join(',') + ')'; };
   const fmt = (v) => { const r = Math.round(v); return r === 0 ? '0%' : (r < 0 ? '−' : '+') + Math.abs(r) + '%'; };
@@ -93,13 +93,19 @@
       return `<div class="bt-card bt-spot"><div class="bt-top"><span class="bt-chip" style="background:${h[2]};color:${h[3]}">${esc(h[0])}</span><span>Best ${esc(s[3])}</span></div><h3><i style="background:${h[1]};color:${s[2] === 'grass' ? '#16241D' : '#fff'}">${n}</i>${esc(s[0])}</h3><div class="bt-ar">${esc(s[1])}</div><p>${esc(s[4])}</p></div>`;
     }).join('') || '<div class="bt-card bt-empty">No hotspots for this habitat.</div>';
   }
+  // The calendar follows the month chosen at the top of the page (or in
+  // its own month bar): it lists the species expected that month, with
+  // that month's column shaded and the birds arriving then marked. "Show
+  // every month" lists all winter visitors instead.
   function renderTimeline() {
-    const sp = sel(), dim = new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate();
+    const all = sel(), dim = new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate();
+    const sp = st.tlMonth ? all.filter((s) => freq(s, st.m) > 0) : all;
     const todayX = cm <= 7 ? pct(cm + (now.getDate() - 1) / dim) : null;
     const today = todayX ? `<span class="bt-tl-today" style="left:${todayX}"></span>` : '';
+    const col = st.tlMonth ? `<span class="bt-tl-col" style="left:${pct(st.m)};width:12.5%"></span>` : '';
     let hidden = 0;
     const groups = Object.entries(HAB).map(([k, h]) => {
-      let rows = sp.filter((s) => s[3] === k).sort((a, b) => b[7] - a[7]);
+      let rows = sp.filter((s) => s[3] === k).sort((a, b) => (st.tlMonth ? freq(b, st.m) - freq(a, st.m) : b[7] - a[7]));
       if (!rows.length) return '';
       if (!st.tlAll && rows.length > 8) { hidden += rows.length - 8; rows = rows.slice(0, 8); }
       rows.sort((a, b) => a[4] - b[4] || b[5] - a[5]);
@@ -107,10 +113,16 @@
         const p0 = Math.min(...s[6]), p1 = Math.max(...s[6]), n = s[5] - s[4] + 1, stops = [];
         for (let i = s[4]; i <= s[5]; i++) stops.push(mix(h[2], h[1], 0.2 + 0.8 * freq(s, i) / s[7]) + ' ' + (((i - s[4]) + 0.5) / n * 100).toFixed(1) + '%');
         const pk = M[p0] + (p1 > p0 ? '–' + M[p1] : '');
-        return `<div class="bt-tl-row"><span class="bt-tl-name"><b>${esc(s[1])}</b><small>${s[4] === 0 ? 'Here from Sep' : 'Arrives ' + M[s[4]]} · peak ${pk}</small></span><span class="bt-tl-track">${today}<span class="bt-tl-bar" title="${esc(s[1])}: ${MF[s[4]]} to ${MF[s[5]]}, peak ${pk}" style="left:${pct(s[4])};width:${pct(n)};background:linear-gradient(90deg,${stops.join(',')})"></span></span></div>`;
+        const arriving = st.tlMonth && s[4] === st.m && st.m > 0;
+        const when = s[4] === 0 ? 'Here from Sep' : 'Arrives ' + M[s[4]];
+        return `<div class="bt-tl-row"><span class="bt-tl-name"><b>${esc(s[1])}${arriving ? ' <em class="bt-tl-new">Arriving</em>' : ''}</b><small>${when} · peak ${pk}</small></span><span class="bt-tl-track">${col}${today}<span class="bt-tl-bar" title="${esc(s[1])}: ${MF[s[4]]} to ${MF[s[5]]}, peak ${pk}" style="left:${pct(s[4])};width:${pct(n)};background:linear-gradient(90deg,${stops.join(',')})"></span></span></div>`;
       }).join('');
     }).join('');
-    $('timeline').innerHTML = `<div class="bt-tl-head"><span class="bt-tl-count">${sp.length} species · Sep–Apr</span><span class="bt-tl-months">${M.map((m, i) => `<span class="${i === cm ? 'now' : ''}">${m}</span>`).join('')}</span></div>${groups}
+    const count = st.tlMonth
+      ? `${sp.length} species expected in ${MF[st.m]} · <button type="button" class="bt-tl-switch" data-tl-every="1">Show every month</button>`
+      : `${sp.length} species · Sep–Apr · <button type="button" class="bt-tl-switch" data-tl-every="0">Only ${MF[st.m]}</button>`;
+    const months = M.map((m, i) => `<button type="button" data-m="${i}" class="${i === st.m && st.tlMonth ? 'sel' : ''}${i === cm ? ' now' : ''}" aria-pressed="${i === st.m}"${i === cm ? ' title="This month"' : ''}>${m}</button>`).join('');
+    $('timeline').innerHTML = `<div class="bt-tl-head"><span class="bt-tl-count">${count}</span><span class="bt-tl-months" role="group" aria-label="Choose a month">${months}</span></div>${groups || `<div class="bt-empty">No winter visitors of this habitat expected in ${MF[st.m]}.</div>`}
       <div class="bt-tl-legend"><span>Fewer records<i style="width:72px;height:12px;border-radius:999px;background:linear-gradient(90deg,#EAF2FA,#2B72B8)"></i>More</span>${todayX ? `<span><i style="height:16px;border-left:2px dashed #16241D"></i>Today, ${now.toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })}</span>` : ''}</div>`;
     const box = $('tlMore');
     box.hidden = !st.tlAll && hidden === 0;
@@ -120,7 +132,10 @@
 
   document.addEventListener('click', (e) => {
     const m = e.target.closest('[data-m]'), h = e.target.closest('[data-h]');
-    if (m) { st.m = +m.dataset.m; st.expAll = false; renderPills(); renderExpected(); }
+    // One month for the whole page: the pills at the top and the calendar's own bar.
+    if (m) { st.m = +m.dataset.m; st.expAll = false; st.tlAll = false; st.tlMonth = true; renderPills(); renderExpected(); renderTimeline(); }
+    const every = e.target.closest('[data-tl-every]');
+    if (every) { st.tlMonth = every.dataset.tlEvery === '0'; st.tlAll = false; renderTimeline(); }
     if (h) { st.h = h.dataset.h; st.expAll = false; render(); }
     if (e.target.closest('#expMore button')) { st.expAll = !st.expAll; renderExpected(); }
     if (e.target.closest('#tlMore button')) { st.tlAll = !st.tlAll; renderTimeline(); }
