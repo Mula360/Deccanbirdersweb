@@ -18,7 +18,7 @@ while (have_posts()) : the_post();
   <div class="hero-photo-scrim"></div>
   <div class="hero-photo-inner">
     <span class="eyebrow" style="color:var(--yellow);">Membership</span>
-    <h1>Join 500+ members</h1>
+    <h1>Join our members</h1>
     <p>Stay in the loop with everything you need to know about bird watching.</p>
   </div>
 </section>

@@ -12,7 +12,7 @@ $membership_url = ($m = get_page_by_path('membership')) ? get_permalink($m) : '/
 <section class="join-band">
   <div class="join-band-inner">
     <div>
-      <h2 class="join-band-title">Join 500+ members</h2>
+      <h2 class="join-band-title">Join our members</h2>
       <p class="join-band-text">Stay in the loop with everything you need to know about bird watching.</p>
     </div>
     <a href="<?php echo esc_url($membership_url); ?>" class="join-band-btn">Apply for Membership</a>
