@@ -16,11 +16,11 @@ function db_bt_admin_page() {
 
   if (isset($_POST['db_bt_run']) && check_admin_referer('db_bt_admin')) {
     if (db_bt_running()) {
-      $notice = 'A recalculation is already under way.';
+      db_bt_kick();
+      $notice = 'Continuing the recalculation under way. Reload this page in a minute to see its progress.';
     } else {
       db_bt_start();
-      spawn_cron();
-      $notice = 'Recalculation started. It takes about 15–30 minutes; this page shows its progress.';
+      $notice = 'Recalculation started. It takes about 15–30 minutes; reload this page to see its progress.';
     }
   }
   if (isset($_POST['db_bt_save_habitats']) && check_admin_referer('db_bt_admin')) {
@@ -74,7 +74,7 @@ function db_bt_admin_page() {
     </table>
     <form method="post" style="margin-top:12px">
       <?php wp_nonce_field('db_bt_admin'); ?>
-      <button class="button button-primary" name="db_bt_run" value="1"<?php disabled($status === 'running' && db_bt_running()); ?>>Recalculate now</button>
+      <button class="button button-primary" name="db_bt_run" value="1"><?php echo db_bt_running() ? 'Continue now' : 'Recalculate now'; ?></button>
     </form>
 
     <h2 style="margin-top:32px">Habitats</h2>

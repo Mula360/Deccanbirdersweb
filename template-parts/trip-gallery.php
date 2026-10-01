@@ -6,16 +6,19 @@
  * out altogether while there are no trip photos.
  *
  * $args['class']: an extra class for the section, for each page's spacing.
+ * $args['title'], $args['eyebrow']: the heading and the line above it.
  */
 $trip_photos = db_trip_strip_photos();
 $extra_class = isset($args['class']) ? ' ' . sanitize_html_class($args['class']) : '';
+$title   = $args['title'] ?? 'Field notes in pictures';
+$eyebrow = $args['eyebrow'] ?? 'From past trips';
 ?>
 <?php if ($trip_photos): ?>
 <section class="home-section trip-gallery<?php echo esc_attr($extra_class); ?>">
   <div class="section-head">
     <div>
-      <span class="eyebrow eyebrow--lede" style="color:var(--blue);">From past trips</span>
-      <h2 class="section-h2">Field notes in pictures</h2>
+      <span class="eyebrow eyebrow--lede" style="color:var(--blue);"><?php echo esc_html($eyebrow); ?></span>
+      <h2 class="section-h2"><?php echo esc_html($title); ?></h2>
     </div>
     <!-- events.js shows these only when the strip runs past the screen,
          and moves the strip along by itself until someone uses them. -->

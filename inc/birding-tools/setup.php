@@ -53,8 +53,8 @@ function db_bt_job() {
 
 function db_bt_running() {
   $job = db_bt_job();
-  // A run that has made no progress for 6 hours has died; let a new one start.
-  return ($job['status'] ?? '') === 'running' && (time() - (int) ($job['touched'] ?? 0)) < 6 * HOUR_IN_SECONDS;
+  // A run that has made no progress for half an hour has stalled; let a new one start.
+  return ($job['status'] ?? '') === 'running' && (time() - (int) ($job['touched'] ?? 0)) < 30 * MINUTE_IN_SECONDS;
 }
 
 /** Begin a new run (unless one is under way) and take its first slice soon. */
@@ -64,64 +64,106 @@ function db_bt_start() {
   db_bt_write('job.json', ['status' => 'running', 'run' => $run, 'started' => time(), 'touched' => time(),
     'fetched' => 0, 'wanted' => 0, 'retries' => 0, 'failed' => []]);
   wp_schedule_single_event(time() + 5, DB_BT_TICK_HOOK);
+  db_bt_kick();
 }
 
-/** One slice of a run: fetch what is missing for up to ~20 seconds. */
+/**
+ * Start the next slice now, in its own request to this site. WP-Cron only
+ * runs when a visit reaches WordPress, and LiteSpeed answers most visits
+ * from its cache, so a run left to WP-Cron alone can sit for hours. Each
+ * slice therefore starts the next itself; the WP-Cron event scheduled
+ * alongside is only the fallback. $wait: seconds the new request waits
+ * before starting (when GBIF has asked us to slow down).
+ */
+function db_bt_kick($wait = 0) {
+  $key = get_option('db_bt_kick_key');
+  if (!$key) { $key = wp_generate_password(32, false); update_option('db_bt_kick_key', $key, false); }
+  wp_remote_post(admin_url('admin-ajax.php'), [
+    'blocking'  => false,
+    'timeout'   => 0.01,
+    'sslverify' => false,
+    'body'      => ['action' => 'db_bt_tick', 'key' => $key, 'wait' => (int) $wait],
+  ]);
+}
+
+// The request a kick makes. Only the site itself knows the key.
+add_action('wp_ajax_db_bt_tick', 'db_bt_tick_request');
+add_action('wp_ajax_nopriv_db_bt_tick', 'db_bt_tick_request');
+function db_bt_tick_request() {
+  $key = (string) get_option('db_bt_kick_key');
+  if (!$key || !hash_equals($key, (string) ($_POST['key'] ?? ''))) wp_die('', '', 403);
+  ignore_user_abort(true);
+  $wait = min(120, max(0, (int) ($_POST['wait'] ?? 0)));
+  if ($wait) sleep($wait);
+  db_bt_tick();
+  wp_die();
+}
+
+/** One slice of a run: fetch what is missing for up to ~20 seconds, then start the next. */
 function db_bt_tick() {
   $job = db_bt_job();
   if (($job['status'] ?? '') !== 'running') return;
   if (get_transient('db_bt_tick_lock')) return;
   set_transient('db_bt_tick_lock', 1, 2 * MINUTE_IN_SECONDS);
-  @set_time_limit(90);
-  $began = microtime(true);
-  $run = $job['run'];
-
+  @set_time_limit(120);
+  $next = null; // seconds until the next slice, or null when there is none
   try {
-    while (true) {
-      $result = db_bt_compute($run);
-      if ($result['done']) {
-        db_bt_write('trends.json', $result['trends']);
-        db_bt_write('migration.json', $result['migration']);
-        $job['status'] = 'done';
-        $job['finished'] = time();
-        $job['summary'] = db_bt_summary($result);
-        db_bt_write('job.json', $job + ['touched' => time()]);
-        db_bt_clean_old_runs($run);
-        if (class_exists('LiteSpeed\Purge')) LiteSpeed\Purge::purge_all();
-        return;
-      }
-
-      $wanted = array_keys($GLOBALS['db_bt_wanted'] ?? []);
-      $job['wanted'] = $job['fetched'] + count($wanted);
-      foreach ($wanted as $url) {
-        if (microtime(true) - $began > 20) break 2;
-        $status = db_bt_fetch($url, $run);
-        if ($status === 'ok') {
-          $job['fetched']++;
-        } elseif ($status === 'retry') {
-          // GBIF asked us to slow down: come back in a couple of minutes.
-          $job['retries']++;
-          $job['touched'] = time();
-          db_bt_write('job.json', $job);
-          wp_schedule_single_event(time() + 2 * MINUTE_IN_SECONDS, DB_BT_TICK_HOOK);
-          return;
-        } else {
-          $job['failed'][] = $url;
-          $job['status'] = 'failed';
-          $job['error'] = 'GBIF refused a request (see Birding Tools in wp-admin).';
-          db_bt_write('job.json', $job + ['touched' => time()]);
-          return;
-        }
-        usleep(300000); // gently: GBIF turns away bursts
-      }
-      if (microtime(true) - $began > 20) break;
-    }
-    $job['touched'] = time();
-    db_bt_write('job.json', $job);
-    wp_schedule_single_event(time() + MINUTE_IN_SECONDS, DB_BT_TICK_HOOK);
+    $next = db_bt_slice($job);
   } finally {
     delete_transient('db_bt_tick_lock');
   }
+  // Only once the lock is gone, or the next slice would find it held.
+  if ($next !== null) {
+    wp_schedule_single_event(time() + max(60, $next + 60), DB_BT_TICK_HOOK); // fallback
+    db_bt_kick($next);
+  }
+}
+
+/** The work of one slice. Returns seconds to wait before the next, or null when the run is over. */
+function db_bt_slice(array $job) {
+  $began = microtime(true);
+  $run = $job['run'];
+  while (true) {
+    $result = db_bt_compute($run);
+    if ($result['done']) {
+      db_bt_write('trends.json', $result['trends']);
+      db_bt_write('migration.json', $result['migration']);
+      $job['status'] = 'done';
+      $job['finished'] = time();
+      $job['summary'] = db_bt_summary($result);
+      db_bt_write('job.json', $job + ['touched' => time()]);
+      db_bt_clean_old_runs($run);
+      if (class_exists('LiteSpeed\Purge')) LiteSpeed\Purge::purge_all();
+      return null;
+    }
+
+    $wanted = array_keys($GLOBALS['db_bt_wanted'] ?? []);
+    $job['wanted'] = $job['fetched'] + count($wanted);
+    foreach ($wanted as $url) {
+      if (microtime(true) - $began > 20) break 2;
+      $status = db_bt_fetch($url, $run);
+      if ($status === 'ok') {
+        $job['fetched']++;
+      } elseif ($status === 'retry') {
+        // GBIF asked us to slow down: come back in a minute.
+        $job['retries']++;
+        $job['touched'] = time();
+        db_bt_write('job.json', $job);
+        return 60;
+      } else {
+        $job['failed'][] = $url;
+        $job['status'] = 'failed';
+        $job['error'] = 'GBIF refused a request (see Birding Tools in wp-admin).';
+        db_bt_write('job.json', $job + ['touched' => time()]);
+        return null;
+      }
+      usleep(300000); // gently: GBIF turns away bursts
+    }
+    if (microtime(true) - $began > 20) break;
+  }
+  $job['touched'] = time();
+  db_bt_write('job.json', $job);
+  return 2;
 }
 
 /** A few numbers for the status screen. */
