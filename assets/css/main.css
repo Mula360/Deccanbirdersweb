@@ -1009,6 +1009,7 @@ body.modal-open { overflow: hidden; }
 .ev-date-month { font-size: 12px; letter-spacing: 0.14em; font-weight: 600; text-transform: uppercase; color: #8FD3AD; }
 .ev-date--past .ev-date-month { color: var(--text-muted); }
 .ev-date-day { font-size: 40px; font-weight: 700; line-height: 1; letter-spacing: -0.03em; margin: 4px 0; }
+.ev-date-day--range { font-size: 26px; letter-spacing: -0.02em; white-space: nowrap; }
 .ev-date-sub { font-size: 12px; font-weight: 600; color: #C8D3CE; }
 .ev-date--past .ev-date-sub { color: var(--text-muted); }
 
@@ -1152,6 +1153,7 @@ body.modal-open { overflow: hidden; }
   .ev-main { grid-template-columns: 64px minmax(0, 1fr); gap: 16px; padding: 20px; }
   .ev-date { width: 64px; height: 76px; border-radius: 14px; }
   .ev-date-day { font-size: 30px; }
+  .ev-date-day--range { font-size: 19px; }
   .ev-expand { grid-template-columns: minmax(0, 1fr); }
   .ev-toggle { padding: 10px 16px; }
 }

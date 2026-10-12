@@ -1252,7 +1252,7 @@ const DB_GLANCE_MARK = '/-{2,}\s*at\s+a\s+glance\s*-{2,}/i';
  * below the block stays part of the invitation).
  */
 function db_event_glance_line($line) {
-  return (bool) preg_match('/^\s*(?:meet(?:\s+note)?|pick\s?up|direct(?:\s+note)?|contribution|bring|duration|species|birds|coordinators?)\s*:/i', $line);
+  return (bool) preg_match('/^\s*(?:meet(?:\s+note)?|pick\s?up|direct(?:\s+note)?|contribution|cost|book\s?by|bring|duration|species|birds|coordinators?)\s*:/i', $line);
 }
 
 /** The invitation without its At a glance block, for showing as written. */
@@ -1296,7 +1296,7 @@ function db_event_glance($description) {
   $empty_stop = ['name' => '', 'time' => '', 'map' => '', 'note' => ''];
   $g = [
     'meet' => $empty_stop, 'pickup' => $empty_stop, 'final' => $empty_stop,
-    'pickups' => [], 'contribution' => '', 'bring' => '', 'duration' => '', 'species' => [], 'coordinators' => [],
+    'pickups' => [], 'contribution' => '', 'cost' => '', 'book_by' => '', 'bring' => '', 'duration' => '', 'species' => [], 'coordinators' => [],
   ];
   $stop = function($value) use ($empty_stop) {
     $parts = array_map('trim', explode('|', $value));
@@ -1332,6 +1332,9 @@ function db_event_glance($description) {
       case 'direct':      $g['final']  = ['note' => $g['final']['note']] + $stop($value); break;
       case 'direct note': $g['final']['note'] = $value; break;
       case 'contribution': $g['contribution'] = $value; break;
+      case 'cost':        $g['cost'] = $value; break;
+      case 'book by':
+      case 'bookby':      $g['book_by'] = $value; break;
       case 'bring':       $g['bring'] = $value; break;
       case 'duration':    $g['duration'] = $value; break;
       case 'species':
@@ -1669,9 +1672,19 @@ function db_event_facts($description, $start_time = '') {
     if ($glance['contribution']) {
       $facts[] = ['label' => 'Non-member contribution', 'value' => $glance['contribution'], 'note' => ''];
     }
+    // Outstation trips: the price for everyone, and when to book by.
+    if ($glance['cost']) {
+      $facts[] = ['label' => 'Cost per person', 'value' => $glance['cost'], 'note' => ''];
+    }
+    if ($glance['book_by']) {
+      $facts[] = ['label' => 'Book by', 'value' => $glance['book_by'], 'note' => ''];
+    }
     if ($glance['bring'] || $glance['duration']) {
       $d = $glance['duration'];
-      $facts[] = ['label' => 'Bring', 'value' => $glance['bring'], 'note' => $d && !preg_match('/\btrip\b/i', $d) ? $d . ' trip' : $d];
+      $note = $d && !preg_match('/\b(trip|days?|nights?)\b/i', $d) ? $d . ' trip' : $d;
+      $facts[] = $glance['bring']
+        ? ['label' => 'Bring', 'value' => $glance['bring'], 'note' => $note]
+        : ['label' => 'Duration', 'value' => $note, 'note' => ''];
     }
     return $facts;
   }

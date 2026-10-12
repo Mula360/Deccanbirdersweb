@@ -30,6 +30,32 @@ function escapeHtml(str) {
   })[c]);
 }
 
+/**
+ * How many calendar days a trip covers. An all-day event arrives as a bare
+ * date ("2026-12-03"), its end the day after the last (Google's end is
+ * exclusive); a timed one as a date and time. A day trip is 1.
+ */
+function tripDays(start, end) {
+  if (!start || !end) return 1;
+  const allDay = /^\d{4}-\d{2}-\d{2}$/.test(start);
+  const a = new Date(String(start).slice(0, 10) + 'T00:00:00');
+  const b = new Date(String(end).slice(0, 10) + 'T00:00:00');
+  const n = Math.round((b - a) / 86400000) + (allDay ? 0 : 1);
+  return n > 1 ? n : 1;
+}
+
+/** The date block for a trip of several days: "3–12" under "DEC", or "28 – 3" under "DEC–JAN". */
+function dateRange(start, days) {
+  const a = new Date(String(start).slice(0, 10) + 'T00:00:00');
+  const b = new Date(a); b.setDate(a.getDate() + days - 1);
+  const m = (d) => d.toLocaleString('en-IN', { month: 'short' });
+  return {
+    day:   a.getDate() + '–' + b.getDate(),
+    month: m(a) === m(b) ? m(a) : m(a) + '–' + m(b),
+    sub:   days + ' days',
+  };
+}
+
 function formatDate(dateStr) {
   const d = new Date(dateStr);
   return {
@@ -242,6 +268,7 @@ function factCell(label, value, link) {
  */
 function renderEventCard(kind, data, index, opts = {}) {
   const { day, month, weekday, year } = formatDate(data.date);
+  const range = data.days > 1 ? dateRange(data.date, data.days) : null;
   const id = `${kind}-${index}`;
   // On the home page the write-up lives on the Events page, so the toggle
   // becomes a link that opens that trip there, already expanded.
@@ -308,9 +335,9 @@ function renderEventCard(kind, data, index, opts = {}) {
   <article class="ev-card${past ? ' ev-card--past' : ''}" data-card="${id}"${data.id ? ` data-event-id="${escapeHtml(data.id)}" id="event-${escapeHtml(data.id)}"` : ''}>
     <div class="ev-main">
       <div class="ev-date${past ? ' ev-date--past' : ''}">
-        <span class="ev-date-month">${escapeHtml(month)}</span>
-        <span class="ev-date-day">${day}</span>
-        <span class="ev-date-sub">${escapeHtml(past ? year : weekday)}</span>
+        <span class="ev-date-month">${escapeHtml(range ? range.month : month)}</span>
+        <span class="ev-date-day${range ? ' ev-date-day--range' : ''}">${escapeHtml(String(range ? range.day : day))}</span>
+        <span class="ev-date-sub">${escapeHtml(range ? (past ? year : range.sub) : (past ? year : weekday))}</span>
       </div>
       <div class="ev-body">
         <div class="ev-head">
@@ -406,7 +433,11 @@ function upcomingFields(e) {
     species:      e.species || [],
     stops:        e.stops || {},
     facts:        e.facts || [],
-    time:         e.date ? new Date(e.date).toLocaleTimeString('en-IN', { hour: 'numeric', minute: '2-digit' }) : '',
+    days:         tripDays(e.date, e.endDate),
+    // Several days away is an outstation trip; a day out is a field trip.
+    kind:         tripDays(e.date, e.endDate) > 1 ? 'Outstation trip' : '',
+    // An all-day event has no start time (a bare date would read as 5:30 am).
+    time:         e.date && !/^\d{4}-\d{2}-\d{2}$/.test(e.date) ? new Date(e.date).toLocaleTimeString('en-IN', { hour: 'numeric', minute: '2-digit' }) : '',
     meetingPoint: '',
     leader:       '',
     fee:          e.fee || '',
